@@ -1,0 +1,78 @@
+﻿name: daeguro_admin_app
+description: A new Flutter application.
+
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.16+1
+
+environment:
+  sdk: ">=2.7.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # The following adds the Cupertino Icons font to your application.
+  # Use with the CupertinoIcons class for iOS style icons.
+  cupertino_icons: ^1.0.2
+
+  get: ^4.3.8
+  get_storage: ^2.0.3
+  mime_type: ^0.3.1
+  image_picker: ^0.6.7+7
+  image_picker_for_web: ^0.1.0+1
+  file_picker: ^2.1.4
+  file_picker_web:
+  bubble_tab_indicator: ^0.1.5
+  date_time_picker: ^1.1.0
+  quiver: ^2.1.3
+  date_format: ^1.0.0
+  dio: ^3.0.0
+  flutter_easyloading: ^3.0.3
+  http: ^0.12.2
+  provider: ^6.0.1
+  url_launcher: ^5.7.10
+  url_strategy: ^0.2.0-nullsafety.0
+  syncfusion_flutter_charts: ^19.3.48
+  syncfusion_flutter_datagrid: ^19.3.48
+  build_web_compilers:
+  shared_preferences:
+  flutter_typeahead:
+  excel:
+  horizontal_data_table: ^3.5.0
+  package_info_plus:
+  data_table_2:
+  animated_flip_counter:
+  fl_chart: ^0.35.0
+  crypto: ^3.0.1
+  image: ^3.0.5
+  month_picker_dialog: ^0.4.0
+  encrypt:
+  synchronized: ^3.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  kopo:
+  js: ^0.6.3
+  universal_html: ^1.2.4
+  universal_io:
+
+dependency_overrides:
+  intl: ^0.17.0-nullsafety.2
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/
+  fonts:
+    - family: NotoSansKR
+      fonts:
+        - asset: assets/fonts/NotoSansKR-Regular.otf
+          weight: 700
+
+flutter_intl:
+  enabled: true
