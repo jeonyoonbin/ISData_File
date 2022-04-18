@@ -1,0 +1,14 @@
+{
+  "divDevice": "string",
+  "idUsrUpd": "string",
+  "nmUsrUpd": "string",
+  "noCoup": "string",
+  "cdComp": "string",
+  "divStatus": "string",
+  "idConfUsr": "string",
+  "nmConfUsr": "string",
+  "idPers": "string",
+  "cdCompPers": "string",
+  "dtOrdNo": "string",
+  "seqOrdNo": "string"
+}
