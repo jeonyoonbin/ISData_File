@@ -35,4 +35,5 @@ Map<String, IconData> iconPackage = {
   'manage':Icons.manage_accounts_outlined,
   'review':Icons.rate_review,
   'redeem':Icons.redeem,
+  'localtaxi':Icons.local_taxi,
 };

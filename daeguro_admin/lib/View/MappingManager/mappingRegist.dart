@@ -31,11 +31,18 @@ class MappingRegistState extends State<MappingRegist> {
   _query() async {
     selectBox_com.clear();
 
-    await ApiCompanyController.to.getData(formData.apiType, '');
-    ApiCompanyController.to.qData.forEach((element) {
-      selectBox_com.add(new SelectOptionVO(
-          value: element['companyGbn'], label: element['companyName']));
+    await ApiCompanyController.to.getData(formData.apiType, '').then((value) {
+      if (value == null) {
+        ISAlert(context, '정상조회가 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
+      }
+      else {
+        value.forEach((element) {
+          selectBox_com.add(new SelectOptionVO(
+              value: element['companyGbn'], label: element['companyName']));
+        });
+      }
     });
+
 
     setState(() {});
   }

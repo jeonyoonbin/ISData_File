@@ -131,7 +131,7 @@ class HistoryShopCancelDetailState extends State<HistoryShopCancelDetail> {
 
   _detail({String orderNo}) async {
     //EasyLoading.show();
-    await OrderController.to.getDetailData(orderNo.toString(), context);
+    await OrderController.to.getDetailData(orderNo.toString());
     //EasyLoading.dismiss();
 
     showDialog(
@@ -490,225 +490,12 @@ class HistoryShopCancelDetailState extends State<HistoryShopCancelDetail> {
                 DataCell(Container(width: 10,)),
                 DataCell(
                   Align(child: SelectableText(_getStatus(item.STATUS.toString()) ?? '--', style: TextStyle(color: Colors.black, fontSize: 12), showCursor: true), alignment: Alignment.centerLeft)
-                  // DropdownButton(
-                  //   style: TextStyle(fontSize: 14, fontFamily: 'NotoSansKR', color: Colors.black),
-                  //   onChanged: (value) async {
-                  //     if (item.STATUS == value) return;
-                  //
-                  //     // 취소 완료일때만 변경 가능하도록
-                  //     if (value != '40' && value != '50') {
-                  //       ISAlert(context, '취소, 완료 상태로만 변경 가능 합니다.');
-                  //       return;
-                  //     }
-                  //
-                  //     var headerData = {
-                  //       "Access-Control-Allow-Origin": "*",
-                  //       // Required for CORS support to work
-                  //       "Access-Control-Allow-Headers": "*",
-                  //       "Access-Control-Allow-Credentials": "true",
-                  //       "Access-Control-Allow-Methods": "*",
-                  //       "Authorization": "QzI1QTgyNEVFQkVEQ0U5RkM2NTUzODFCNTc3MUJENTc=",
-                  //       "Method": "DELETE",
-                  //       "Content-Type": "application/json",
-                  //     };
-                  //
-                  //     var PosheaderData = {
-                  //       "content-type": "application/json",
-                  //       //"Accept": "application/json",
-                  //     };
-                  //
-                  //     var PosbodyData = {'"order_no"': '"' + item.ORDER_NO.toString() + '"', '"order_status"': '"' + value + '"', '"shop_token"': '"' + item.API_COM_CODE + '"'};
-                  //
-                  //     if (value == '50') {
-                  //       showDialog(
-                  //         barrierDismissible: false,
-                  //         context: context,
-                  //         builder: (BuildContext context) => Dialog(
-                  //           child: OrderCancelCode(),
-                  //         ),
-                  //       ).then((v) async {
-                  //         if (v != null) {
-                  //           saveStatusData.cancelCode = v[0];
-                  //           saveStatusData.cancelReason = v[1];
-                  //
-                  //           saveStatusData.orderNo = item.ORDER_NO.toString();
-                  //           saveStatusData.status = value;
-                  //           saveStatusData.modCode = GetStorage().read('logininfo')['uCode']; //formData.modeUcode;
-                  //           saveStatusData.modName = GetStorage().read('logininfo')['name'] + '[관리앱 취소]'; //formData.modeName;
-                  //
-                  //           payCancelData.order_no = item.ORDER_NO.toString();
-                  //           payCancelData.trade_kcp_no = item.TUID;
-                  //
-                  //           // 카드결제 유무 판단
-                  //           String _card_approval_gbn = await OrderController.to.getOrderCardApprovalGbn(item.ORDER_NO.toString());
-                  //
-                  //           // (카드결재, 행복페이) 취소 인경우 카드결제 취소 같이
-                  //           if (((item.PAY_GBN == '2' || item.PAY_GBN == '7') && _card_approval_gbn != 'N')) {
-                  //             if (item.TUID != '') {
-                  //               if (item.CUST_ID_GBN == 'Z') {
-                  //                 // 비회원
-                  //                 await OrderController.to.postPayBasicCancel(headerData, payCancelData.toJson(), saveStatusData.toJson(), PosheaderData, PosbodyData, context);
-                  //               } else {
-                  //                 // 회원
-                  //                 await OrderController.to.postPaySmartCancel(headerData, payCancelData.toJson(), saveStatusData.toJson(), PosheaderData, PosbodyData, context);
-                  //               }
-                  //             } else {
-                  //               var result = await OrderController.to.putData(saveStatusData.toJson(), context);
-                  //
-                  //               if (result == '00') {
-                  //                 // POS REQUEST 정보
-                  //                 await RestApiProvider.to.postRestError('0', '/admin/Order : putData', '[POS 상태변경 요청] ' + PosbodyData.toString());
-                  //
-                  //                 await http
-                  //                     .post(Uri.parse('https://pos.daeguro.co.kr:15409/api/Agent/B2B_OrderStatus_Change_Manage'), headers: PosheaderData, body: PosbodyData.toString())
-                  //                     .then((http.Response response) async {
-                  //                   if (response.statusCode == 200) {
-                  //                     var decodeBody = jsonDecode(response.body);
-                  //
-                  //                     if (decodeBody['code'] != 0) {
-                  //                       await RestApiProvider.to.postRestError('0', '/admin/Order : putData',
-                  //                           '[POS 상태변경 실패] ' + PosbodyData.toString() + ' || return : [' + response.statusCode.toString() + ']' + decodeBody.toString());
-                  //                     } else {
-                  //                       await RestApiProvider.to.postRestError('0', '/admin/Order : putData',
-                  //                           '[POS 상태변경 성공] ' + PosbodyData.toString() + ' || return : [' + response.statusCode.toString() + ']' + decodeBody.toString());
-                  //                     }
-                  //                   } else {
-                  //                     var decodeBody = jsonDecode(response.body);
-                  //                     await RestApiProvider.to.postRestError(
-                  //                         '0', '/admin/Order : putData', '[POS 상태변경 통신 실패] ' + PosbodyData.toString() + ' || return : [' + response.statusCode.toString() + ']' + decodeBody.toString());
-                  //                   }
-                  //                 });
-                  //               }
-                  //             }
-                  //           } else {
-                  //             var result = await OrderController.to.putData(saveStatusData.toJson(), context);
-                  //
-                  //             if (result == '00') {
-                  //               await RestApiProvider.to.postRestError('0', '/admin/Order : putData', '[POS 상태변경 요청] ' + PosbodyData.toString());
-                  //               await http
-                  //                   .post(Uri.parse('https://pos.daeguro.co.kr:15409/api/Agent/B2B_OrderStatus_Change_Manage'), headers: PosheaderData, body: PosbodyData.toString())
-                  //                   .then((http.Response response) async {
-                  //                 if (response.statusCode == 200) {
-                  //                   var decodeBody = jsonDecode(response.body);
-                  //
-                  //                   if (decodeBody['code'] != 0) {
-                  //                     await RestApiProvider.to.postRestError('0', '/admin/Order : putData',
-                  //                         '[POS 상태변경 실패] ' + PosbodyData.toString() + ' || return : [' + response.statusCode.toString() + ']' + decodeBody.toString());
-                  //                   } else {
-                  //                     await RestApiProvider.to.postRestError('0', '/admin/Order : putData',
-                  //                         '[POS 상태변경 성공] ' + PosbodyData.toString() + ' || return : [' + response.statusCode.toString() + ']' + decodeBody.toString());
-                  //                   }
-                  //                 } else {
-                  //                   var decodeBody = jsonDecode(response.body);
-                  //                   await RestApiProvider.to.postRestError(
-                  //                       '0', '/admin/Order : putData', '[POS 상태변경 통신 실패] ' + PosbodyData.toString() + ' || return : [' + response.statusCode.toString() + ']' + decodeBody.toString());
-                  //                 }
-                  //               });
-                  //             }
-                  //           }
-                  //
-                  //           await Future.delayed(Duration(milliseconds: 1000), () {
-                  //             _query();
-                  //           });
-                  //         }
-                  //       });
-                  //     } else {
-                  //       ISConfirm(context, '상태 변경', '상태변경 하시겠습니까?', (context) async {
-                  //         Navigator.of(context).pop();
-                  //
-                  //         saveStatusData.orderNo = item.ORDER_NO.toString();
-                  //         saveStatusData.status = value;
-                  //         //saveStatusData.cancelCode = '00';
-                  //         saveStatusData.modCode = GetStorage().read('logininfo')['uCode']; //formData.modeUcode;
-                  //         saveStatusData.modName = GetStorage().read('logininfo')['name']; //formData.modeName;
-                  //
-                  //         payCancelData.order_no = item.ORDER_NO.toString();
-                  //         payCancelData.trade_kcp_no = item.TUID;
-                  //         //payCancelData.cancel_reason = '00';
-                  //
-                  //         var result = await OrderController.to.putData(saveStatusData.toJson(), context);
-                  //
-                  //         if (value == '40' && result == '00') {
-                  //           await RestApiProvider.to.postRestError('0', '/admin/Order : putData', '[POS 상태변경 요청] ' + PosbodyData.toString());
-                  //
-                  //           await http
-                  //               .post(Uri.parse('https://pos.daeguro.co.kr:15409/api/Agent/B2B_OrderStatus_Change_Manage'), headers: PosheaderData, body: PosbodyData.toString())
-                  //               .then((http.Response response) async {
-                  //             if (response.statusCode == 200) {
-                  //               var decodeBody = jsonDecode(response.body);
-                  //
-                  //               // pos 저장 실패시 로그 저장
-                  //               if (decodeBody['code'] != 0) {
-                  //                 await RestApiProvider.to.postRestError(
-                  //                     '0', '/admin/Order : putData', '[POS 상태변경 실패] ' + PosbodyData.toString() + ' || return : [' + response.statusCode.toString() + ']' + decodeBody.toString());
-                  //               } else {
-                  //                 await RestApiProvider.to.postRestError(
-                  //                     '0', '/admin/Order : putData', '[POS 상태변경 성공] ' + PosbodyData.toString() + ' || return : [' + response.statusCode.toString() + ']' + decodeBody.toString());
-                  //               }
-                  //             } else {
-                  //               var decodeBody = jsonDecode(response.body);
-                  //
-                  //               await RestApiProvider.to.postRestError(
-                  //                   '0', '/admin/Order : putData', '[POS 상태변경 통신 실패] ' + PosbodyData.toString() + ' || return : [' + response.statusCode.toString() + ']' + decodeBody.toString());
-                  //             }
-                  //           });
-                  //         }
-                  //
-                  //         await Future.delayed(Duration(milliseconds: 1000), () {
-                  //           _query();
-                  //         });
-                  //       });
-                  //     }
-                  //   },
-                  //   value: item.STATUS,
-                  //   items: [
-                  //     DropdownMenuItem(
-                  //       value: '10',
-                  //       child: Text('접수'),
-                  //     ),
-                  //     DropdownMenuItem(
-                  //       value: '20',
-                  //       child: Text('대기'),
-                  //     ),
-                  //     DropdownMenuItem(
-                  //       value: '30',
-                  //       child: Text('가맹점 접수확인'),
-                  //     ),
-                  //     DropdownMenuItem(
-                  //       value: '35',
-                  //       child: Text('운행'),
-                  //     ),
-                  //     DropdownMenuItem(
-                  //       value: '40',
-                  //       child: Text('완료'),
-                  //     ),
-                  //     DropdownMenuItem(
-                  //       value: '50',
-                  //       child: Text('취소'),
-                  //     ),
-                  //     DropdownMenuItem(
-                  //       value: '80',
-                  //       child: Text('결제대기'),
-                  //     ),
-                  //   ].cast<DropdownMenuItem<String>>(),
-                  // ),
                 ),
                 DataCell(Align(child: SelectableText(item.CANCEL_TYPE.toString() ?? '--' , style: TextStyle(color: Colors.black), showCursor: true), alignment: Alignment.centerLeft)),
                 DataCell(Center(
                   child: SelectableText(Utils.getPhoneNumFormat(item.CUSTOMER_TELNO, false).toString() ?? '--', style: TextStyle(color: Colors.black), showCursor: true),
                 )
                 ),
-                // DataCell(
-                //     Column(
-                //       mainAxisAlignment: MainAxisAlignment.center,
-                //       crossAxisAlignment: CrossAxisAlignment.start,
-                //       children: <Widget>[
-                //         SelectableText(item.cardName.toString() ?? '--', style: TextStyle(color: Colors.black, fontSize: 13), showCursor: true),
-                //         SelectableText(item.tuid.toString() ?? '--', style: TextStyle(color: Colors.black, fontSize: 11), showCursor: true)
-                //       ],
-                //     )
-                // ),
-                //DataCell(Align(child: SelectableText(Utils.getCashComma(item.cardAmount.toString()) ?? '--' ?? '--', style: TextStyle(color: Colors.black), showCursor: true), alignment: Alignment.centerLeft)),
                 DataCell(Center(child: item.DIRECT_PAY.toString() == 'Y' ? Icon(Icons.radio_button_unchecked, color: Colors.blue, size: 16) : Icon(Icons.clear, color: Colors.red, size: 16))),
                 DataCell(
                   Center(
@@ -732,8 +519,6 @@ class HistoryShopCancelDetailState extends State<HistoryShopCancelDetail> {
               DataColumn(label: Expanded(child: Text('진행상태', textAlign: TextAlign.left)),),
               DataColumn(label: Expanded(child: Text('취소사유', textAlign: TextAlign.left)),),
               DataColumn(label: Expanded(child: Text('회원전화', textAlign: TextAlign.center)),),
-              //DataColumn(label: Expanded(child: Text('카드승인정보', textAlign: TextAlign.left)),),
-              //DataColumn(label: Expanded(child: Text('승인금액', textAlign: TextAlign.left)),),
               DataColumn(label: Expanded(child: Text('할인', textAlign: TextAlign.center)),),
               DataColumn(label: Expanded(child: Text('상세', textAlign: TextAlign.center)),),
             ],

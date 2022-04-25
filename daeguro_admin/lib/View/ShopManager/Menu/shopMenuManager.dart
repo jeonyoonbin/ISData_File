@@ -12,7 +12,7 @@ import 'package:daeguro_admin_app/View/ShopManager/Menu/shopMenuListEdit.dart';
 import 'package:daeguro_admin_app/View/ShopManager/Menu/shopMenuOptionSetting.dart';
 import 'package:daeguro_admin_app/View/ShopManager/Account/shopAccount_controller.dart';
 
-import 'package:daeguro_admin_app/Provider/FileUpLoader.dart';
+import 'package:daeguro_admin_app/Network/FileUpLoader.dart';
 import 'package:daeguro_admin_app/Util/utils.dart';
 
 import 'package:flutter/cupertino.dart';

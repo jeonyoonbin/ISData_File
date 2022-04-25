@@ -85,7 +85,7 @@ class RestListDetail_100State extends State<RestListDetail_100> with SingleTicke
   loadOperatorListData() async {
     selectBox_operator.clear();
 
-    await UserController.to.getUserCodeNameOperator('2', '6').then((value) {
+    await UserController.to.getUserCodeName('2', '6').then((value) {
       if (value == null) {
         ISAlert(context, '사용자ID 또는 비밀번호를 확인하십시오.');
       } else {
@@ -112,11 +112,12 @@ class RestListDetail_100State extends State<RestListDetail_100> with SingleTicke
   }
 
   loadData() async {
-    await RequestController.to.getDetailData(widget.seq, context);
-
-    if (this.mounted) {
-      setState(() {
-        formData = ServiceRequestDetail.fromJson(RequestController.to.qDataDetail);
+    await RequestController.to.getDetailData(widget.seq).then((value) {
+      if (value == null) {
+        ISAlert(context, '정상조회가 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
+      }
+      else {
+        formData = ServiceRequestDetail.fromJson(value);
 
         _alloc_ucode = formData.ALLOC_UCODE.toString();
         _alloc_uname = formData.ALLOC_UNAME;
@@ -181,8 +182,16 @@ class RestListDetail_100State extends State<RestListDetail_100> with SingleTicke
             '\n사업자 대표자명 : ' +
             b_buss_owner.toString();
         //formData.SERVICE_DATA = '사업자번호 : ' + _reg_no + '\n대표자명 : ' + _owner + '\n업태 : ' + _buss_con + '\n업종 : ' + _buss_type + '\n사업장 주소 : ' + _buss_addr + '\n과세구분 : ' + _buss_tax_type;
+
+
+      }
+    });
+
+    //if (this.mounted) {
+      setState(() {
+
       });
-    }
+    //}
   }
 
   @override

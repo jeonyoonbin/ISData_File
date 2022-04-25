@@ -13,6 +13,7 @@ import 'package:daeguro_admin_app/View/Layout/layout_controller.dart';
 import 'package:daeguro_admin_app/View/UserManager/user_controller.dart';
 import 'package:daeguro_admin_app/constants/serverInfo.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -44,15 +45,18 @@ class LoginSMSState extends State<LoginSMS> {
 
   String _loginId = '';
   String _loginPw = '';
+
   //String _loginOtpConfirm = '';
 
   FocusNode focusNode_IDInput;
   FocusNode focusNode_PassInput;
   FocusNode focusNode_LoginBtn;
+
   //FocusNode focusNode_OTPInput;
   //FocusNode focusNode_OTPRequestBtn;
 
   bool isRemberID = false;
+
   //bool isOTPConfirm = false;
   String rememberIDStr = '';
 
@@ -134,9 +138,9 @@ class LoginSMSState extends State<LoginSMS> {
     //print('Login dispose()');
     //timerReset();
 
-    if (focusNode_IDInput != null)            focusNode_IDInput.dispose();
-    if (focusNode_PassInput != null)          focusNode_PassInput.dispose();
-    if (focusNode_LoginBtn != null)          focusNode_LoginBtn.dispose();
+    if (focusNode_IDInput != null) focusNode_IDInput.dispose();
+    if (focusNode_PassInput != null) focusNode_PassInput.dispose();
+    if (focusNode_LoginBtn != null) focusNode_LoginBtn.dispose();
 
     //if (focusNode_OTPInput != null)           focusNode_OTPInput.dispose();
     //if (focusNode_OTPRequestBtn != null)      focusNode_OTPRequestBtn.dispose();
@@ -164,7 +168,7 @@ class LoginSMSState extends State<LoginSMS> {
 
     return Container(
       //16CBFC
-      color: Colors.blue.shade200,//Color.fromARGB(255, 0, 202, 255),//Colors.blue.shade200,//.fromARGB(160, 001, 201, 255),//Colors.cyan.shade100,
+      color: Colors.blue.shade200, //Color.fromARGB(255, 0, 202, 255),//Colors.blue.shade200,//.fromARGB(160, 001, 201, 255),//Colors.cyan.shade100,
       child: Stack(
         alignment: Alignment.center,
         children: [
@@ -207,36 +211,113 @@ class LoginSMSState extends State<LoginSMS> {
                   width: 300,
                   child: Column(
                     children: [
-                      TextField(
+                      // TextField(
+                      //   focusNode: focusNode_IDInput,
+                      //   controller: TextEditingController(text: rememberIDStr.toString()),
+                      //   autofocus: isRemberID == true ? false : true,
+                      //   obscureText: false,
+                      //   onEditingComplete: () => FocusScope.of(context).nextFocus(),
+                      //   // keyboardType: TextInputType.emailAddress,
+                      //   decoration: InputDecoration(
+                      //       fillColor: Color(0xffdefcfc),
+                      //       filled: true,
+                      //       border: new OutlineInputBorder(
+                      //           borderSide: BorderSide(width: 0, style: BorderStyle.none), borderRadius: const BorderRadius.all(const Radius.circular(10))),
+                      //       labelText: 'id',
+                      //       labelStyle: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.blue)),
+                      //   onChanged: (text) {
+                      //     _loginId = (text);
+                      //     rememberIDStr = (text);
+                      //   },
+                      //   style: TextStyle(
+                      //     fontSize: 15,
+                      //     color: Colors.black,
+                      //   ),
+                      // ),
+                      // Container(
+                      //   margin: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+                      //   child: TextField(
+                      //     focusNode: focusNode_PassInput,
+                      //     autofocus: isRemberID == true ? true : false,
+                      //     controller: TextEditingController(text: _loginPw.toString()),
+                      //     onEditingComplete: () => FocusScope.of(context).requestFocus(focusNode_LoginBtn),
+                      //     //FocusScope.of(context).nextFocus(),
+                      //     decoration: InputDecoration(
+                      //         fillColor: Color(0xffdefcfc),
+                      //         filled: true,
+                      //         border: new OutlineInputBorder(
+                      //             borderSide: BorderSide(width: 0, style: BorderStyle.none), borderRadius: const BorderRadius.all(const Radius.circular(10))),
+                      //         labelText: 'password',
+                      //         labelStyle: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.blue)),
+                      //     onChanged: (text) {
+                      //       _loginPw = (text);
+                      //     },
+                      //     onSubmitted: (v) {
+                      //       //_login();
+                      //     },
+                      //     obscureText: true,
+                      //     enableSuggestions: false,
+                      //     autocorrect: false,
+                      //     style: TextStyle(fontSize: 15, color: Colors.black),
+                      //   ),
+                      // ),
+                      RawKeyboardListener(
                         focusNode: focusNode_IDInput,
-                        controller: TextEditingController(text: rememberIDStr.toString()),
-                        autofocus: isRemberID == true ? false : true,
-                        obscureText: false,
-                        onEditingComplete: () => FocusScope.of(context).nextFocus(),
-                        // keyboardType: TextInputType.emailAddress,
-                        decoration: InputDecoration(fillColor: Color(0xffdefcfc), filled: true, border: new OutlineInputBorder(borderSide: BorderSide(width: 0, style: BorderStyle.none), borderRadius: const BorderRadius.all(const Radius.circular(10))), labelText: 'id', labelStyle: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.blue)),
-                        onChanged: (text) {
-                          _loginId = (text);
-                          rememberIDStr = (text);
+                        onKey: (event) {
+                          if (event.logicalKey == LogicalKeyboardKey.tab) {
+                            //print('tabkey');
+                          }
                         },
-                        style: TextStyle(
-                          fontSize: 15,
-                          color: Colors.black,
+                        child: TextField(
+                          controller: TextEditingController(text: rememberIDStr.toString()),
+                          autofocus: isRemberID == true ? false : true,
+                          obscureText: false,
+                          onEditingComplete: () => FocusScope.of(context).nextFocus(),
+                          // keyboardType: TextInputType.emailAddress,
+                          decoration: InputDecoration(
+                              fillColor: Color(0xffdefcfc),
+                              filled: true,
+                              border: new OutlineInputBorder(
+                                  borderSide: BorderSide(width: 0, style: BorderStyle.none), borderRadius: const BorderRadius.all(const Radius.circular(10))),
+                              labelText: 'id',
+                              labelStyle: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.blue)),
+                          onChanged: (text) {
+                            _loginId = (text);
+                            rememberIDStr = (text);
+                          },
+                          onSubmitted: (v) {
+                            FocusScope.of(context).nextFocus();
+                          },
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: Colors.black,
+                          ),
                         ),
                       ),
-                      Container(
-                        margin: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+                      SizedBox(height: 10),
+                      RawKeyboardListener(
+                        focusNode: focusNode_PassInput,
+                        onKey: (event) {
+                          if (event.logicalKey == LogicalKeyboardKey.tab) {
+                            //print('tabkey');
+                          }
+                        },
                         child: TextField(
-                          focusNode: focusNode_PassInput,
-                          autofocus: isRemberID == true ? true : false,
                           controller: TextEditingController(text: _loginPw.toString()),
-                          onEditingComplete: () => FocusScope.of(context).requestFocus(focusNode_LoginBtn), //FocusScope.of(context).nextFocus(),
-                          decoration: InputDecoration(fillColor: Color(0xffdefcfc), filled: true, border: new OutlineInputBorder(borderSide: BorderSide(width: 0, style: BorderStyle.none), borderRadius: const BorderRadius.all(const Radius.circular(10))), labelText: 'password', labelStyle: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.blue)),
+                          autofocus: isRemberID == true ? true : false,
+                          // keyboardType: TextInputType.emailAddress,
+                          decoration: InputDecoration(
+                              fillColor: Color(0xffdefcfc),
+                              filled: true,
+                              border: new OutlineInputBorder(
+                                  borderSide: BorderSide(width: 0, style: BorderStyle.none), borderRadius: const BorderRadius.all(const Radius.circular(10))),
+                              labelText: 'password',
+                              labelStyle: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.blue)),
                           onChanged: (text) {
                             _loginPw = (text);
                           },
                           onSubmitted: (v) {
-                            //_login();
+                            _login();
                           },
                           obscureText: true,
                           enableSuggestions: false,
@@ -272,7 +353,7 @@ class LoginSMSState extends State<LoginSMS> {
                       //   ),
                       // ),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.end,//.spaceBetween,
+                        mainAxisAlignment: MainAxisAlignment.end, //.spaceBetween,
                         children: [
                           // RaisedButton.icon(
                           //   focusNode: focusNode_OTPRequestBtn,
@@ -313,9 +394,7 @@ class LoginSMSState extends State<LoginSMS> {
                                   //await prefs.setString('rememberID', rememberIDStr.toString());
                                   isRemberID = true;
                                 }
-                              }
-                          ),
-
+                              }),
                         ],
                       ),
                       // Container(
@@ -358,7 +437,8 @@ class LoginSMSState extends State<LoginSMS> {
                           height: 40,
                           child: ElevatedButton(
                             focusNode: focusNode_LoginBtn,
-                            style: ButtonStyle(shape: MaterialStateProperty.all<RoundedRectangleBorder>(RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)))),
+                            style: ButtonStyle(
+                                shape: MaterialStateProperty.all<RoundedRectangleBorder>(RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)))),
                             child: Text('로그인'),
                             onPressed: () {
                               // if (_loginId == '' || _loginId == null) {
@@ -415,7 +495,21 @@ class LoginSMSState extends State<LoginSMS> {
   }
 
   _tempLogin() async {
-    var value = {'uCode': '48', 'ccCode': null, 'name': '이성훈', 'id': 'sbjd98', 'password': null, 'level': '0', 'mobile': null, 'working': '1', 'memo': '', 'modUCode': null, 'modName': null, 'insertDate': '2021-05-06 오후 7:08:02', 'retireDate': ''};
+    var value = {
+      'uCode': '48',
+      'ccCode': null,
+      'name': '이성훈',
+      'id': 'sbjd98',
+      'password': null,
+      'level': '0',
+      'mobile': null,
+      'working': '1',
+      'memo': '',
+      'modUCode': null,
+      'modName': null,
+      'insertDate': '2021-05-06 오후 7:08:02',
+      'retireDate': ''
+    };
 
     DateFormat currentTimeFormat = new DateFormat('yyyy-MM-dd HH:mm:ss');
 
@@ -439,19 +533,17 @@ class LoginSMSState extends State<LoginSMS> {
     //print('loadAuthData id:${pid}');
     String ucode = GetStorage().read('logininfo')['uCode'];
     await AuthController.to.getAuthData(ucode, '', '').then((value) {
-      if(value == null){
+      if (value == null) {
         ISAlert(context, '권한정보가 정상조회 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
-      }
-      else {
-        if (value.length != 0){
+      } else {
+        if (value.length != 0) {
           AuthUtil.MenuAuthItem.clear();
           AuthUtil.MenuAuthItem = value;
 
           // AuthUtil.MenuAuthItem.forEach((element) {
           //   print('MenuAuthItem e:${element.toString()}');
           // });
-        }
-        else{
+        } else {
           //_selectedComment = '하위메뉴가 없습니다.';
         }
       }
@@ -459,7 +551,6 @@ class LoginSMSState extends State<LoginSMS> {
   }
 
   _login() async {
-
     if (_loginId == '' || _loginId == null) {
       ISAlert(context, '아이디를 입력하여 주세요.');
       FocusScope.of(context).requestFocus(focusNode_IDInput);
@@ -519,22 +610,35 @@ class LoginSMSState extends State<LoginSMS> {
         GetStorage().write('logininfoDateTime', currentTimeFormat.format(DateTime.now()));
 
         await AuthController.to.getSideBarData(GetStorage().read('logininfo')['uCode']).then((value) {
-          if(value == null){
+          if (value == null) {
             ISAlert(context, '메뉴 정보를 가져오지 못했습니다. \n\n관리자에게 문의 바랍니다');
-          }
-          else{
+          } else {
             //parent Menu loading...
             value.forEach((element) {
-              if (element['MENUDEPTH'].toString() == '0' && element['READ_YN'].toString() == 'Y')//(element['VISIBLE'].toString() == 'Y' || element['READ_YN'].toString() == 'Y'))
-                AuthUtil.SideBarMenu.add(Menu(id: element['ID'].toString(), name: element['NAME'].toString(), menuDepth: element['MENUDEPTH'].toString(),
-                  icon: element['ICON'].toString(), pid: null, url: element['URL'].toString(), visible: element['VISIBLE'].toString() == 'Y' ? true : false));
+              if (element['MENUDEPTH'].toString() == '0' &&
+                  element['READ_YN'].toString() == 'Y') //(element['VISIBLE'].toString() == 'Y' || element['READ_YN'].toString() == 'Y'))
+                AuthUtil.SideBarMenu.add(Menu(
+                    id: element['ID'].toString(),
+                    name: element['NAME'].toString(),
+                    menuDepth: element['MENUDEPTH'].toString(),
+                    icon: element['ICON'].toString(),
+                    pid: null,
+                    url: element['URL'].toString(),
+                    visible: element['VISIBLE'].toString() == 'Y' ? true : false));
             });
 
             //child Menu loading...
             value.forEach((element) {
-              if (element['MENUDEPTH'].toString() == '1'  && element['READ_YN'].toString() == 'Y')//(element['VISIBLE'].toString() == 'Y' || element['READ_YN'].toString() == 'Y'))
-                AuthUtil.SideBarMenu.add(Menu(id: element['ID'].toString(), name: element['NAME'].toString(), menuDepth: element['MENUDEPTH'].toString(),
-                  icon: element['ICON'].toString(), pid: element['PID'].toString(), url: element['URL'].toString(), visible: element['VISIBLE'].toString() == 'Y' ? true : false));
+              if (element['MENUDEPTH'].toString() == '1' &&
+                  element['READ_YN'].toString() == 'Y') //(element['VISIBLE'].toString() == 'Y' || element['READ_YN'].toString() == 'Y'))
+                AuthUtil.SideBarMenu.add(Menu(
+                    id: element['ID'].toString(),
+                    name: element['NAME'].toString(),
+                    menuDepth: element['MENUDEPTH'].toString(),
+                    icon: element['ICON'].toString(),
+                    pid: element['PID'].toString(),
+                    url: element['URL'].toString(),
+                    visible: element['VISIBLE'].toString() == 'Y' ? true : false));
             });
 
             // int checkIdx = Utils.sideBarMenu.indexWhere((item) => item.id.toString() == '50');
@@ -550,10 +654,9 @@ class LoginSMSState extends State<LoginSMS> {
         loadAuthData();
 
         await AgentController.to.getDataMCodeItems().then((value) {
-          if(value == null){
+          if (value == null) {
             ISAlert(context, '회원사정보를 가져오지 못했습니다. \n\n관리자에게 문의 바랍니다');
-          }
-          else{
+          } else {
             GetStorage().write('MCodeListinfo', value);
           }
         });
@@ -564,8 +667,7 @@ class LoginSMSState extends State<LoginSMS> {
 
         if (isRemberID == false) {
           await prefs.clear();
-        }
-        else {
+        } else {
           await prefs.setString('rememberID', rememberIDStr.toString());
         }
 
@@ -582,8 +684,7 @@ class LoginSMSState extends State<LoginSMS> {
         //print('----- MCodeListitems:${MCodeListitems.toString()}');
 
         setState(() {});
-      }
-      else{
+      } else {
         Utils.setLoginState(false);
 
         _loginPw = '';

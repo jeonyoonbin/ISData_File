@@ -15,6 +15,7 @@ class voucherListModel {
   String REG_DATE;
   String REG_EXP_DATE;
   String INS_DATE;
+  String USE_EXP_DATE;
   String INS_UCODE;
   String INS_NAME;
   String EXTENSION_YN;
@@ -39,6 +40,7 @@ voucherListModel _$ModelFromJson(Map<String, dynamic> json) {
     ..REG_DATE = json['REG_DATE'] as String
     ..REG_EXP_DATE = json['REG_EXP_DATE'] as String
     ..INS_DATE = json['INS_DATE'] as String
+    ..USE_EXP_DATE = json['USE_EXP_DATE'] as String
     ..INS_UCODE = json['INS_UCODE'] as String
     ..INS_NAME = json['INS_NAME'] as String
     ..EXTENSION_YN = json['EXTENSION_YN'] as String
@@ -60,6 +62,7 @@ Map<String, dynamic> _$ModelToJson(voucherListModel instance) => <String, dynami
   'REG_DATE' : instance.REG_DATE,
   'REG_EXP_DATE' : instance.REG_EXP_DATE,
   'INS_DATE' : instance.INS_DATE,
+  'USE_EXP_DATE' : instance.USE_EXP_DATE,
   'INS_UCODE' : instance.INS_UCODE,
   'INS_NAME' : instance.INS_NAME,
   'EXTENSION_YN' : instance.EXTENSION_YN,

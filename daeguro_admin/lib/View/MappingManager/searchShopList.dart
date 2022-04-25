@@ -83,7 +83,7 @@ class SearchShopListState extends State<SearchShopList> {
   loadData() async {
     dataList.clear();
 
-    await ShopController.to.getData(_mCode, _searchItems.code, '', '', '','','','','','','', _currentPage.toString(), _selectedpagerows.toString(),).then((value) {
+    await ShopController.to.getData(_mCode, _searchItems.code, '', '', '','', '','','','','', _currentPage.toString(), _selectedpagerows.toString(),).then((value) {
       if (this.mounted) {
         if (value == null) {
           ISAlert(context, '정상조회가 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
@@ -215,20 +215,27 @@ class SearchShopListState extends State<SearchShopList> {
                               children: <Widget>[
                                 IconButton(
                                   onPressed: () async {
-                                    await MappingController.to.getCheckApiMap(item.shopCd);
+                                    await MappingController.to.getCheckApiMap(item.shopCd).then((value) {
+                                      if (value == null) {
+                                        ISAlert(context, '정상조회가 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
+                                      }
+                                      else {
+                                        if(value == '0')
+                                        {
+                                          _ret[0] = item.shopCd.toString();
+                                          _ret[1] = item.shopName.toString();
+                                          _ret[2] = item.ccCode.toString();
 
-                                    if(MappingController.to.checkCount == '0')
-                                    {
-                                      _ret[0] = item.shopCd.toString();
-                                      _ret[1] = item.shopName.toString();
-                                      _ret[2] = item.ccCode.toString();
+                                          Navigator.pop(context, _ret);
+                                        }
+                                        else
+                                        {
+                                          ISAlert(context, '이미 연결 된 업체 정보가 있습니다.');
+                                        }
+                                      }
+                                    });
 
-                                      Navigator.pop(context, _ret);
-                                    }
-                                    else
-                                    {
-                                      ISAlert(context, '이미 연결 된 업체 정보가 있습니다.');
-                                    }
+
                                   },
                                   icon: Icon(Icons.check),
                                   tooltip: '선택',

@@ -6,6 +6,7 @@ import 'package:daeguro_admin_app/View/ShopManager/Account/shopAccount_controlle
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:get_storage/get_storage.dart';
 
@@ -67,6 +68,9 @@ class ShopMenuGroupEditState extends State<ShopMenuGroupEdit> {
             value: formData.menuGroupName ?? '',
             context: context,
             height: 64,
+            inputFormatters: <TextInputFormatter>[
+              BlacklistingTextInputFormatter(RegExp('[;]')),
+            ],
             //padding: 0,
             label: '그룹이름',
             maxLength: 25,

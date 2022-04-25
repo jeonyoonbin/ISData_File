@@ -4,6 +4,7 @@ library javascript_bundler;
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:daeguro_admin_app/ISWidget/is_dialog.dart';
 import 'package:daeguro_admin_app/ISWidget/search/is_search_dropdown.dart';
 import 'package:daeguro_admin_app/Model/serviceRequestDetail.dart';
 import 'package:daeguro_admin_app/Model/shop/shopImageHistory.dart';
@@ -58,11 +59,12 @@ class RestListDetailState extends State<RestListDetail> with SingleTickerProvide
   int current_tabIdx = 0;
 
   loadData() async {
-    await RequestController.to.getDetailData(widget.seq, context);
-
-    if (this.mounted) {
-      setState(() {
-        formData = ServiceRequestDetail.fromJson(RequestController.to.qDataDetail);
+    await RequestController.to.getDetailData(widget.seq).then((value) {
+      if (value == null) {
+        ISAlert(context, '정상조회가 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
+      }
+      else {
+        formData = ServiceRequestDetail.fromJson(value);
 
         Map<String, dynamic> _tojson = jsonDecode(formData.SERVICE_DATA);
 
@@ -72,8 +74,14 @@ class RestListDetailState extends State<RestListDetail> with SingleTickerProvide
         _test = _tojson['test'];
 
         formData.SERVICE_DATA = '사업자번호 : ' + _reg_no + '\n대표자명 : ' + _ceo_name + '\n이미지 주소 : ' + _image_url + '\ntest : ' + _test;
+      }
+    });
+
+    //if (this.mounted) {
+      setState(() {
+
       });
-    }
+    //}
   }
 
   @override

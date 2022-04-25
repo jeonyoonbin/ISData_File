@@ -27,25 +27,25 @@ class ISProgressDialog{
     showDialog(
         context: context,
         barrierDismissible: false,
+        barrierColor: Colors.black38,
         builder: (context) => Center(
           child: Container(
-            padding: EdgeInsets.only(top: 26.0, left: 26.0, right: 26.0),
-            //width: 110.0 + addWidth,
-            height: 110.0,
+            padding: EdgeInsets.all(10.0),
             decoration: BoxDecoration(
-              color: Colors.black87,
-              borderRadius: BorderRadius.circular(8.0),
+              color: Color.fromRGBO(75, 135, 185, 1),//Colors.blue.shade700, //Colors.black87,
+              borderRadius: BorderRadius.circular(15),
+              boxShadow: [
+                BoxShadow(color: Colors.black26, offset: Offset(2.0, 2.0), blurRadius: 4.0),
+              ],
             ),
-            child: Column(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 12.0),
-                  child: CircularProgressIndicator(color: Colors.white,),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(bottom: 4),
-                  child: Text(status, style: TextStyle(color: Colors.white, fontSize: 14),),
-                ),
+                CircularProgressIndicator(color: Colors.white,),
+                SizedBox(width: 30,),
+                Text(status, style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),),
+                SizedBox(width: 20,),
               ],
             ),
           ),

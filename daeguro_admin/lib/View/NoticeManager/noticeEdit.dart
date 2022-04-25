@@ -10,7 +10,7 @@ import 'package:daeguro_admin_app/Util/select_option_vo.dart';
 import 'package:daeguro_admin_app/View/NoticeManager/noticeFileUpload.dart';
 import 'package:daeguro_admin_app/View/NoticeManager/notice_controller.dart';
 
-import 'package:daeguro_admin_app/Provider/FileUpLoader.dart';
+import 'package:daeguro_admin_app/Network/FileUpLoader.dart';
 import 'package:daeguro_admin_app/constants/serverInfo.dart';
 
 import 'package:date_format/date_format.dart';
@@ -122,6 +122,30 @@ class NoticeEditState extends State<NoticeEdit> {
               ),
               Flexible(
                 flex: 1,
+                child: Container(
+                  margin: EdgeInsets.all(8.0),
+                  decoration: new BoxDecoration(
+                      color: editData.extUrlYn == 'Y' ? Colors.blue[200] : Colors.red[200],
+                      borderRadius: new BorderRadius.circular(6)),
+                  child: SwitchListTile(
+                    dense: true,
+                    value: editData.extUrlYn == 'Y' ? true : false,
+                    title: Text('외부URL 사용 유무', style: TextStyle(fontSize: 10, color: Colors.white),),
+                    onChanged: (v) {
+                      setState(() {
+                        editData.extUrlYn = v ? 'Y' : 'N';
+                        formKey.currentState.save();
+                      });
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Row(
+            children: <Widget>[
+              Flexible(
+                flex: 1,
                 child: ISSelect(
                   ignoring: true,
                   label: '구분',
@@ -134,11 +158,7 @@ class NoticeEditState extends State<NoticeEdit> {
                     });
                   },
                 ),
-              )
-            ],
           ),
-          Row(
-            children: <Widget>[
               Flexible(
                 flex: 1,
                 child: ISSelectDate(
@@ -330,7 +350,9 @@ class NoticeEditState extends State<NoticeEdit> {
                 editData.noticeUrl_2,
                 editData.orderDate,
                 editData.modUCode,
-                editData.modName);
+                editData.modName,
+                editData.extUrlYn,
+            );
 
             await Future.delayed(Duration(milliseconds: 500), () {
               setState(() {
@@ -372,7 +394,7 @@ class NoticeEditState extends State<NoticeEdit> {
       bottomNavigationBar: buttonBar,
     );
     return SizedBox(
-      width: 440,
+      width: 480,
       height: 700,
       child: result,
     );

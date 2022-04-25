@@ -1,6 +1,9 @@
 
 import 'package:daeguro_admin_app/ISWidget/is_dialog.dart';
-import 'package:daeguro_admin_app/Provider/RestApiProvider.dart';
+import 'package:daeguro_admin_app/Network/DioClient.dart';
+
+import 'package:daeguro_admin_app/constants/serverInfo.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 
@@ -9,9 +12,6 @@ class NoticeController extends GetxController
   static NoticeController get to => Get.find();
   BuildContext context;
 
-  List<dynamic> qData = [];
-  List<dynamic> qDataSortList = [];
-  dynamic qDataDetail;
   List qDataItems = [];
 
   int totalRowCnt = 0;
@@ -25,101 +25,66 @@ class NoticeController extends GetxController
 
   @override
   void onInit() {
-    Get.put(RestApiProvider());
-
     raw.value = 15;
     page.value = 1;
-
-    //getData(context);
 
     super.onInit();
   }
 
-  getData(BuildContext context) async {
-    var result = await RestApiProvider.to.getNotice(
-        noticeGbn.value.toString(),
-        dispGbn.value.toString(),
-        fromDate.value.toString(),
-        toDate.value.toString(),
-        page.value,
-        raw.value);
+  Future<List<dynamic>> getData() async {
+    List<dynamic> qData = [];
 
-    totalRowCnt = int.parse(result.body['count'].toString());
+    final response = await DioClient().get(ServerInfo.REST_URL_NOTICE + '?noticeGbn=${noticeGbn.value.toString()}&dispGbn=${dispGbn.value.toString()}&fromDate=${fromDate.value.toString()}&toDate=${toDate.value.toString()}&page=${page.value}&rows=${raw.value}');
 
-    if (result.body['code'].toString() == null ||
-        result.body['code'].toString() == 'null' ||
-        result.body['code'].toString() == '') {
-      ISAlert(context, '정상조회가 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
-      return;
+    if (response.data['code'].toString() == null || response.data['code'].toString() == 'null' || response.data['code'].toString() == '') {
+      return null;
     }
 
-    qData.assignAll(result.body['data']);
-    if (result.body['code'] != '00') {
-      ISAlert(context, '정상조회가 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
+    if (response.data['code'] == '00') {
+      totalRowCnt = int.parse(response.data['count'].toString());
+
+      qData.assignAll(response.data['data']);
     }
+    else
+      return null;
+
+    return qData;
+
   }
 
-  getDetailData(String noticeSeq, BuildContext context) async {
-    var result = await RestApiProvider.to.getNoticeDetail(noticeSeq);
+  Future<dynamic> getDetailData(String noticeSeq) async {
+    final response = await DioClient().get(ServerInfo.REST_URL_NOTICE + '/$noticeSeq');
 
-    //qDataDetail.clear();
-
-
-    qDataDetail = result.body['data'];
-
-    if (result.body['code'] != '00') {
-      ISAlert(context, '정상조회가 되지 않았습니다. \n\n관리자에게 문의 바랍니다.');
+    if (response.data['code'] == '00') {
+      return response.data['data'];
     }
+
+    return null;
   }
-
-  // postData(Map data, BuildContext context) async {
-  //   var result = await RestApiProvider.to.postNotice(data);
-  //
-  //
-  //   if (result.body['code'] != '00') {
-  //     ISAlert(context, '정상적으로 저장 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
-  //   }
-  // }
-  //
-  // putData(Map data, BuildContext context) async {
-  //   var result = await RestApiProvider.to.putNotice(data);
-  //
-  //   if (result.body['code'] != '00') {
-  //     ISAlert(context, '정상적으로 수정 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
-  //   }
-  // }
-
-  // Future<List<dynamic>> getDashboardNoticeData() async {
-  //   List<dynamic> qNoticeData = [];
-  //
-  //   var result = await RestApiProvider.to.getDashboardNotice();
-  //
-  //   if (result.body['code'] == '00')
-  //     qNoticeData.assignAll(result.body['data']);
-  //   else
-  //     return null;
-  //
-  //   return qNoticeData;
-  // }
 
   updateSort(dynamic data, BuildContext context) async {
-    var result = await RestApiProvider.to.postNoticeSort(data);
+    var response = await DioClient().post(ServerInfo.REST_URL_NOTICE_SORT, data: data);
 
-    if (result.body['code'] != '00') {
+    if (response.data['code'] != '00') {
       ISAlert(context, '정상적으로 저장 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
     }
   }
 
-  getNoticeSortList(String noticeGbn, BuildContext context) async {
-    var result = await RestApiProvider.to.getNoticeSortList(noticeGbn);
+  Future<List<dynamic>> getNoticeSortList(String noticeGbn) async {
+    List<dynamic> qDataMenuGroup = [];
 
-    qDataSortList.assignAll(result.body['data']);
+    final response = await DioClient().get(ServerInfo.REST_URL_NOTICE + '/getNoticeSortList?noticeGbn=$noticeGbn');
 
-    if (result.body['code'].toString() == null ||
-        result.body['code'].toString() == 'null' ||
-        result.body['code'].toString() == '') {
-      ISAlert(context, '정상조회가 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
-      return;
+    if (response.data['code'].toString() == null || response.data['code'].toString() == 'null' || response.data['code'].toString() == '') {
+      return null;
     }
+
+    if (response.data['code'] == '00') {
+      qDataMenuGroup.assignAll(response.data['data']);
+    }
+    else
+      return null;
+
+    return qDataMenuGroup;
   }
 }

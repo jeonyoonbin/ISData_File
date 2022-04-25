@@ -24,6 +24,7 @@ class BuinessTypeListModel {
   int menuName_1029;
   int menuName_1030;
   int menuName_1031;
+  int menuName_1032;
 
   BuinessTypeListModel({
     this.isOpened,
@@ -49,6 +50,7 @@ class BuinessTypeListModel {
     this.menuName_1028,
     this.menuName_1029,
     this.menuName_1030,
-    this.menuName_1031
+    this.menuName_1031,
+    this.menuName_1032
   });
 }

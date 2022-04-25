@@ -130,7 +130,7 @@ class CalculateShopMileageState extends State<CalculateShopMileage> {
   }
 
   _detail({String orderNo}) async {
-    await OrderController.to.getDetailData(orderNo.toString(), context);
+    await OrderController.to.getDetailData(orderNo.toString());
     // print(orderNo);
 
     showDialog(

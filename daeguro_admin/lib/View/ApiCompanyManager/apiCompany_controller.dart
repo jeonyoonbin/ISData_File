@@ -1,6 +1,8 @@
 
 import 'package:daeguro_admin_app/ISWidget/is_dialog.dart';
-import 'package:daeguro_admin_app/Provider/RestApiProvider.dart';
+import 'package:daeguro_admin_app/Network/DioClient.dart';
+import 'package:daeguro_admin_app/constants/serverInfo.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -8,54 +10,50 @@ class ApiCompanyController extends GetxController with SingleGetTickerProviderMi
   static ApiCompanyController get to => Get.find();
   BuildContext context;
 
-  List<dynamic> qData = [];
-  dynamic qDataDetail;
   List qDataCCenterItems = [];
   List qDataMCodeItems = [];
-  //List<ResponseBodyApi> qData;
 
   @override
   void onInit(){
-    Get.put(RestApiProvider());
-
-    //getData();
-
     super.onInit();
   }
 
-  getData(String comType, String comGbn) async {
-    var result = await RestApiProvider.to.getApiCompany(comType, comGbn);
+  Future<List<dynamic>> getData(String comType, String comGbn) async {
+    List<dynamic> qData = [];
 
-    qData.assignAll(result.body['data']);
+    final response = await DioClient().get(ServerInfo.REST_URL_API + '?comType=$comType&comGbn=$comGbn');
 
-    if (result.body['code'] != '00') {
-      ISAlert(context, '정상조회가 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
+    if (response.data['code'] == '00') {
+      qData.assignAll(response.data['data']);
     }
+    else
+      return null;
+
+    return qData;
   }
 
-  getDetailData(String seq) async {
-    var result = await RestApiProvider.to.getApiCompanyDetail(seq);
+  Future<dynamic> getDetailData(String seq) async {
+    final response = await DioClient().get(ServerInfo.REST_URL_API + '/' + seq);
 
-    //print(result.body['data']);
-    qDataDetail = result.body['data'];
-
-    if (result.body['code'] != '00') {
-      ISAlert(context, '정상조회가 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
+    if (response.data['code'] == '00') {
+      return response.data['data'];
     }
+
+    return null;
   }
 
   postData(Map data, BuildContext context) async {
-    var result = await RestApiProvider.to.postApiCompany(data);
+    var response = await DioClient().post(ServerInfo.REST_URL_API, data: data);
 
-    if (result.body['code'] != '00') {
+    if (response.data['code'] != '00') {
       ISAlert(context, '정상적으로 저장 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
     }
   }
 
   putData(Map data, BuildContext context) async {
-    var result = await RestApiProvider.to.putApiCompany(data);
+    final response = await DioClient().put(ServerInfo.REST_URL_API, data: data);
 
-    if (result.body['code'] != '00') {
+    if (response.data['code'] != '00') {
       ISAlert(context, '정상적으로 수정이 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
     }
   }

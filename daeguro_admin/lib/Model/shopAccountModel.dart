@@ -11,20 +11,14 @@ class ShopAccountModel {
   String shopName;
   String regNo;
   String regNoYn;
-  //String telNo;
-  //String owner;
-  //String addr1;
-  //String addr2;
   String useGbn;
-  //String shopId;
-  //String shopPwd;
   String openDate;
   String salesmanCode;
   String salesmanName;
   String operatorCode;
   String operatorName;
-  String imageStatus;
-  String memo;
+  //String imageStatus;
+  String shopStatus;
   String absentYn;
   String calcYn;
   String shopInfoYn;
@@ -42,7 +36,6 @@ class ShopAccountModel {
   String shopImageYn;
   String menuComplete;
   String franchiseCd;
-  String reserveYn;
 
   factory ShopAccountModel.fromJson(Map<String, dynamic> json) =>      _$ModelFromJson(json);
 
@@ -57,20 +50,14 @@ ShopAccountModel _$ModelFromJson(Map<String, dynamic> json) {
     ..shopName = json['shopName'] as String
     ..regNo = json['regNo'] as String
     ..regNoYn = json['regNoYn'] as String
-    //..telNo = json['telNo'] as String
-    //..owner = json['owner'] as String
-    //..addr1 = json['addr1'] as String
-    //..addr2 = json['addr2'] as String
     ..useGbn = json['useGbn'] as String
-    //..shopId = json['shopId'] as String
-    //..shopPwd = json['shopPwd'] as String
     ..openDate = json['openDate'] as String
     ..salesmanCode = json['salesmanCode'] as String
     ..salesmanName = json['salesmanName'] as String
     ..operatorCode = json['operatorCode'] as String
     ..operatorName = json['operatorName'] as String
-    ..imageStatus = json['imageStatus'] as String
-    ..memo = json['memo'] as String
+    //..imageStatus = json['imageStatus'] as String
+    ..shopStatus = json['shopStatus'] as String
     ..absentYn = json['absentYn'] as String
     ..calcYn = json['calcYn'] as String
     ..shopInfoYn = json['shopInfoYn'] as String
@@ -87,8 +74,7 @@ ShopAccountModel _$ModelFromJson(Map<String, dynamic> json) {
     ..apiComCode = json['apiComCode'] as String
     ..shopImageYn = json['shopImageYn'] as String
     ..menuComplete = json['menuComplete'] as String
-    ..franchiseCd = json['franchiseCd'] as String
-    ..reserveYn = json['reserveYn'] as String;
+    ..franchiseCd = json['franchiseCd'] as String;
 }
 
 Map<String, dynamic> _$ModelToJson(ShopAccountModel instance) => <String, dynamic>{
@@ -98,20 +84,14 @@ Map<String, dynamic> _$ModelToJson(ShopAccountModel instance) => <String, dynami
       'shopName': instance.shopName,
       'regNo': instance.regNo,
       'regNoYn': instance.regNoYn,
-      //'telNo': instance.telNo,
-      //'owner': instance.owner,
-      //'addr1': instance.addr1,
-      //'addr2': instance.addr2,
       'useGbn': instance.useGbn,
-      //'shopId': instance.shopId,
-      //'shopPwd': instance.shopPwd,
       'openDate': instance.openDate,
       'salesmanCode': instance.salesmanCode,
       'salesmanName': instance.salesmanName,
       'operatorCode': instance.operatorCode,
       'operatorName': instance.operatorName,
-      'imageStatus': instance.imageStatus,
-      'memo': instance.memo,
+      //'imageStatus': instance.imageStatus,
+      'shopStatus': instance.shopStatus,
       'absentYn': instance.absentYn,
       'calcYn': instance.calcYn,
       'shopInfoYn': instance.shopInfoYn,
@@ -128,6 +108,5 @@ Map<String, dynamic> _$ModelToJson(ShopAccountModel instance) => <String, dynami
       'apiComCode': instance.apiComCode,
       'shopImageYn': instance.shopImageYn,
       'menuComplete': instance.menuComplete,
-      'franchiseCd': instance.franchiseCd,
-      'reserveYn': instance.reserveYn
+      'franchiseCd': instance.franchiseCd
     };

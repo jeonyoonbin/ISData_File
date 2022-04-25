@@ -17,8 +17,9 @@ import 'package:get_storage/get_storage.dart';
 
 class CouponEdit extends StatefulWidget {
   final List couponTypeItems;
+  final String selectedCouponType;
 
-  const CouponEdit({Key key, this.couponTypeItems}) : super(key: key);
+  const CouponEdit({Key key, this.couponTypeItems, this.selectedCouponType}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -54,7 +55,7 @@ class CouponEditState extends State<CouponEdit> {
 
     formData = couponEditModel();
 
-    formData.couponType = 'IS_C100';
+    formData.couponType = widget.selectedCouponType;//'IS_C100';
     formData.jobUcode = GetStorage().read('logininfo')['uCode'];
     formData.jobName = GetStorage().read('logininfo')['name'];
   }

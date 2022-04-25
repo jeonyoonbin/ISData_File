@@ -115,7 +115,7 @@ class CalculateOrderPayMentSearchState extends State<CalculateOrderPayMentSearch
 
   _detail({String orderNo}) async {
     //EasyLoading.show();
-    await OrderController.to.getDetailData(orderNo.toString(), context);
+    await OrderController.to.getDetailData(orderNo.toString());
     //EasyLoading.dismiss();
 
     showDialog(

@@ -1,17 +1,12 @@
 import 'package:daeguro_admin_app/Model/dashboard/dashboardTodayCountModel.dart';
-import 'package:daeguro_admin_app/Provider/RestApiProvider.dart';
+import 'package:daeguro_admin_app/Network/DioClient.dart';
+
 import 'package:daeguro_admin_app/constants/serverInfo.dart';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 
 class DashBoardController extends GetxController with SingleGetTickerProviderMixin {
   static DashBoardController get to => Get.find();
-
-  //RxList<DashBoardWeekOrderModel> dataWeekOrderList = <DashBoardWeekOrderModel>[].obs;
-  //RxList<DashBoardWeekCustomerModel> dataWeekCustomerList = <DashBoardWeekCustomerModel>[].obs;
-
-  //Rx<DashBoardModel> mData = DashBoardModel().obs;
-  //Rx<DashBoardTodayCountModel> mTodayCountData = DashBoardTodayCountModel().obs;
 
   Rx<DashBoardTodayCountModel> mTodayCountData = DashBoardTodayCountModel().obs;
 
@@ -27,8 +22,6 @@ class DashBoardController extends GetxController with SingleGetTickerProviderMix
 
   @override
   void onInit() {
-    Get.put(RestApiProvider());
-
     super.onInit();
   }
 
@@ -45,14 +38,7 @@ class DashBoardController extends GetxController with SingleGetTickerProviderMix
   Future<dynamic> getData() async {
     dynamic qData;
 
-    //var result = await RestApiProvider.to.getDashBoard();
-
-    // dio 패키지
-    var dio = Dio();
-    final response = await dio.get(ServerInfo.REST_URL_DASHBOARD);
-
-    dio.clear();
-    dio.close();
+    final response = await DioClient().get(ServerInfo.REST_URL_DASHBOARD);
 
     if (response.data['code'] == '00') {
       qData = response.data['data'];
@@ -67,14 +53,7 @@ class DashBoardController extends GetxController with SingleGetTickerProviderMix
   Future<List<dynamic>> getWeekCustomerData() async {
     List<dynamic> qData = [];
 
-    //var result = await RestApiProvider.to.getDashBoardWeekCustomer();
-
-    // dio 패키지
-    var dio = Dio();
-    final response = await dio.get(ServerInfo.REST_URL_DASHBOARDWEEKCUSTOMER);
-
-    dio.clear();
-    dio.close();
+    final response = await DioClient().get(ServerInfo.REST_URL_DASHBOARDWEEKCUSTOMER);
 
     if (response.data['code'] == '00') {
       qData.assignAll(response.data['data']);
@@ -94,14 +73,7 @@ class DashBoardController extends GetxController with SingleGetTickerProviderMix
   Future<List<dynamic>> getWeekOrderData() async {
     List<dynamic> qData = [];
 
-    //var result = await RestApiProvider.to.getDashBoardWeekOrder();
-
-    // dio 패키지
-    var dio = Dio();
-    final response = await dio.get(ServerInfo.REST_URL_DASHBOARDWEEKORDER);
-
-    dio.clear();
-    dio.close();
+    final response = await DioClient().get(ServerInfo.REST_URL_DASHBOARDWEEKORDER);
 
     if (response.data['code'] == '00') {
       qData.assignAll(response.data['data']);
@@ -121,14 +93,7 @@ class DashBoardController extends GetxController with SingleGetTickerProviderMix
   getTodayCountData() async {
     List<dynamic> qData = [];
 
-    //var result = await RestApiProvider.to.getDashBoardTodayCount();
-
-    // dio 패키지
-    var dio = Dio();
-    final response = await dio.get(ServerInfo.REST_URL_DASHBOARDTODAYCOUNT);
-
-    dio.clear();
-    dio.close();
+    final response = await DioClient().get(ServerInfo.REST_URL_DASHBOARDTODAYCOUNT);
 
     if (response.data['code'] == '00') {
       qData.assignAll(response.data['data']);
@@ -143,47 +108,13 @@ class DashBoardController extends GetxController with SingleGetTickerProviderMix
 
       mTodayCountData = null;
       qData.clear();
-
-      dio = null;
     }
   }
-
-  // Future<dynamic> getInfoSumTotal() async {
-  //   dynamic qData = null;
-  //
-  //   //var result = await RestApiProvider.to.getDaeguroTotalInfoSum();
-  //
-  //   // dio 패키지
-  //   var dio = Dio();
-  //   final response = await dio.get(ServerInfo.REST_URL_DASHBOARDTOTALINFOSUM);
-  //
-  //   dio.clear();
-  //   dio.close();
-  //
-  //   if (response.data['code'] == '00') {
-  //     //qData.assignAll(result.body['totalOS']);
-  //     qData = response.data;
-  //     // dataWeekCustomerList.clear();
-  //     // qData.forEach((element) {
-  //     //   DashBoardWeekCustomerModel temp = DashBoardWeekCustomerModel.fromJson(element);
-  //     //   dataWeekCustomerList.value.add(temp);
-  //     // });
-  //   }
-  //   else
-  //     return null;
-  //
-  //   return qData;
-  // }
 
   Future<dynamic> getTotalInstalled() async {
     dynamic qData = null;
 
-    // dio 패키지
-    var dio = Dio();
-    final response = await dio.get(ServerInfo.REST_URL_DASHBOARDTOTALINSTALLOS);
-
-    dio.clear();
-    dio.close();
+    final response = await DioClient().get(ServerInfo.REST_URL_DASHBOARDTOTALINSTALLOS);
 
     if (response.data['code'] == '00') {
       qData = response.data['data'];
@@ -197,12 +128,7 @@ class DashBoardController extends GetxController with SingleGetTickerProviderMix
   Future<dynamic> getTotalOrders() async {
     dynamic qData = null;
 
-    // dio 패키지
-    var dio = Dio();
-    final response = await dio.get(ServerInfo.REST_URL_DASHBOARDTOTALORDERS);
-
-    dio.clear();
-    dio.close();
+    final response = await DioClient().get(ServerInfo.REST_URL_DASHBOARDTOTALORDERS);
 
     if (response.data['code'] == '00') {
       qData = response.data['data'];
@@ -216,12 +142,7 @@ class DashBoardController extends GetxController with SingleGetTickerProviderMix
   Future<dynamic> getTotalYearMembers() async {
     dynamic qData = null;
 
-    // dio 패키지
-    var dio = Dio();
-    final response = await dio.get(ServerInfo.REST_URL_DASHBOARDTOTALYEARMEMBERS);
-
-    dio.clear();
-    dio.close();
+    final response = await DioClient().get(ServerInfo.REST_URL_DASHBOARDTOTALYEARMEMBERS);
 
     if (response.data['code'] == '00') {
       qData = response.data['data'];
@@ -235,12 +156,7 @@ class DashBoardController extends GetxController with SingleGetTickerProviderMix
   Future<dynamic> getTotalCancel() async {
     dynamic qData = null;
 
-    // dio 패키지
-    var dio = Dio();
-    final response = await dio.get(ServerInfo.REST_URL_DASHBOARDTOTALCANCEL);
-
-    dio.clear();
-    dio.close();
+    final response = await DioClient().get(ServerInfo.REST_URL_DASHBOARDTOTALCANCEL);
 
     if (response.data['code'] == '00') {
       qData = response.data['data'];
@@ -250,64 +166,4 @@ class DashBoardController extends GetxController with SingleGetTickerProviderMix
 
     return qData;
   }
-
-  // Future<List<dynamic>> getInfoSumYearmembers() async {
-  //   List<dynamic> qData = [];
-  //
-  //   var result = await RestApiProvider.to.getDaeguroTotalInfoSum();
-  //
-  //   if (result.body['code'] == '00') {
-  //     qData.assignAll(result.body['totalYearMembers']);
-  //
-  //     // dataWeekCustomerList.clear();
-  //     // qData.forEach((element) {
-  //     //   DashBoardWeekCustomerModel temp = DashBoardWeekCustomerModel.fromJson(element);
-  //     //   dataWeekCustomerList.value.add(temp);
-  //     // });
-  //   }
-  //   else
-  //     return null;
-  //
-  //   return qData;
-  // }
-  //
-  // Future<List<dynamic>> getInfoSumOrders() async {
-  //   List<dynamic> qData = [];
-  //
-  //   var result = await RestApiProvider.to.getDaeguroTotalInfoSum();
-  //
-  //   if (result.body['code'] == '00') {
-  //     qData.assignAll(result.body['totalOrders']);
-  //
-  //     // dataWeekCustomerList.clear();
-  //     // qData.forEach((element) {
-  //     //   DashBoardWeekCustomerModel temp = DashBoardWeekCustomerModel.fromJson(element);
-  //     //   dataWeekCustomerList.value.add(temp);
-  //     // });
-  //   }
-  //   else
-  //     return null;
-  //
-  //   return qData;
-  // }
-  //
-  // Future<List<dynamic>> getInfoSumCancel() async {
-  //   List<dynamic> qData = [];
-  //
-  //   var result = await RestApiProvider.to.getDaeguroTotalInfoSum();
-  //
-  //   if (result.body['code'] == '00') {
-  //     qData.assignAll(result.body['totalCancel']);
-  //
-  //     // dataWeekCustomerList.clear();
-  //     // qData.forEach((element) {
-  //     //   DashBoardWeekCustomerModel temp = DashBoardWeekCustomerModel.fromJson(element);
-  //     //   dataWeekCustomerList.value.add(temp);
-  //     // });
-  //   }
-  //   else
-  //     return null;
-  //
-  //   return qData;
-  // }
 }

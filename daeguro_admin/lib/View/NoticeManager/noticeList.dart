@@ -1,4 +1,5 @@
 ﻿import 'package:daeguro_admin_app/ISWidget/is_datatable.dart';
+import 'package:daeguro_admin_app/ISWidget/is_dialog.dart';
 import 'package:daeguro_admin_app/ISWidget/search/is_search_button.dart';
 import 'package:daeguro_admin_app/ISWidget/search/is_search_date.dart';
 import 'package:daeguro_admin_app/ISWidget/search/is_search_dropdown.dart';
@@ -63,11 +64,13 @@ class NoticeListState extends State {
   _edit({String noticeSeq}) async {
     noticeDetailModel editData = null;
 
-    await NoticeController.to.getDetailData(noticeSeq.toString(), context);
-
-    if (NoticeController.to.qDataDetail != null) {
-      editData = noticeDetailModel.fromJson(NoticeController.to.qDataDetail);
-    }
+    await NoticeController.to.getDetailData(noticeSeq.toString()).then((value) {
+      if (value == null) {
+        ISAlert(context, '정상조회가 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
+      } else {
+        editData = noticeDetailModel.fromJson(value);
+      }
+    });
 
     showDialog(
       context: context,
@@ -129,19 +132,25 @@ class NoticeListState extends State {
   loadData() async {
     dataList.clear();
 
-    await NoticeController.to.getData(context);
-
-    if (this.mounted) {
-      setState(() {
-        NoticeController.to.qData.forEach((e) {
+    await NoticeController.to.getData().then((value) {
+      if (value == null) {
+        ISAlert(context, '정상조회가 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
+      } else {
+        value.forEach((e) {
           noticeListModel temp = noticeListModel.fromJson(e);
           dataList.add(temp);
         });
 
         _totalRowCnt = NoticeController.to.totalRowCnt;
         _totalPages = (_totalRowCnt / _selectedpagerows).ceil();
+      }
+    });
+
+    //if (this.mounted) {
+      setState(() {
+
       });
-    }
+    //}
   }
 
   @override

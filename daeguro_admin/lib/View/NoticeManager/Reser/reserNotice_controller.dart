@@ -1,6 +1,8 @@
 
 import 'package:daeguro_admin_app/ISWidget/is_dialog.dart';
-import 'package:daeguro_admin_app/Provider/RestApiProvider.dart';
+import 'package:daeguro_admin_app/Network/DioClient.dart';
+import 'package:daeguro_admin_app/Network/DioClientReserve.dart';
+
 import 'package:daeguro_admin_app/constants/serverInfo.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
@@ -27,27 +29,16 @@ class ReserNoticeController extends GetxController
 
   @override
   void onInit() {
-    Get.put(RestApiProvider());
-
     raw.value = 15;
     page.value = 1;
-
-    //getData(context);
 
     super.onInit();
   }
 
   getData(BuildContext context) async {
-    var dio = Dio();
-    final response = await dio.get(ServerInfo.REST_RESERVEURL+'/notice?noticeGbn=${noticeGbn.value.toString()}&dispGbn=${dispGbn.value.toString()}&frDate=${fromDate.value.toString()}&toDate=${toDate.value.toString()}&page=${page.value}&rows=${raw.value}');
-        //'https://reser.daeguro.co.kr:10008/notice-admin?noticeGbn=${noticeGbn.value.toString()}&dispGbn=${dispGbn.value.toString()}&frDate=${fromDate.value.toString()}&toDate=${toDate.value.toString()}&page=${page.value}&rows=${raw.value}');
-
-    dio.clear();
-    dio.close();
+    final response = await DioClientReserve().get(ServerInfo.REST_RESERVEURL+'/notice?noticeGbn=${noticeGbn.value.toString()}&dispGbn=${dispGbn.value.toString()}&frDate=${fromDate.value.toString()}&toDate=${toDate.value.toString()}&page=${page.value.toString()}&rows=${raw.value.toString()}');
 
     totalRowCnt = int.parse(response.data['cnt'].toString());
-
-    //totalRowCnt = 1;
 
     if (response.data['code'].toString() == null || response.data['code'].toString() == 'null' || response.data['code'].toString() == '') {
       ISAlert(context, '정상조회가 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
@@ -61,15 +52,7 @@ class ReserNoticeController extends GetxController
   }
 
   getDetailData(String noticeSeq, BuildContext context) async {
-    //var result = await RestApiProvider.to.getNoticeDetail(noticeSeq);
-
-    var dio = Dio();
-    final response = await dio.get(ServerInfo.REST_RESERVEURL+'/notice/$noticeSeq');
-        //'https://reser.daeguro.co.kr:10008/notice-admin/$noticeSeq');
-
-    dio.clear();
-    dio.close();
-
+    final response = await DioClientReserve().get(ServerInfo.REST_RESERVEURL+'/notice/$noticeSeq');
 
     qDataDetail = response.data['data'][0];
 
@@ -78,44 +61,8 @@ class ReserNoticeController extends GetxController
     }
   }
 
-  // postData(Map data, BuildContext context) async {
-  //   var result = await RestApiProvider.to.postNotice(data);
-  //
-  //
-  //   if (result.body['code'] != '00') {
-  //     ISAlert(context, '정상적으로 저장 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
-  //   }
-  // }
-  //
-  // putData(Map data, BuildContext context) async {
-  //   var result = await RestApiProvider.to.putNotice(data);
-  //
-  //   if (result.body['code'] != '00') {
-  //     ISAlert(context, '정상적으로 수정 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
-  //   }
-  // }
-
-  // Future<List<dynamic>> getDashboardNoticeData() async {
-  //   List<dynamic> qNoticeData = [];
-  //
-  //   var result = await RestApiProvider.to.getDashboardNotice();
-  //
-  //   if (result.body['code'] == '00')
-  //     qNoticeData.assignAll(result.body['data']);
-  //   else
-  //     return null;
-  //
-  //   return qNoticeData;
-  // }
-
   updateSort(dynamic data, BuildContext context) async {
-    //var result = await RestApiProvider.to.postNoticeSort(data);
-
-    var dio = Dio();
-    final response = await dio.put(ServerInfo.REST_RESERVEURL+'/notice-sort', data : data);
-
-    dio.clear();
-    dio.close();
+    final response = await DioClientReserve().put(ServerInfo.REST_RESERVEURL+'/notice-sort', data : data);
 
     if (response.data['code'] != '00') {
       ISAlert(context, '정상적으로 저장 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
@@ -123,13 +70,7 @@ class ReserNoticeController extends GetxController
   }
 
   getNoticeSortList(String noticeGbn, BuildContext context) async {
-    var dio = Dio();
-    final response = await dio.get(ServerInfo.REST_RESERVEURL+'/notice-sort?noticeGbn=$noticeGbn');
-
-    dio.clear();
-    dio.close();
-
-    //var result = await RestApiProvider.to.getNoticeSortList(noticeGbn);
+    final response = await DioClientReserve().get(ServerInfo.REST_RESERVEURL+'/notice-sort?noticeGbn=$noticeGbn');
 
     qDataSortList.assignAll(response.data['data']);
 

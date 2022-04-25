@@ -3,9 +3,11 @@ import 'package:daeguro_admin_app/ISWidget/is_button.dart';
 import 'package:daeguro_admin_app/ISWidget/is_dialog.dart';
 import 'package:daeguro_admin_app/ISWidget/is_input.dart';
 import 'package:daeguro_admin_app/ISWidget/is_select.dart';
+import 'package:daeguro_admin_app/ISWidget/is_select_date.dart';
 import 'package:daeguro_admin_app/Model/coupon/couponRegistModel.dart';
 import 'package:daeguro_admin_app/Util/select_option_vo.dart';
 import 'package:daeguro_admin_app/View/CouponManager/coupon_controller.dart';
+import 'package:date_format/date_format.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -14,7 +16,10 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
 class B2BCouponRegist  extends StatefulWidget {
-  const B2BCouponRegist({Key key}) : super(key: key);
+  final List couponTypeItems;
+  final String selectedCouponType;
+
+  const B2BCouponRegist({Key key, this.couponTypeItems, this.selectedCouponType}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -27,24 +32,25 @@ class B2BCouponRegistState extends State<B2BCouponRegist> {
   couponRegistModel formData;
   String _couponCnt;
   String _startDate = '';
+  String _expDate = '';
 
   List<SelectOptionVO> selectBox_couponType = List();
   List<SelectOptionVO> selectBox_couponItem = List();
 
-  loadTypeData() async {
-    await CouponController.to.getDataB2BCodeItems(context).then((value) {
-      if(value == null){
-        ISAlert(context, '쿠폰정보를 가져오지 못했습니다. \n\n관리자에게 문의 바랍니다');
-      }
-      else{
-        value.forEach((element) {
-          selectBox_couponType.add(new SelectOptionVO(value: element['code'], label: '[${element['code']}] ' + element['codeName']));
-        });
-      }
-    });
-
-    setState(() {});
-  }
+  // loadTypeData() async {
+  //   await CouponController.to.getDataB2BCodeItems(context).then((value) {
+  //     if(value == null){
+  //       ISAlert(context, '쿠폰정보를 가져오지 못했습니다. \n\n관리자에게 문의 바랍니다');
+  //     }
+  //     else{
+  //       value.forEach((element) {
+  //         selectBox_couponType.add(new SelectOptionVO(value: element['code'], label: '[${element['code']}] ' + element['codeName']));
+  //       });
+  //     }
+  //   });
+  //
+  //   setState(() {});
+  // }
 
   loadItemData(String coupon_type) async {
     selectBox_couponItem.clear();
@@ -75,17 +81,21 @@ class B2BCouponRegistState extends State<B2BCouponRegist> {
     //       value: element['code'], label: element['codeName']));
     // });
 
+    widget.couponTypeItems.forEach((element) {
+      selectBox_couponType.add(new SelectOptionVO(value: element['code'], label: '[${element['code']}] '+element['codeName']));
+    });
+
     formData = couponRegistModel();
 
-    formData.couponType = 'B2B_C100';
+    formData.couponType = widget.selectedCouponType;//'B2B_C100';
     //formData.startDate = formatDate(DateTime.now(), [yyyy, '-', mm, '-', dd]);
     //_startDate = formatDate(DateTime.now(), [yyyy, '', mm, '', dd]);
     formData.insertUcode = GetStorage().read('logininfo')['uCode'];
     formData.insertName = GetStorage().read('logininfo')['name'];
 
     WidgetsBinding.instance.addPostFrameCallback((c) {
-      loadTypeData();
-      loadItemData('B2B_C100');
+      //loadTypeData();
+      loadItemData(widget.selectedCouponType);//'B2B_C100');
     });
   }
 
@@ -159,6 +169,32 @@ class B2BCouponRegistState extends State<B2BCouponRegist> {
                   inputFormatters: <TextInputFormatter>[FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))],
                   onSaved: (v) {
                     formData.couponCount = v;
+                  },
+                ),
+              ),
+              Flexible(
+                flex: 1,
+                child: ISSelectDate(
+                  context,
+                  label: '만료일',
+                  value: formData.expDate,
+                  onTap: () async {
+                    DateTime valueDt = DateTime.now();
+                    final DateTime picked = await showDatePicker(
+                      context: context,
+                      initialDate: valueDt,
+                      firstDate: DateTime(1900, 1),
+                      lastDate: DateTime(2031, 12),
+                    );
+
+                    setState(() {
+                      if (picked != null) {
+                        formData.expDate = formatDate(picked, [yyyy, '-', mm, '-', dd]);
+                        _expDate = formatDate(picked, [yyyy, '', mm, '', dd]);
+                      }
+                    });
+
+                    formKey.currentState.save();
                   },
                 ),
               ),
@@ -252,6 +288,7 @@ class B2BCouponRegistState extends State<B2BCouponRegist> {
               ISAlert(context, '발행수량을 확인해주세요.');
               return;
             }
+            formData.expDate = _expDate;
 
             //formData.startDate = _startDate;
             CouponController.to.postB2BData(formData.toJson(), context);

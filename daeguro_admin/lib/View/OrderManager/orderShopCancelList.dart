@@ -393,7 +393,7 @@ class OrderShopCancelListState extends State {
             columns: <DataColumn>[
               DataColumn(label: Expanded(child: Text('가맹점명', textAlign: TextAlign.center)), ),
               DataColumn(label: Expanded(child: Text('상점전화', textAlign: TextAlign.center)),),
-              DataColumn(label: Expanded(child: Text('POS상태\n(설치/로그인)', textAlign: TextAlign.center, style: TextStyle(fontSize: 12))),),
+              DataColumn(label: Expanded(child: Text('POS상태\n(설치/로그인)', textAlign: TextAlign.center, style: TextStyle(fontSize: 10))),),
               DataColumn(label: Expanded(child: Text('최종 취소 시간', textAlign: TextAlign.center)),),
               DataColumn(label: Expanded(child: Text('취소건수', textAlign: TextAlign.center)),),
               DataColumn(label: Expanded(child: Text('휴점', textAlign: TextAlign.center)),),

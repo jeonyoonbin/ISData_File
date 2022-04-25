@@ -214,7 +214,7 @@ class AuthMenuRegistState extends State<AuthMenuRegist> {
               formData.pid = '';
             }
 
-            print('id:${formData.id}, pid:${formData.pid}, menuDepth:${formData.menuDepth}, name:${formData.name}, icon:${formData.icon}, url:${formData.url}, visibleStr:$visibleStr');
+            //print('id:${formData.id}, pid:${formData.pid}, menuDepth:${formData.menuDepth}, name:${formData.name}, icon:${formData.icon}, url:${formData.url}, visibleStr:$visibleStr');
 
             AuthController.to.postMenuData(formData.pid, formData.menuDepth, formData.name, formData.icon, formData.url, visibleStr).then((value) {
               if (value != null){

@@ -1,29 +1,30 @@
+import 'package:dio/dio.dart';
+
 class ServerInfo {
-  static const String APP_VERSION = "검수중";//"v2.1.4";//
+  static const String APP_VERSION = "v2.1.5";//[검수중]";//"v2.1.4";//
   
   // 이미지경로
   static const String REST_IMG_BASEURL = "";  // 실서버 배포
 
   //API경로
-  // static const String REST_BASEURL = "https://admin.daeguro.co.kr/api"; //  실서버API
-  // static const String REST_RESERVEURL = 'https://admin.daeguro.co.kr/Reserveapi';  // 실서버API
-
   static const String REST_BASEURL = "http://dgpub.282.co.kr:8426";  // 테스트서버API
-  static const String REST_RESERVEURL = 'https://reser.daeguro.co.kr:10018';//"/Reserveapi";  // 테스트서버API
+  //static const String REST_RESERVEURL = 'https://reser.daeguro.co.kr:10018';//"/Reserveapi";  // 테스트서버API
+
+  //static const String REST_BASEURL = "/api";
+  static const String REST_RESERVEURL = "/Reserveapi";
 
   ///////////// 전체현황
   static const String REST_URL_DASHBOARD = REST_BASEURL + "/Total/getShopCount";
   static const String REST_URL_DASHBOARDWEEKORDER = REST_BASEURL + "/Total/getWeekOrder";
   static const String REST_URL_DASHBOARDWEEKCUSTOMER = REST_BASEURL + "/Total/getWeekCustomer";
   static const String REST_URL_DASHBOARDTODAYCOUNT = REST_BASEURL + "/Total/getTodayCount";
-  //static const String REST_URL_DASHBOARDTOTALINFOSUM = REST_BASEURL + "/Total/getDaeguroTotalInfoSum";
 
   static const String REST_URL_DASHBOARDTOTALINSTALLOS = REST_BASEURL + "/Total/getTotalInstalled";
   static const String REST_URL_DASHBOARDTOTALORDERS = REST_BASEURL + "/Total/getTotalOrders";
   static const String REST_URL_DASHBOARDTOTALYEARMEMBERS = REST_BASEURL + "/Total/getTotalYearMembers";
   static const String REST_URL_DASHBOARDTOTALCANCEL = REST_BASEURL + "/Total/getTotalCancel";
 
-  /////////////
+  ///////////// 콜센터
   static const String REST_URL_AGENT = REST_BASEURL + "/Agent";
   static const String REST_URL_AGENT_CODE = REST_BASEURL +"/AgentCode";
 
@@ -39,11 +40,22 @@ class ServerInfo {
   static const String REST_URL_SHOPBASIC = REST_BASEURL +"/ShopBasic";
   static const String REST_URL_SHOPFRANCHISELIST = REST_BASEURL +"/ShopBasic/getFranchiseList";
   static const String REST_URL_SHOPINFO = REST_BASEURL +"/ShopInfo";
+
+  static const String REST_URL_SHOPRESERVE_IMAGE = REST_RESERVEURL +"/shopImage";
+  static const String REST_URL_SHOPRESERVE_IMAGE_DELETE = REST_RESERVEURL +"/shopImage/delete";
+
+  static const String REST_URL_SHOP_RESERVE_REVIEW_IMAGE = REST_RESERVEURL +"/reviewImage";
+  static const String REST_URL_SHOP_RESERVE_REVIEW_IMAGE_DELETE = REST_RESERVEURL +"/reviewImage/delete";
+
   static const String REST_URL_SHOPIMAGEHISTORY = REST_BASEURL + "/Image/history";
   static const String REST_URL_SHOPCALC = REST_BASEURL +"/ShopCalc";
   static const String REST_URL_SHOPCALC_CONFIRM = REST_BASEURL +"/ShopCalc/confirm";
   static const String REST_URL_SHOPSECTOR = REST_BASEURL +"/ShopSector";
   static const String REST_URL_SHOPSECTORHIST = REST_BASEURL +"/ShopSector/history";
+
+  static const String REST_URL_SHOPSECTOR_GETGEOFENCE = REST_BASEURL +"/ShopSector/getGeofenceYn";
+  static const String REST_URL_SHOPSECTOR_SETGEOFENCE = REST_BASEURL +"/ShopSector/setGeofenceYn";
+
   static const String REST_URL_SHOPUPDATESORT = REST_BASEURL +"/Menu/updateSort";
   static const String REST_URL_SHOPBANKCONFIRM = REST_BASEURL +"/Shop/setBankConfirm";
   static const String REST_URL_SHOPCHARGEJOIN = REST_BASEURL +"/Shop/ChargeJoin";
@@ -87,9 +99,11 @@ class ServerInfo {
   static const String REST_URL_SET_DAYTIME = REST_BASEURL +"/DeliTip/setDayTime";
 
   static const String REST_URL_DELITIP = REST_BASEURL +"/DeliTip";
-  static const String REST_URL_DELITIPHISTORY = REST_BASEURL +"/DeliTip/history";
 
-  //static const String REST_URL_DELITIPSETRESERVE = REST_BASEURL +"/DeliTip/setReserve";
+  static const String REST_URL_DELITIPDAEGURO = REST_BASEURL +"/DeliTip/getDeliDgrYn";
+  static const String REST_URL_SET_DELITIPDAEGURO = REST_BASEURL +"/DeliTip/setDeliDgrYn";
+
+  static const String REST_URL_DELITIPHISTORY = REST_BASEURL +"/DeliTip/history";
 
   static const String REST_URL_EXCELEXPORT = REST_BASEURL +"/Shop/ExcelExport";
 
@@ -100,7 +114,6 @@ class ServerInfo {
   static const String REST_URL_SHOPEVENTMENU = REST_BASEURL +"/ShopInfo/getShopEventDiscMenu";
   static const String REST_URL_SHOPEVENTYN = REST_BASEURL + "/ShopInfo/getEventYn";
 
-  //static const String REST_URL_TAXREGCHECK = REST_BASEURL + "/Tax";
   static const String REST_URL_DBREGCHECK = REST_BASEURL + "/Shop/RegNoCheck";
 
   static const String REST_URL_MOVEREVIEW = REST_BASEURL + "/ShopReview/moveReview";
@@ -112,7 +125,7 @@ class ServerInfo {
   static const String REST_URL_SETVISIBLE = REST_BASEURL + "/ShopReview/setVisible";
   static const String REST_URL_SHOPREIVEWHIST = REST_BASEURL + "/ShopReview/history";
 
-  //static const String REST_URL_RESER_LIST = "https://reser.daeguro.co.kr:10008/reser-list";
+  static const String REST_URL_POS_APPPROCESS = "https://pos.daeguro.co.kr:15412/posApi/POSData/DaeguroApp_Process";
 
   ///////////// 주문조회
   static const String REST_URL_ORDER = REST_BASEURL +"/Order";
@@ -122,9 +135,12 @@ class ServerInfo {
   static const String REST_URL_ORDER_COMPLETETOCANCEL = REST_BASEURL +"/Order/getCompleteToCancelOrderList";
   static const String REST_URL_ORDER_GETCARDAPPROVALGBN = REST_BASEURL +"/Order/getCardApprovalGbn";
 
+  static const String REST_URL_POSORDER_CHANGE = "https://pos.daeguro.co.kr:15409/orderApi/POSOrder/B2B_OrderStatus_Change_Manage";
+
   ///////////// 쿠폰관리
   static const String REST_URL_COUPON = REST_BASEURL +"/Coupon";
   static const String REST_URL_COUPON_CODE = REST_BASEURL +"/Coupon/couponCode";
+  static const String REST_URL_COUPON_CODE_R = REST_BASEURL +"/Coupon/getCouponCodeR";
   static const String REST_URL_COUPON_HISTORY = REST_BASEURL +"/Coupon/getCouponHistory";
   static const String REST_URL_SETCOUPONAPPCUSTOMER= REST_BASEURL +"/Coupon/setCouponAppCustomer";
 
@@ -173,13 +189,12 @@ class ServerInfo {
   static const String REST_URL_USER_CHECK = REST_BASEURL  + "/User/idCheck";
   static const String REST_URL_USER_CODE_NAME = REST_BASEURL  + "/User/user_code_name";
   static const String REST_URL_USER_ADDLOGINLOG = REST_BASEURL  + "/User/addLoginLog";
+  static const String REST_URL_USER_HIST = REST_BASEURL  + "/User/getUserHist";
 
   ///////////// 이미지관리
   static const String REST_URL_IMAGE = REST_BASEURL +"/Image";
   static const String REST_URL_IMAGETHUMB = REST_BASEURL +"/Image/thumb";
   static const String REST_URL_MENUIMAGE_REMOVE = REST_BASEURL +"/Image/removeMenuImage";
-
-
 
   ///////////// 사장님사이트 연동
   static const String OWNERSITE_URL = "https://ceo.daeguro.co.kr/login";
@@ -194,14 +209,7 @@ class ServerInfo {
   static const String REST_URL_MAPPING = REST_BASEURL  + "/Mapping";
   static const String REST_URL_MAPPING_CHECK = REST_BASEURL + "/Mapping/checkApiMap";
 
-  ///////////// 로지올 리뷰API(사장님사이트측 API호출(Shop))
-  //local Test URL : http://172.16.10.74:12500
-  //Test Server URL : http://dgpub.282.co.kr:10002
-  //Real Server URL : https://ceo.daeguro.co.kr
-
-  static const String REVIEW_API_TOKEN = "https://ceo.daeguro.co.kr/api/ReviewRest/token";
-  static const String REVIEW_API_SHOPCONFIRM = "https://ceo.daeguro.co.kr/api/ReviewRest/Register";
-  static const String REVIEW_API_SHOPINFO = "https://ceo.daeguro.co.kr/api/ReviewRest/ShopInfo";
+  //static const String REVIEW_API_SHOPCONFIRM = "https://ceo.daeguro.co.kr/api/ReviewRest/Register";
 
   // 내부망
   //static const String REST_URL_BANKACCOUNT = "http://192.168.30.98:10002/api/AdmAcc/confrim_v2";
@@ -259,7 +267,6 @@ class ServerInfo {
   static const String REST_URL_CODE = REST_BASEURL + "/Code";
   static const String REST_URL_CODE_GETFOODSAFETY = REST_BASEURL + "/Code/getFoodSafety";
   static const String REST_URL_CODE_PUTFOODSAFETY = REST_BASEURL + "/Code/putFoodSafety";
-  //static const String REST_URL_RESTCOUPONCODE = REST_BASEURL + "/CouponManage";
 
   ///////////// 정산관리
   static const String REST_URL_CALCULATE_SHOPMILEAGE = REST_BASEURL + "/Calculate/getShopCalculateList";
@@ -299,4 +306,6 @@ class ServerInfo {
   ///////////// 상품권관리
   static const String REST_URL_VOUCHER = REST_BASEURL +"/Voucher";
   static const String REST_URL_VOUCHER_GETVOUCHERLIST = REST_BASEURL +"/Voucher/getVoucherList";
+  static const String REST_URL_VOUCHER_SETVOUCHERAPPCUSTOMER = REST_BASEURL +"/Voucher/setVoucherAppCustomer";
+  static const String REST_URL_VOUCHER_HIST = REST_BASEURL +"/Voucher/getVoucherHist";
 }

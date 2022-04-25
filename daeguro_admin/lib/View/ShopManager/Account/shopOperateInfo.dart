@@ -4,12 +4,13 @@ import 'package:bubble_tab_indicator/bubble_tab_indicator.dart';
 import 'package:daeguro_admin_app/ISWidget/is_button.dart';
 import 'package:daeguro_admin_app/ISWidget/is_dialog.dart';
 import 'package:daeguro_admin_app/ISWidget/is_input.dart';
+import 'package:daeguro_admin_app/ISWidget/is_progressDialog.dart';
 import 'package:daeguro_admin_app/ISWidget/is_select.dart';
 import 'package:daeguro_admin_app/Model/shop/shop_delitip.dart';
 import 'package:daeguro_admin_app/Model/shop/shop_saleDaytime.dart';
 import 'package:daeguro_admin_app/Model/shop/shop_saletime.dart';
-import 'package:daeguro_admin_app/Model/shop/shopposupdate.dart';
-import 'package:daeguro_admin_app/Provider/RestApiProvider.dart';
+import 'package:daeguro_admin_app/Network/DioClient.dart';
+
 import 'package:daeguro_admin_app/Util/auth_util.dart';
 import 'package:daeguro_admin_app/Util/select_option_vo.dart';
 import 'package:daeguro_admin_app/View/CodeManager/code_controller.dart';
@@ -17,6 +18,9 @@ import 'package:daeguro_admin_app/View/ShopManager/Account/shopDetailNotifierDat
 import 'package:daeguro_admin_app/View/ShopManager/Account/shopAccount_controller.dart';
 import 'package:daeguro_admin_app/Util/multi_masked_formatter.dart';
 import 'package:daeguro_admin_app/Util/utils.dart';
+import 'package:daeguro_admin_app/View/ShopManager/Account/shopReserveShopImageInfo.dart';
+import 'package:daeguro_admin_app/View/ShopManager/Account/shopReviewImage.dart';
+import 'package:daeguro_admin_app/constants/serverInfo.dart';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +28,6 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import 'package:get_storage/get_storage.dart';
-import 'package:http/http.dart' as http;
 
 class ShopOperateInfo extends StatefulWidget {
   final Stream<ShopDetailNotifierData> stream;
@@ -44,16 +47,14 @@ class ShopOperateInfo extends StatefulWidget {
   }
 }
 
+
 class ShopOperateInfoState extends State<ShopOperateInfo> with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   TabController _nestedTabController;
 
-  ShopPosUpdateModel shopPosUpdate = ShopPosUpdateModel();
   List<ShopSaleDayTimeModel> dataSaleDayTimeList = <ShopSaleDayTimeModel>[];
   ShopDetailNotifierData detailData;
-
-
 
   ShopSaleTimeModel formSaleTimeData = ShopSaleTimeModel();
   ShopSaleTimeModel editData = ShopSaleTimeModel();
@@ -64,12 +65,22 @@ class ShopOperateInfoState extends State<ShopOperateInfo> with SingleTickerProvi
   bool isListSaveEnabled = false;
   bool chkTimeGbn = false;
 
+  List<SelectOptionVO> _ThemeList = [];
+  List<SelectOptionVO> _ThemeSelectedList = [];
+
   String _introduce = '';
 
-  String _theme1 = '0';
-  String _theme2 = '0';
-  String _theme3 = '0';
-  String _theme4 = '0';
+  // String _theme1 = '0';
+  // String _theme2 = '0';
+  // String _theme3 = '0';
+  // String _theme4 = '0';
+  // String _theme5 = '0';
+  // String _theme6 = '0';
+  // String _theme7 = '0';
+  // String _theme8 = '0';
+  // String _theme9 = '0';
+  // String _theme10 = '0';
+
 
   String _conv1 = 'N';
   String _conv2 = 'N';
@@ -84,20 +95,29 @@ class ShopOperateInfoState extends State<ShopOperateInfo> with SingleTickerProvi
 
   String _itemCd = '';
   String _itemCd1 = '';
-  String _tema_1_itemCd = '';
+  String _tema_1_sub = '';
 
   String _reveiwUseGbn = 'N';
 
   ScrollController _scrollController;
 
   bool isReceiveDataEnabled = false;
+  bool _theme1Enabled = false;
+
+  String _delitipDaeguroYn = 'N';
+  String _delitipDaeguroAMT = '0';
+  //String _delitipDaeguroCust = '0';
 
   void refreshWidget(ShopDetailNotifierData element) {
     detailData = element;
     if (detailData != null) {
       //loadFoodSafetyData();
       //loadReserCategoryData();
-      loadReserShopInfo();
+
+      loadDelitipDaeguroData();
+
+      //loadReserThemeInfo();
+      //loadReserShopInfo();
       loadSaleDayTimeData();
 
       isReceiveDataEnabled = true;
@@ -112,9 +132,6 @@ class ShopOperateInfoState extends State<ShopOperateInfo> with SingleTickerProvi
       formSaleTimeData = null;
       formSaleTimeData = ShopSaleTimeModel();
 
-      shopPosUpdate = null;
-      shopPosUpdate = ShopPosUpdateModel();
-
       dataSaleDayTimeList = null;
       dataSaleDayTimeList = <ShopSaleDayTimeModel>[];
 
@@ -128,24 +145,95 @@ class ShopOperateInfoState extends State<ShopOperateInfo> with SingleTickerProvi
     }
   }
 
-  // loadFoodSafetyData() async {
-  //   if (detailData != null && detailData.selected_franchiseCd != ''){
-  //     await CodeController.to.getFoodSafetyData(detailData.selected_franchiseCd).then((value) {
-  //       if (value != null){
-  //         _FoodSafetyData = value['NUTRITION'];
-  //         _AllergyData = value['ALLERGY'];
-  //       }
-  //     });
-  //   }
+  // loadThemeData() async {
+  //   _ThemeList.clear();
+  //   await ShopController.to.getReserItems('0002').then((value) {
+  //     if (value == null) {
+  //       ISAlert(context, '테마 조회가 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
+  //     } else {
+  //       //int otherElementCnt = 10 - value.length;
+  //
+  //       value.forEach((element) {
+  //         //selectBox_reserve_itemCd.add(new SelectOptionVO(value: element['code'], label: element['nameMain'], label2: element['nameMain']));
+  //         String itemName = element['nameMain'].toString().replaceAll('\r\n', '');
+  //         _ThemeList.add(new SelectOptionVO(value: element['code'].toString(), label: itemName, label2: '0'));
+  //       });
+  //
+  //       // for (int i =0 ; i<otherElementCnt; i++){
+  //       //   _ThemeList.add(new SelectOptionVO(value: '', label: '', label2: '0'));
+  //       // }
+  //     }
+  //   });
+  //
+  //   setState(() {
+  //     // sData_dongList.forEach((element) {
+  //     //   if (_getCompareData(element)){
+  //     //     selectedThemeList.add(element);
+  //     //   }
+  //     // });
+  //   });
   // }
+
+  loadDelitipDaeguroData() async {
+    await ShopController.to.getDelitipDaeguro(detailData.selected_shopCode).then((value) {
+      if (value == null) {
+        ISAlert(context, '정상조회가 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
+      }
+      else {
+        _delitipDaeguroAMT = value['DELI_DGR_AMT'].toString();
+        _delitipDaeguroYn = value['DELI_DGR_YN'].toString();
+      }
+    });
+
+    setState(() {
+
+    });
+  }
+
+  loadReserThemeInfo() async {
+    await ShopController.to.getReserShopThemeInfo(detailData.selected_shopCode.toString()).then((value) {
+      if (value == null) {
+        ISAlert(context, '예약정보가 정상조회 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
+      }
+      else {
+        _ThemeList.clear();
+        _ThemeSelectedList.clear();
+
+        value.forEach((element) {
+          _ThemeList.add(new SelectOptionVO(value: element['code'].toString(), label: element['name'].toString(), label2: element['useGbn'].toString()));
+        });
+
+        int idx = 0;
+        _ThemeList.forEach((element) {
+          if (element.label2.toString() == '1') {
+            _ThemeSelectedList.add(_ThemeList.elementAt(idx));
+          }
+
+          idx++;
+        });
+
+
+        _theme1Enabled = _getSubThemeCompareData('1000000000');
+      }
+    });
+
+    setState(() {});
+  }
+
+  bool _getSubThemeCompareData(String code){
+    bool temp = false;
+
+    for (final element in _ThemeSelectedList){
+      if (element.value == code) {
+        temp = true;
+        break;
+      }
+    }
+    return temp;
+  }
 
   loadReserShopInfo() async {
     _introduce = '';
-
-    _theme1 = '0';
-    _theme2 = '0';
-    _theme3 = '0';
-    _theme4 = '0';
 
     _conv1 = 'N';
     _conv2 = 'N';
@@ -162,7 +250,7 @@ class ShopOperateInfoState extends State<ShopOperateInfo> with SingleTickerProvi
 
     _itemCd = '';
     _itemCd1 = '';
-    _tema_1_itemCd = '';
+    _tema_1_sub = '';
 
     await ShopController.to.getReserShopInfo(detailData.selected_shopCode.toString()).then((value) {
       if (value == null) {
@@ -172,10 +260,6 @@ class ShopOperateInfoState extends State<ShopOperateInfo> with SingleTickerProvi
       } else {
         if (value != null) {
           _introduce = value[0]['introduce'].toString();
-          _theme1 = value[0]['tema_1'].toString();
-          _theme2 = value[0]['tema_2'].toString();
-          _theme3 = value[0]['tema_3'].toString();
-          _theme4 = value[0]['tema_4'].toString();
 
           _conv1 = value[0]['facilities_1'].toString();
           _conv2 = value[0]['facilities_2'].toString();
@@ -192,12 +276,10 @@ class ShopOperateInfoState extends State<ShopOperateInfo> with SingleTickerProvi
 
           _itemCd = value[0]['itemCd'].toString();
           _itemCd1 = value[0]['itemCd1'].toString();
-          _tema_1_itemCd = value[0]['tema_1_itemCd'].toString();
+          _tema_1_sub = value[0]['tema_1_sub'].toString();
 
-          if (_tema_1_itemCd == null || _tema_1_itemCd == 'null')
-            _tema_1_itemCd = '';
-          print('_tema_1_itemCd:${_tema_1_itemCd}');
-
+          if (_tema_1_sub == null || _tema_1_sub == 'null')
+            _tema_1_sub = '';
         }
       }
     });
@@ -490,113 +572,160 @@ class ShopOperateInfoState extends State<ShopOperateInfo> with SingleTickerProvi
                                   sendData.modUCode = GetStorage().read('logininfo')['uCode'];
                                   sendData.modName = GetStorage().read('logininfo')['name'];
 
-                                  //print('formData--> '+sendData.toJson().toString());
-
                                   ShopController.to.postSaleTimeData(sendData.toJson()).then((value) async {
                                     if (value != null){
                                       ISAlert(context, '[운영정보] 정상적으로 저장되지 않았습니다. \n\n${value}');
                                       return;
                                     }
                                     else{
-                                      var bodyData = {
-                                        '"shopCd"': '"${detailData.selected_shopCode}"',
-                                        '"ccCode"': '"${widget.ccCode}"',
-                                        '"itemCd"': '"$_itemCd"',
-                                        '"introduce"': '"$_introduce"',
-                                        '"itemCd1"': '"$_itemCd1"',
-                                        '"reveiwUseGbn"': '"$_reveiwUseGbn"',
-                                        '"tema_1"': '"$_theme1"',
-                                        '"tema_2"': '"$_theme2"',
-                                        '"tema_3"': '"$_theme3"',
-                                        '"tema_4"': '"$_theme4"',
-                                        '"facilities_1"': '"$_conv1"',
-                                        '"facilities_2"': '"$_conv2"',
-                                        '"facilities_3"': '"$_conv3"',
-                                        '"facilities_4"': '"$_conv4"',
-                                        '"facilities_5"': '"$_conv5"',
-                                        '"facilities_6"': '"$_conv6"',
-                                        '"facilities_7"': '"$_conv7"',
-                                        '"facilities_8"': '"$_conv8"',
-                                        '"facilities_9"': '"$_conv9"',
-                                        '"facilities_10"': '"$_conv10"',
-                                        '"tema_1_itemCd"': '"$_tema_1_itemCd"',
-                                        '"userId"': '"${GetStorage().read('logininfo')['uCode']}"',
+                                      String posAppOrderYn = '1';
+                                      String posReserveYn = '1';
+
+                                      // 매장 유형이 배달(5) or 포장(7) 포함 된 경우
+                                      if (formSaleTimeData.shopType.contains('5') || formSaleTimeData.shopType.contains('7')) {
+                                        posAppOrderYn = '1';
+                                      } else {
+                                        posAppOrderYn = '0';
+                                      }
+
+                                      if (formSaleTimeData.reserveYn == 'Y') {
+                                        posReserveYn = '1';
+                                        if (formSaleTimeData.shopType.contains('9')) {
+                                          posReserveYn = '1';
+                                        }
+                                        else
+                                          posReserveYn = '0';
+                                      }
+                                      else {
+                                        posReserveYn = '0';
+                                      }
+
+                                      var bodyPosData = {'"app_name"': '"대구로 어드민"', '"app_type"': '"admin-daeguroApp"',
+                                        '"shop_info"': '{"job_gbn" :"STOREUSE_UPDATE", "use_gbn" : "' + sendData.useGbn +
+                                            '", "shop_token" : "' + detailData.selected_apiComCode +
+                                            '", "is_fooddelivery" : "' + posAppOrderYn +
+                                            '", "is_reserve" : "' + posReserveYn +
+                                            '", "mod_ucode" : "' + GetStorage().read('logininfo')['uCode'] + '"}'
                                       };
 
-                                      await ShopController.to.setReserveShopInfoadmin(bodyData).then((value) async {
-                                        if (value != null){
-                                          ISAlert(context, '[예약설정] 정상적으로 저장되지 않았습니다. \n\n${value}');
-                                          return;
+                                      await DioClient().postRestLog('0', 'shopOperate/postAppProcess', '[POS 가맹점 정보 저장] ' + bodyPosData.toString() + '|| ucode : ' + GetStorage().read('logininfo')['uCode'].toString() + ', name : ' + GetStorage().read('logininfo')['name'].toString());
+
+                                      await ShopController.to.postPosShopUpdate(ServerInfo.REST_URL_POS_APPPROCESS, bodyPosData.toString()).then((value) async {
+                                        if(value == null){
+                                          ISAlert(context, '[POS설정] POS API연동 오류. \n\n관리자에게 문의 바랍니다');
                                         }
                                         else{
-                                          shopPosUpdate.job_gbn = 'STOREUSE_UPDATE';
-                                          shopPosUpdate.shop_token = detailData.selected_apiComCode;
-                                          shopPosUpdate.use_gbn = sendData.useGbn;
-                                          shopPosUpdate.mod_ucode = GetStorage().read('logininfo')['uCode'];
+                                          if (value.data['code'] != 0) {
+                                            //ISAlert(context, '[POS설정] 정상적으로 저장되지 않았습니다. \n\n- [${value.data['code']}] ${value.data['message']}');
 
-                                          var headerData = {
-                                            "Access-Control-Allow-Origin": "*",
-                                            // Required for CORS support to work
-                                            "Access-Control-Allow-Headers": "*",
-                                            "Access-Control-Allow-Credentials": "true",
-                                            "Access-Control-Allow-Methods": "*",
-                                            "Content-Type": "application/json",
-                                            "Authorization":
-                                            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6Im9yZGVyX2NvbXAiLCJhcHBfdHlwZSI6Im9yZGVyIiwiYXBwX25hbWUiOiJkYWd1cm9hcHAiLCJuYmYiOjE2NDExODcwMDAsImV4cCI6MTY3NTIwNjAwMCwiaWF0IjoxNjQxMTg3MDAwLCJpc3MiOiJodHRwczovL2xvY2FsaG9zdDoxNTQwOSIsImF1ZCI6Ikluc3VuZ1BPUyJ9.hVaYELqN7i9IQ3o00LRcF--sCv6up7slUq1i94WDw78",
-                                            //"Accept": "application/json",
-                                          };
-
-                                          String posAppOrderYn = '1';
-                                          String posReserveYn = '1';
-
-                                          if (chkappOrderYn == true) {
-                                            posAppOrderYn = '1';
-                                          } else {
-                                            posAppOrderYn = '0';
+                                            await DioClient().postRestLog('0', 'shopOperate/postAppProcess', '[POS 가맹점 정보 저장 실패] - [${value.data['code']}] ${value.data['message']}\n' + bodyPosData.toString() + '|| ucode : ' + GetStorage().read('logininfo')['uCode'].toString() + ', name : ' + GetStorage().read('logininfo')['name'].toString());
                                           }
-
-                                          if (formSaleTimeData.reserveYn == 'Y') {
-                                            posReserveYn = '1';
-                                            if (formSaleTimeData.shopType == '7' || formSaleTimeData.shopType == '5' || formSaleTimeData.shopType == '5,7' || formSaleTimeData.shopType == '7,5') {
-                                              posReserveYn = '1';
-                                            }
-                                            else
-                                              posReserveYn = '0';
-                                          }
-                                          else {
-                                            posReserveYn = '0';
-                                          }
-
-                                          var bodyPosData = {'"app_name"': '"대구로 어드민"', '"app_type"': '"admin-daeguroApp"',
-                                            '"shop_info"': '{"job_gbn" :"STOREUSE_UPDATE", "use_gbn" : "' + sendData.useGbn +
-                                                '", "shop_token" : "' + detailData.selected_apiComCode +
-                                                '", "is_fooddelivery" : "' + posAppOrderYn +
-                                                '", "is_reserve" : "' + posReserveYn +
-                                                '", "mod_ucode" : "' + GetStorage().read('logininfo')['uCode'] + '"}'
-                                          };
-
-                                          await RestApiProvider.to.postRestError('0', '/admin/shopOperate : postSaleTimeData', '[POS 가맹점 정보 저장] ' + bodyPosData.toString() + '|| ucode : ' + GetStorage().read('logininfo')['uCode'].toString() + ', name : ' + GetStorage().read('logininfo')['name'].toString());
-
-                                          await http.post(Uri.parse('https://pos.daeguro.co.kr:15412/posApi/POSData/DaeguroApp_Process'), headers: headerData, body: bodyPosData.toString()).then((http.Response response) {
-                                            if (response.statusCode == 200) {
-                                              var decodeBody = jsonDecode(response.body);
-                                              //print('pos [200]:${decodeBody.toString()}');
-                                            } else {
-                                              var decodeBody = jsonDecode(response.body);
-                                              //print('pos [other]:${decodeBody.toString()}');
-
-                                              ISAlert(context, '[POS설정] 정상적으로 저장되지 않았습니다. \n\n${decodeBody.toString()}');
-                                            }
-                                          });
-
-                                          setState(() {
-                                            isInfoSaveEnabled = true;
-                                          });
-
-
-                                          widget.callback();
                                         }
                                       });
+
+                                      if (int.parse(_delitipDaeguroAMT) < 0){
+                                        ISAlert(context, '계약요금은 0원 이상이어야 합니다.');
+                                        return;
+                                      }
+
+                                      await ShopController.to.postDelitipDaeguro(detailData.selected_shopCode, _delitipDaeguroYn, _delitipDaeguroAMT, context);
+
+                                      setState(() {
+                                        isInfoSaveEnabled = true;
+                                      });
+
+
+                                      widget.callback();
+                                      
+                                      // var bodyData = {
+                                      //   '"shopCd"': '"${detailData.selected_shopCode}"',
+                                      //   '"ccCode"': '"${widget.ccCode}"',
+                                      //   '"itemCd"': '"$_itemCd"',
+                                      //   '"introduce"': '"$_introduce"',
+                                      //   '"itemCd1"': '"$_itemCd1"',
+                                      //   '"reveiwUseGbn"': '"$_reveiwUseGbn"',
+                                      //   '"facilities_1"': '"$_conv1"',
+                                      //   '"facilities_2"': '"$_conv2"',
+                                      //   '"facilities_3"': '"$_conv3"',
+                                      //   '"facilities_4"': '"$_conv4"',
+                                      //   '"facilities_5"': '"$_conv5"',
+                                      //   '"facilities_6"': '"$_conv6"',
+                                      //   '"facilities_7"': '"$_conv7"',
+                                      //   '"facilities_8"': '"$_conv8"',
+                                      //   '"facilities_9"': '"$_conv9"',
+                                      //   '"facilities_10"': '"$_conv10"',
+                                      //   '"tema_1_sub"': '"$_tema_1_sub"',
+                                      //   '"userId"': '"${GetStorage().read('logininfo')['uCode']}"',
+                                      // };
+                                      //
+                                      // await ShopController.to.setReserveShopInfoadmin(bodyData).then((value) async {
+                                      //   if (value != null){
+                                      //     ISAlert(context, '[예약설정] 정상적으로 저장되지 않았습니다. \n\n${value}');
+                                      //
+                                      //     await DioClient().postRestLog('0', 'shopOperate/reserveShopInfo', '[예약설정] 저장 실패 - {${value} || ucode : ' + GetStorage().read('logininfo')['uCode'].toString() + ', name : ' + GetStorage().read('logininfo')['name'].toString());
+                                      //     return;
+                                      //   }
+                                      //   else{
+                                      //     String posAppOrderYn = '1';
+                                      //     String posReserveYn = '1';
+                                      //
+                                      //     // 매장 유형이 배달(5) or 포장(7) 포함 된 경우
+                                      //     if (formSaleTimeData.shopType.contains('5') || formSaleTimeData.shopType.contains('7')) {
+                                      //       posAppOrderYn = '1';
+                                      //     } else {
+                                      //       posAppOrderYn = '0';
+                                      //     }
+                                      //
+                                      //     if (formSaleTimeData.reserveYn == 'Y') {
+                                      //       posReserveYn = '1';
+                                      //       if (formSaleTimeData.shopType.contains('9')) {
+                                      //         posReserveYn = '1';
+                                      //       }
+                                      //       else
+                                      //         posReserveYn = '0';
+                                      //     }
+                                      //     else {
+                                      //       posReserveYn = '0';
+                                      //     }
+                                      //
+                                      //     var bodyPosData = {'"app_name"': '"대구로 어드민"', '"app_type"': '"admin-daeguroApp"',
+                                      //                        '"shop_info"': '{"job_gbn" :"STOREUSE_UPDATE", "use_gbn" : "' + sendData.useGbn +
+                                      //                                         '", "shop_token" : "' + detailData.selected_apiComCode +
+                                      //                                         '", "is_fooddelivery" : "' + posAppOrderYn +
+                                      //                                         '", "is_reserve" : "' + posReserveYn +
+                                      //                                         '", "mod_ucode" : "' + GetStorage().read('logininfo')['uCode'] + '"}'
+                                      //     };
+                                      //
+                                      //     await DioClient().postRestLog('0', 'shopOperate/postAppProcess', '[POS 가맹점 정보 저장] ' + bodyPosData.toString() + '|| ucode : ' + GetStorage().read('logininfo')['uCode'].toString() + ', name : ' + GetStorage().read('logininfo')['name'].toString());
+                                      //
+                                      //     await ShopController.to.postPosShopUpdate(ServerInfo.REST_URL_POS_APPPROCESS, bodyPosData.toString()).then((value) async {
+                                      //         if(value == null){
+                                      //           ISAlert(context, '[POS설정] POS API연동 오류. \n\n관리자에게 문의 바랍니다');
+                                      //         }
+                                      //         else{
+                                      //           if (value.data['code'] != 0) {
+                                      //             //ISAlert(context, '[POS설정] 정상적으로 저장되지 않았습니다. \n\n- [${value.data['code']}] ${value.data['message']}');
+                                      //
+                                      //             await DioClient().postRestLog('0', 'shopOperate/postAppProcess', '[POS 가맹점 정보 저장 실패] - [${value.data['code']}] ${value.data['message']}\n' + bodyPosData.toString() + '|| ucode : ' + GetStorage().read('logininfo')['uCode'].toString() + ', name : ' + GetStorage().read('logininfo')['name'].toString());
+                                      //           }
+                                      //         }
+                                      //     });
+                                      //
+                                      //     if (int.parse(_delitipDaeguroAMT) < 0){
+                                      //       ISAlert(context, '계약요금은 0원 이상이어야 합니다.');
+                                      //       return;
+                                      //     }
+                                      //
+                                      //     await ShopController.to.postDelitipDaeguro(detailData.selected_shopCode, _delitipDaeguroYn, _delitipDaeguroAMT, context);
+                                      //
+                                      //     setState(() {
+                                      //       isInfoSaveEnabled = true;
+                                      //     });
+                                      //
+                                      //
+                                      //     widget.callback();
+                                      //   }
+                                      // });
                                     }
                                   });
 
@@ -826,6 +955,10 @@ class ShopOperateInfoState extends State<ShopOperateInfo> with SingleTickerProvi
                                   value: formSaleTimeData.reserveYn == 'Y' ? true : false,
                                   title: Text('예약 노출', style: TextStyle(fontSize: 12, color: Colors.white),),
                                   onChanged: (v) {
+                                    if (formSaleTimeData.shopType.contains('9') == false) {
+                                      ISAlert(context, '매장정보->매장유형(예약)선택 후, 활성화가 가능합니다.');
+                                      return;
+                                    }
 
                                     formSaleTimeData.reserveYn = (v == true ? 'Y' : 'N');
 
@@ -841,9 +974,91 @@ class ShopOperateInfoState extends State<ShopOperateInfo> with SingleTickerProvi
                         ),
                       ),
                       Divider(),
-                      formSaleTimeData.reserveYn == 'Y' ? Container(
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Row(
+                            children: [
+                              Text('배달도 대구로 사용', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),),
+                            ],
+                          ),
+                        ],
+                      ),
+                      getDelTipDaeguro(),
+                      /*formSaleTimeData.reserveYn == 'Y' ? Container(
                         child: Column(
                           children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text('- [예약] 알림 이미지', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                                Container(
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        height: 30,
+                                        decoration: new BoxDecoration(
+                                            color: _reveiwUseGbn == 'Y' ? Colors.blue[200] : Colors.red[200],
+                                            borderRadius: new BorderRadius.only(
+                                                topRight: Radius.circular(15.0),
+                                                bottomRight: Radius.circular(15.0),
+                                                topLeft: Radius.circular(15.0),
+                                                bottomLeft: Radius.circular(15.0))),
+                                        child: ISButton(
+                                            label: '리뷰',
+                                            iconData: Icons.save,
+                                            iconColor: Colors.white,
+                                            textStyle: TextStyle(color: Colors.white),
+                                            onPressed: () async {
+                                              showDialog(
+                                                context: context,
+                                                builder: (BuildContext context) => Dialog(
+                                                  child: ShopReviewImage(shopCd: detailData.selected_shopCode, ccCode: widget.ccCode),
+                                                ),
+                                              ).then((v) async {
+                                                if (v != null) {
+
+                                                }
+                                              });
+                                            }),
+                                      ),
+                                      SizedBox(width: 5),
+                                      Container(
+                                        height: 30,
+                                        decoration: new BoxDecoration(
+                                            color: _reveiwUseGbn == 'Y' ? Colors.blue[200] : Colors.red[200],
+                                            borderRadius: new BorderRadius.only(
+                                                topRight: Radius.circular(15.0),
+                                                bottomRight: Radius.circular(15.0),
+                                                topLeft: Radius.circular(15.0),
+                                                bottomLeft: Radius.circular(15.0))),
+                                        child: ISButton(
+                                            label: '매장',
+                                            iconData: Icons.save,
+                                            iconColor: Colors.white,
+                                            textStyle: TextStyle(color: Colors.white),
+                                            onPressed: () async {
+                                              showDialog(
+                                                context: context,
+                                                builder: (BuildContext context) => Dialog(
+                                                  child: ShopReserveShopImageInfo(shopCd: detailData.selected_shopCode, ccCode: widget.ccCode),
+                                                ),
+                                              ).then((v) async {
+                                                if (v != null) {
+
+                                                }
+                                              });
+                                            }),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+                              ],
+                            ),
+                            Divider(),
                             Container(
                               child: Text('- [예약] 한줄소개', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                               alignment: Alignment.centerLeft,
@@ -935,69 +1150,83 @@ class ShopOperateInfoState extends State<ShopOperateInfo> with SingleTickerProvi
                               child: Text('- [예약] 테마', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                               alignment: Alignment.centerLeft,
                             ),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: SwitchListTile(
-                                    dense: true,
-                                    value: _theme1 == '1' ? true : false,
-                                    title: Text('특화거리 다 대구로', style: TextStyle(fontSize: 12),),
-                                    onChanged: (v) {
-                                      setState(() {
-                                        _theme1 = v ? '1' : '0';
-                                      });
-                                    },
-                                  ),
+                            Container(
+                              //padding: EdgeInsets.only(left: 8.0, right: 8.0, top: 6.0),
+                              alignment: Alignment.centerLeft,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Wrap(
+                                  spacing: 10.0,
+                                  runSpacing: 5.0,
+                                  children: _buildThemeChoiceList(),
                                 ),
-                                Expanded(
-                                  child: SwitchListTile(
-                                    dense: true,
-                                    value: _theme2 == '1' ? true : false,
-                                    title: Text('손닙접대 하기 좋은 곳', style: TextStyle(fontSize: 12),),
-                                    onChanged: (v) {
-                                      setState(() {
-                                        _theme2 = v ? '1' : '0';
-                                      });
-                                    },
-                                  ),
-                                ),
-                              ],
+                              ),
                             ),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: SwitchListTile(
-                                    dense: true,
-                                    value: _theme3 == '1' ? true : false,
-                                    title: Text('가족 모임 하기 좋은 곳', style: TextStyle(fontSize: 12),),
-                                    onChanged: (v) {
-                                      setState(() {
-                                        _theme3 = v ? '1' : '0';
-                                      });
-                                    },
-                                  ),
-                                ),
-                                Expanded(
-                                  child: SwitchListTile(
-                                    dense: true,
-                                    value: _theme4 == '1' ? true : false,
-                                    title: Text('대구 맛집 일보 다 대구로', style: TextStyle(fontSize: 12),),
-                                    onChanged: (v) {
-                                      setState(() {
-                                        _theme4 = v ? '1' : '0';
-                                      });
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                            (widget.selectBox_subitemCd.length != 0 && _theme1 == '1') ? ISSelect(
+
+                            // Row(
+                            //   children: [
+                            //     Expanded(
+                            //       child: SwitchListTile(
+                            //         dense: true,
+                            //         value: _theme1 == '1' ? true : false,
+                            //         title: Text('특화거리 다 대구로', style: TextStyle(fontSize: 12),),
+                            //         onChanged: (v) {
+                            //           setState(() {
+                            //             _theme1 = v ? '1' : '0';
+                            //           });
+                            //         },
+                            //       ),
+                            //     ),
+                            //     Expanded(
+                            //       child: SwitchListTile(
+                            //         dense: true,
+                            //         value: _theme2 == '1' ? true : false,
+                            //         title: Text('손닙접대 하기 좋은 곳', style: TextStyle(fontSize: 12),),
+                            //         onChanged: (v) {
+                            //           setState(() {
+                            //             _theme2 = v ? '1' : '0';
+                            //           });
+                            //         },
+                            //       ),
+                            //     ),
+                            //   ],
+                            // ),
+                            // Row(
+                            //   children: [
+                            //     Expanded(
+                            //       child: SwitchListTile(
+                            //         dense: true,
+                            //         value: _theme3 == '1' ? true : false,
+                            //         title: Text('가족 모임 하기 좋은 곳', style: TextStyle(fontSize: 12),),
+                            //         onChanged: (v) {
+                            //           setState(() {
+                            //             _theme3 = v ? '1' : '0';
+                            //           });
+                            //         },
+                            //       ),
+                            //     ),
+                            //     Expanded(
+                            //       child: SwitchListTile(
+                            //         dense: true,
+                            //         value: _theme4 == '1' ? true : false,
+                            //         title: Text('대구 맛집 일보 다 대구로', style: TextStyle(fontSize: 12),),
+                            //         onChanged: (v) {
+                            //           setState(() {
+                            //             _theme4 = v ? '1' : '0';
+                            //           });
+                            //         },
+                            //       ),
+                            //     ),
+                            //   ],
+                            // ),
+                            (widget.selectBox_subitemCd.length != 0 && _theme1Enabled == true) ? ISSelect(
                               label: '특화거리 카테고리 설정',
-                              value: _tema_1_itemCd,
+                              value: _tema_1_sub,
                               dataList: widget.selectBox_subitemCd,
                               onChange: (v) {
                                 setState(() {
-                                  _tema_1_itemCd = v;
+                                  _tema_1_sub = v;
+                                  print('_tema_1_sub:${_tema_1_sub}');
                                 });
                               },
                               onSaved: (v) {
@@ -1181,7 +1410,7 @@ class ShopOperateInfoState extends State<ShopOperateInfo> with SingleTickerProvi
                             Divider(),
                           ],
                         ),
-                      ) : Container(),
+                      ) : */Container(),
                     ],
                   )
                 ]),
@@ -1306,6 +1535,69 @@ class ShopOperateInfoState extends State<ShopOperateInfo> with SingleTickerProvi
   //     ),
   //   );
   // }
+
+  Widget getDelTipDaeguro() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Row(
+                children: [
+                  Container(
+                    width: 220,
+                    height: 40,
+                    decoration: new BoxDecoration(
+                        color: _delitipDaeguroYn == 'Y' ? Colors.blue[200] : Colors.red[200],
+                        borderRadius: new BorderRadius.only(topRight: Radius.circular(15.0), bottomRight: Radius.circular(15.0), topLeft: Radius.circular(15.0), bottomLeft: Radius.circular(15.0))),
+                    child: SwitchListTile(
+                      dense: true,
+                      value: _delitipDaeguroYn == 'Y' ? true : false,
+                      title: Text('배달도대구로 사용', style: TextStyle(fontSize: 12, color: Colors.white),),
+                      onChanged: (v) {
+                        setState(() {
+                          _delitipDaeguroYn = v ? 'Y' : 'N';
+                        });
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Container(
+                    width: 70,
+                    child: Text('계약요금: '),
+                  ),
+                  ISInput(
+                    width: 120,
+                    value: _delitipDaeguroAMT == null ? '' : Utils.getCashComma(_delitipDaeguroAMT) ?? '', //Utils.getCashComma(_delitipDaeguroAMT),
+                    label: '계약요금',
+                    maxLines: 1,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: <TextInputFormatter>[
+                      MultiMaskedTextInputFormatter(masks: ['x,xxx', 'xx,xxx', 'xxx,xxx'], separator: ',')
+                    ],
+                    onChange: (v) {
+                      (v == null || v == '') ?  _delitipDaeguroAMT = '0' : _delitipDaeguroAMT = v.toString().replaceAll(',', '');
+
+                      //int tempCustAMT = _delitipDaeguroDefault - int.parse(_delitipDaeguroAMT);
+                      //_delitipDaeguroCust = tempCustAMT.toString();
+
+                      setState(() {
+                      });
+                    },
+                  )
+                ],
+              )
+
+            ]
+        ),
+        //Text(' - 배달도대구로 사용시, 기존 배달팁은 미사용되고, 설정된 계약요금으로만 사용됩니다.', style: TextStyle(color: Colors.black54, fontSize: 12),),
+      ],
+    );
+  }
 
   Widget getWeeklyTimeTableTabView(){
     return ListView(
@@ -1560,6 +1852,47 @@ class ShopOperateInfoState extends State<ShopOperateInfo> with SingleTickerProvi
         )
       ],
     );
+  }
+
+  _buildThemeChoiceList(){
+    Color color = Colors.teal;
+
+    List<Widget> choices = List();
+    _ThemeList.forEach((item) {
+      if (item.label != '')
+      choices.add(Container(
+            //padding: const EdgeInsets.all(4.0),
+            child: ChoiceChip(
+              padding: const EdgeInsets.all(5),
+              backgroundColor: color.withOpacity(0.3),
+              selectedColor: color,
+              label: Text(item.label, style: TextStyle(fontSize: 11, color: Colors.white)),
+              selected: _ThemeSelectedList.contains(item) == true,
+              onSelected: (selected) async {
+                if (item.value == '1000000000'){
+                  _theme1Enabled = selected;
+                }
+
+                item.label2 = (selected == true ? '1' : '0');
+
+                var bodyData = {
+                  '"shopCode"': '"${detailData.selected_shopCode}"',
+                  '"userId"': '"${GetStorage().read('logininfo')['uCode']}"',
+                  '"code"': '"${item.value}"',
+                  '"useGbn"': '"${item.label2}"'
+                };
+
+                await ShopController.to.setReserShopThemeInfo(bodyData, context);
+
+                setState(() {
+                  _ThemeSelectedList.contains(item) ? _ThemeSelectedList.remove(item) : _ThemeSelectedList.add(item);
+                });
+              },
+            ),
+          ));
+    });
+
+    return choices;
   }
 
   @override

@@ -224,7 +224,7 @@ class _ModificationRegNoListState extends State<ModificationRegNoList> {
                 // DataCell(Align(child: Text(item.shop_cd.toString(), style: TextStyle(color: Colors.black),), alignment: Alignment.center)),
                 // DataCell(Align(child: Text(item.shop_name.toString(), style: TextStyle(color: Colors.black),), alignment: Alignment.center)),
                 DataCell(Align(child: SelectableText(item.shop_name.toString() == null ? '--' : '['+ item.shop_cd.toString() +'] '+item.shop_name.toString(), style: TextStyle(color: Colors.black, fontSize: 13),showCursor: true), alignment: Alignment.centerLeft)),
-                DataCell(Align(child: SelectableText(item.owner.toString(), style: TextStyle(color: Colors.black),), alignment: Alignment.center)),
+                DataCell(Align(child: SelectableText(Utils.getNameAbsoluteFormat(item.owner.toString(), true), style: TextStyle(color: Colors.black),), alignment: Alignment.center)),
                 DataCell(Center(child: SelectableText(Utils.getPhoneNumFormat(item.telno.toString(), true) ?? '--', style: TextStyle(color: Colors.black),showCursor: true,))),
                 DataCell(Align(child: SelectableText(item.regno_hist.toString(), style: TextStyle(color: Colors.black),showCursor: true), alignment: Alignment.center)),
                 DataCell(Align(child: SelectableText(item.hist_date.toString(), style: TextStyle(color: Colors.black),showCursor: true), alignment: Alignment.center)),

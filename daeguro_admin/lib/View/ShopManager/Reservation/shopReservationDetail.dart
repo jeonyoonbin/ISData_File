@@ -53,8 +53,7 @@ class ShopReservationDetailState extends State<ShopReservationDetail> {
                 ),
                 SizedBox(width: 5),
                 Align(
-                    child: SelectableText(
-                      '[' + widget.data['custName'].toString() + '] ' + Utils.getPhoneNumFormat(widget.data['custTelno'], true).toString(),
+                    child: SelectableText(widget.data['custName'].toString() + '(${Utils.getPhoneNumFormat(widget.data['custTelno'], false).toString()})',
                       style: TextStyle(fontSize: 14),
                       showCursor: true,
                     ),

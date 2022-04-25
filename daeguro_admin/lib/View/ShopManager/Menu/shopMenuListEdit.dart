@@ -78,6 +78,9 @@ class ShopMenuListEditState extends State<ShopMenuListEdit> {
                   value: formData.menuName,
                   context: context,
                   label: '메뉴이름',
+                  inputFormatters: <TextInputFormatter>[
+                    BlacklistingTextInputFormatter(RegExp('[;]')),
+                  ],
                   maxLength: 50,
                   onChange: (v) {
                     formData.menuName = v;

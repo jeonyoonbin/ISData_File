@@ -17,7 +17,10 @@ import 'package:get_storage/get_storage.dart';
 
 
 class B2BCouponChange extends StatefulWidget {
-  const B2BCouponChange({Key key}) : super(key: key);
+  final List couponTypeItems;
+  final String selectedCouponType;
+
+  const B2BCouponChange({Key key, this.couponTypeItems, this.selectedCouponType}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -41,20 +44,20 @@ class B2BCouponChangeState extends State<B2BCouponChange> {
   List<SelectOptionVO> selectBox_couponType = List();
   List<SelectOptionVO> selectBox_couponItem = List();
 
-  loadTypeData() async {
-    await CouponController.to.getDataB2BCodeItems(context).then((value) {
-      if(value == null){
-        ISAlert(context, '쿠폰정보를 가져오지 못했습니다. \n\n관리자에게 문의 바랍니다');
-      }
-      else{
-        value.forEach((element) {
-          selectBox_couponType.add(new SelectOptionVO(value: element['code'], label: '[${element['code']}] '+element['codeName']));
-        });
-      }
-    });
-
-    setState(() {});
-  }
+  // loadTypeData() async {
+  //   await CouponController.to.getDataB2BCodeItems(context).then((value) {
+  //     if(value == null){
+  //       ISAlert(context, '쿠폰정보를 가져오지 못했습니다. \n\n관리자에게 문의 바랍니다');
+  //     }
+  //     else{
+  //       value.forEach((element) {
+  //         selectBox_couponType.add(new SelectOptionVO(value: element['code'], label: '[${element['code']}] '+element['codeName']));
+  //       });
+  //     }
+  //   });
+  //
+  //   setState(() {});
+  // }
 
   loadItemData(String coupon_type) async {
     selectBox_couponItem.clear();
@@ -85,15 +88,19 @@ class B2BCouponChangeState extends State<B2BCouponChange> {
     //       value: element['code'], label: element['codeName']));
     // });
 
+    widget.couponTypeItems.forEach((element) {
+      selectBox_couponType.add(new SelectOptionVO(value: element['code'], label: '[${element['code']}] '+element['codeName']));
+    });
+
     formData = couponEditModel();
 
-    formData.couponType = 'B2B_C100';
+    formData.couponType = widget.selectedCouponType;//'B2B_C100';
     formData.jobUcode = GetStorage().read('logininfo')['uCode'];
     formData.jobName = GetStorage().read('logininfo')['name'];
 
     WidgetsBinding.instance.addPostFrameCallback((c) {
-      loadTypeData();
-      loadItemData('B2B_C100');
+      //loadTypeData();
+      loadItemData(widget.selectedCouponType);//'B2B_C100');
     });
   }
 

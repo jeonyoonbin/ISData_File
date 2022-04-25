@@ -103,8 +103,6 @@ class StatMileageSaleInOutMonthState extends State with AutomaticKeepAliveClient
   }
 
   removeDetailData(String MDATE) {
-
-    print(MDATE);
     setState(() {
       dataList.removeWhere((item) => (item.MDATE.contains(MDATE) == true && item.isChild == true));
     });

@@ -9,7 +9,7 @@ import 'package:daeguro_admin_app/ISWidget/search/is_search_input.dart';
 import 'package:daeguro_admin_app/Model/search_items.dart';
 import 'package:daeguro_admin_app/Model/shop/calculateUngeneratedTaxModel.dart';
 import 'package:daeguro_admin_app/Model/shop/shopnew.dart';
-import 'package:daeguro_admin_app/Provider/BackendService.dart';
+import 'package:daeguro_admin_app/Network/BackendService.dart';
 import 'package:daeguro_admin_app/Util/auth_util.dart';
 import 'package:daeguro_admin_app/Util/utils.dart';
 import 'package:daeguro_admin_app/View/CalculateManager/calculateSearchShopTax.dart';
@@ -122,10 +122,10 @@ class CalculateInsertTaxMastState extends State<CalculateInsertTaxMast> {
       else {
         //print('loadCountDate -> ${value.toString()}');
 
-        _ungenerated = value.body['ungenerated'];
-        _generated = value.body['generated'];
-        _unpublished = value.body['unpublished'];
-        _published = value.body['published'];
+        _ungenerated = value.data['ungenerated'];
+        _generated = value.data['generated'];
+        _unpublished = value.data['unpublished'];
+        _published = value.data['published'];
 
         //print('loadCountDate -> _ungenerated:${_ungenerated}, _generated:${_generated}, _unpublished:${_unpublished}, _published:${_published}');
 

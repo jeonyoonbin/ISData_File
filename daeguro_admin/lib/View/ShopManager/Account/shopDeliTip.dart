@@ -1,9 +1,11 @@
 ﻿import 'package:bubble_tab_indicator/bubble_tab_indicator.dart';
 import 'package:daeguro_admin_app/ISWidget/is_button.dart';
 import 'package:daeguro_admin_app/ISWidget/is_dialog.dart';
+import 'package:daeguro_admin_app/ISWidget/is_input.dart';
 import 'package:daeguro_admin_app/Model/shop/shop_delitip.dart';
 import 'package:daeguro_admin_app/Model/shop/shop_delitipHistory.dart';
 import 'package:daeguro_admin_app/Util/auth_util.dart';
+import 'package:daeguro_admin_app/Util/multi_masked_formatter.dart';
 import 'package:daeguro_admin_app/View/ShopManager/Account/shopDeliTipEdit.dart';
 import 'package:daeguro_admin_app/View/ShopManager/Account/shopDeliTipLocalEdit.dart';
 import 'package:daeguro_admin_app/View/ShopManager/Account/shopDetailNotifierData.dart';
@@ -12,6 +14,7 @@ import 'package:daeguro_admin_app/Util/utils.dart';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 
 class ShopDeliTip extends StatefulWidget {
@@ -25,6 +28,8 @@ class ShopDeliTip extends StatefulWidget {
     return ShopDeliTipState();
   }
 }
+
+
 
 class ShopDeliTipState extends State<ShopDeliTip> with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
@@ -42,6 +47,8 @@ class ShopDeliTipState extends State<ShopDeliTip> with SingleTickerProviderState
   ShopDetailNotifierData detailData;
 
   bool isReceiveDataEnabled = false;
+
+
 
   void refreshWidget(ShopDetailNotifierData element){
     detailData = element;
@@ -81,6 +88,8 @@ class ShopDeliTipState extends State<ShopDeliTip> with SingleTickerProviderState
 
   _query() async {
     //print('call deliTip query()');
+
+    //loadDelitipDaeguroData();
 
     loadTimeDeliTipData();
     loadCostDeliTipData();
@@ -197,8 +206,6 @@ class ShopDeliTipState extends State<ShopDeliTip> with SingleTickerProviderState
     ISConfirm(context, '배달팁 삭제', '배달팁을 삭제합니다. \n\n계속 진행 하시겠습니까?', (context) async {
       await ShopController.to.deleteDeliTipData(tipSeq, context);
 
-      //EasyLoading.showSuccess('삭제 성공', maskType: EasyLoadingMaskType.clear);
-
       Navigator.of(context).pop();
 
       await Future.delayed(Duration(milliseconds: 500), () {
@@ -217,6 +224,8 @@ class ShopDeliTipState extends State<ShopDeliTip> with SingleTickerProviderState
     dataCostDeliTipList.clear();
     dataLocalDeliTipList.clear();
     deliTipHistoryList.clear();
+
+
 
     // WidgetsBinding.instance.addPostFrameCallback((c) {
     //   _query();
@@ -254,47 +263,81 @@ class ShopDeliTipState extends State<ShopDeliTip> with SingleTickerProviderState
             child: Container(
               child: Wrap(
                 children: <Widget>[
-                  Container(
-                    alignment: Alignment.centerRight,
-                    padding: EdgeInsets.only(right: 16),
-                    child: ISButton(
-                      iconData: Icons.refresh,
-                      iconColor: Colors.white,
-                      tip: '갱신',
-                      onPressed: (){
-                        if (isReceiveDataEnabled == true){
-                          _query();
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(),
+                          // Container(
+                          //     child: Text('배달도 대구로 사용', style: TextStyle(fontSize: 12, color: Colors.black),),
+                          //     margin: EdgeInsets.only(top: 5, bottom: 5, left: 20, right: 10)//.all(5),
+                          // ),
+                          // Radio(value: RadioGbn.gbn1, groupValue: _radioGbn,
+                          //     onChanged: (v) async {
+                          //       setState(() {
+                          //         _radioGbn = v;
+                          //       });
+                          //
+                          //       //await ShopController.to.postSectorGeofenceData(detailData.selected_shopCode, 'N', context);
+                          //
+                          //     }),
+                          // Text('미사용', style: TextStyle(fontSize: 12)),
+                          // Container(
+                          //   margin: EdgeInsets.fromLTRB(10, 0, 0, 0),
+                          //   child: Radio(value: RadioGbn.gbn2, groupValue: _radioGbn,
+                          //       onChanged: (v) async {
+                          //         setState(() {
+                          //           _radioGbn = v;
+                          //         });
+                          //
+                          //
+                          //         //await ShopController.to.postSectorGeofenceData(detailData.selected_shopCode, 'Y', context);
+                          //       }),
+                          // ),
+                          // Text('사용', style: TextStyle(fontSize: 12)),
+                          // SizedBox(width: 5,),
+                        ],
+                      ),
+                      Container(
+                        alignment: Alignment.centerRight,
+                        padding: EdgeInsets.only(right: 16),
+                        child: ISButton(
+                          iconData: Icons.refresh,
+                          iconColor: Colors.white,
+                          tip: '갱신',
+                          onPressed: (){
+                            if (isReceiveDataEnabled == true){
+                              _query();
 
-                          setState(() {
-                            _nestedTabController.index = 0;
-                            _scrollController.jumpTo(0.0);
-                          });
-                        }
-                      },
+                              setState(() {
+                                _nestedTabController.index = 0;
+                                _scrollController.jumpTo(0.0);
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                  /*_radioGbn == RadioGbn.gbn1 ?*/ Container(
+                    padding: EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Column(
+                      children: [
+                        Divider(height: 20,),
+                        getTitleBarSet('7', '주문 시간대별 배달팁'),
+                        TimeDeliTipTable(),
+                        Divider(height: 2),
+                        getTitleBarSet('3', '주문 금액별 배달팁'),
+                        CostDeliTipTable(),
+                        Divider(height: 2),
+                        getTitleBarSet('9', '지역별 배달팁'),
+                        LocalDeliTipTable(),
+                        //Divider(height: 2),
+                      ],
                     ),
-                  ),
-                  Container(
-                    padding: EdgeInsets.only(left: 8.0, right: 8.0, top: 10.0),
-                    child: Divider(height: 2,),
-                  ),
-                  getTitleBarSet('7', '주문 시간대별 배달팁'),
-                  TimeDeliTipTable(),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Divider(height: 2),
-                  ),
-                  getTitleBarSet('3', '주문 금액별 배달팁'),
-                  CostDeliTipTable(),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Divider(height: 2),
-                  ),
-                  getTitleBarSet('9', '지역별 배달팁'),
-                  LocalDeliTipTable(),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Divider(height: 2),
-                  ),
+                  )// : getDelTipDaeguro()
                 ],
               ),
             ),
@@ -354,28 +397,29 @@ class ShopDeliTipState extends State<ShopDeliTip> with SingleTickerProviderState
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
-        Container(
-          padding: const EdgeInsets.only(left: 16),
-          child: Text(
-            titleStr,
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+          Container(
+            //padding: const EdgeInsets.only(left: 10),
+            child: Text(
+              titleStr,
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+            ),
           ),
-        ),
 
           addBtnEnabled == true ? Container(
-          padding: const EdgeInsets.only(right: 12),
+          //padding: const EdgeInsets.only(right: 4),
           child: IconButton(
+            icon: Icon(
+              Icons.add_box,
+              color: Colors.blue,
+              size: 30,
+            ),
             onPressed: () {
               if (type == '9')
                 _editDeliLocalTip();
               else
                 _editDeliTip(null, tipGbn: type);
             },
-            icon: Icon(
-              Icons.add_box,
-              color: Colors.blue,
-              size: 30,
-            ),
+
           ),
           // ISButton(
           //     label: '추가', iconData: Icons.add,
@@ -391,7 +435,7 @@ class ShopDeliTipState extends State<ShopDeliTip> with SingleTickerProviderState
       controller: ScrollController(),
       physics: NeverScrollableScrollPhysics(),
       shrinkWrap: true,
-      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 14),
+      padding: const EdgeInsets.only(bottom: 14),
       children: <Widget>[
         DataTable(
           decoration: BoxDecoration(
@@ -453,7 +497,7 @@ class ShopDeliTipState extends State<ShopDeliTip> with SingleTickerProviderState
       controller: ScrollController(),
       physics: NeverScrollableScrollPhysics(),
       shrinkWrap: true,
-      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 14),
+      padding: const EdgeInsets.only(bottom: 14),
       children: <Widget>[
         DataTable(
           decoration: BoxDecoration(
@@ -513,7 +557,7 @@ class ShopDeliTipState extends State<ShopDeliTip> with SingleTickerProviderState
       controller: ScrollController(),
       physics: NeverScrollableScrollPhysics(),
       shrinkWrap: true,
-      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 14),
+      padding: const EdgeInsets.only(bottom: 14),
       children: <Widget>[
         DataTable(
           decoration: BoxDecoration(
@@ -567,6 +611,8 @@ class ShopDeliTipState extends State<ShopDeliTip> with SingleTickerProviderState
       ],
     );
   }
+
+
 
   Widget getHistoryDelTip() {
     return ListView.builder(

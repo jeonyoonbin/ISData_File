@@ -12,6 +12,7 @@ import 'package:daeguro_admin_app/Util/utils.dart';
 import 'package:daeguro_admin_app/View/AgentManager/agentAccount_Controller.dart';
 import 'package:daeguro_admin_app/View/Layout/responsive.dart';
 import 'package:daeguro_admin_app/View/UserManager/userEdit.dart';
+import 'package:daeguro_admin_app/View/UserManager/userHistory.dart';
 import 'package:daeguro_admin_app/View/UserManager/userRegist.dart';
 import 'package:daeguro_admin_app/View/UserManager/user_controller.dart';
 import 'package:daeguro_admin_app/constants/constant.dart';
@@ -78,6 +79,21 @@ class UserAccountListState extends State {
     loadData();
   }
 
+  _History(String ucode) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) => Dialog(
+        child: UserHistory(shopCode: ucode),
+      ),
+    ).then((v) async {
+      if (v != null) {
+        await Future.delayed(Duration(milliseconds: 500), () {
+          _query();
+        });
+      }
+    });
+  }
+
   _regist() async {
     showDialog(
       context: context,
@@ -96,11 +112,14 @@ class UserAccountListState extends State {
   _edit({String uCode}) async {
     UserListDetail editData = null;
 
-    await UserController.to.getDetailData(uCode.toString(), context);
-
-    if (UserController.to.qDataDetail != null) {
-      editData = UserListDetail.fromJson(UserController.to.qDataDetail);
-    }
+    await UserController.to.getDetailData(uCode.toString()).then((value) {
+      if (value == null) {
+        ISAlert(context, '정상조회가 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
+      }
+      else {
+        editData = UserListDetail.fromJson(value);
+      }
+    });
 
     showDialog(
       context: context,
@@ -229,7 +248,7 @@ class UserAccountListState extends State {
                           setState(() {
                             _level = value;
                             _currentPage = 1;
-                            formKey.currentState.save();
+                            //formKey.currentState.save();
                             _query();
                           });
                         },
@@ -360,6 +379,20 @@ class UserAccountListState extends State {
                     ),
                   ),
                 ),
+                DataCell(
+                  Center(
+                      child: Container(
+                        //color: Colors.red,
+                        child: IconButton(
+                          //padding: EdgeInsets.only(top: 20),
+                          onPressed: () {
+                            _History(item.uCode);
+                          },
+                          icon: Icon(Icons.history, color: Colors.blue, size: 20,),
+                          tooltip: '변경 이력',
+                        ),
+                      )),
+                ),
               ]);
             }).toList(),
             columns: <DataColumn>[
@@ -371,6 +404,7 @@ class UserAccountListState extends State {
               DataColumn(label: Expanded(child: Text('접속권한', textAlign: TextAlign.center)),),
               DataColumn(label: Expanded(child: Text('업무상태', textAlign: TextAlign.center)),),
               DataColumn(label: Expanded(child: Text('관리', textAlign: TextAlign.center)),),
+              DataColumn(label: Expanded(child: Text('변경이력', textAlign: TextAlign.center)),),
             ],
           ),
           Divider(),

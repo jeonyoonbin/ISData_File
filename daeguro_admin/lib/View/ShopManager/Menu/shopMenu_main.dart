@@ -9,7 +9,7 @@ import 'package:daeguro_admin_app/View/ShopManager/Menu/shopMenuManager.dart';
 import 'package:daeguro_admin_app/View/ShopManager/Menu/shopMenuOptionManager.dart';
 import 'package:daeguro_admin_app/View/ShopManager/Account/shopAccount_controller.dart';
 
-import 'package:daeguro_admin_app/Provider/BackendService.dart';
+import 'package:daeguro_admin_app/Network/BackendService.dart';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -57,8 +57,13 @@ class ShopMenuMainState extends State<ShopMenuMain>  with SingleTickerProviderSt
   loadData() async {
     if (this.mounted) {
       await ShopController.to.getEventYn(widget.shopCode).then((value) {
-        _eventYn = value.toString();
-        setState(() {});
+        if (value == null){
+          ISAlert(context, '정상조회가 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
+        }
+        else{
+          _eventYn = value.toString();
+          setState(() {});
+        }
       });
     }
   }

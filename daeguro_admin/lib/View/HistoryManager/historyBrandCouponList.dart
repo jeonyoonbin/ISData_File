@@ -361,7 +361,7 @@ class HistoryBrandCouponListState extends State {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
                   child: Text('주문번호: ${item.ORDER_NO.toString()}', style: TextStyle(fontSize: 13, color: Colors.white)),
                   onPressed: () async {
-                    await OrderController.to.getDetailData(item.ORDER_NO.toString(), context);
+                    await OrderController.to.getDetailData(item.ORDER_NO.toString());
 
                     showDialog(
                       context: context,

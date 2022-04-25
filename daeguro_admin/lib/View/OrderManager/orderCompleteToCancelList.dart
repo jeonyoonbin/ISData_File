@@ -116,7 +116,7 @@ class OrderCompleteToCancelManagerState extends State<OrderCompleteToCancelManag
 
   _detail({String orderNo}) async {
     //EasyLoading.show();
-    await OrderController.to.getDetailData(orderNo.toString(), context);
+    await OrderController.to.getDetailData(orderNo.toString());
     //EasyLoading.dismiss();
 
     showDialog(
@@ -442,7 +442,7 @@ class OrderCompleteToCancelManagerState extends State<OrderCompleteToCancelManag
 
               DataColumn(label: Expanded(child: Text('상점명', textAlign: TextAlign.center)),),
               DataColumn(label: Expanded(child: Text('상점전화', textAlign: TextAlign.center)),),
-              DataColumn(label: Expanded(child: Text('POS상태\n(설치/로그인)', textAlign: TextAlign.center, style: TextStyle(fontSize: 12), ))),
+              DataColumn(label: Expanded(child: Text('POS상태\n(설치/로그인)', textAlign: TextAlign.center, style: TextStyle(fontSize: 10), ))),
               DataColumn(label: Expanded(child: Text('결제수단', textAlign: TextAlign.center)),),
               DataColumn(label: Expanded(child: Text('결제금액', textAlign: TextAlign.left)),),
               DataColumn(label: Expanded(child: Text('취소사유', textAlign: TextAlign.left)),),

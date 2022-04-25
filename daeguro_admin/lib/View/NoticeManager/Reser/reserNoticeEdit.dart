@@ -13,7 +13,7 @@ import 'package:daeguro_admin_app/Util/utils.dart';
 import 'package:daeguro_admin_app/View/NoticeManager/noticeFileUpload.dart';
 import 'package:daeguro_admin_app/View/NoticeManager/notice_controller.dart';
 
-import 'package:daeguro_admin_app/Provider/FileUpLoader.dart';
+import 'package:daeguro_admin_app/Network/FileUpLoader.dart';
 import 'package:daeguro_admin_app/constants/serverInfo.dart';
 
 import 'package:date_format/date_format.dart';

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:daeguro_admin_app/ISWidget/is_datatable.dart';
+import 'package:daeguro_admin_app/ISWidget/is_dialog.dart';
 import 'package:daeguro_admin_app/ISWidget/search/is_search_button.dart';
 import 'package:daeguro_admin_app/ISWidget/search/is_search_dropdown.dart';
 import 'package:daeguro_admin_app/Model/apiCompanyDModel.dart';
@@ -60,11 +61,15 @@ class ApiCompanyListState extends State {
   _edit({String seq}) async {
     ApiCompanyDModel editData = null;
 
-    await ApiCompanyController.to.getDetailData(seq.toString());
+    await ApiCompanyController.to.getDetailData(seq.toString()).then((value) {
+      if (value == null) {
+        ISAlert(context, '정상조회가 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
+      }
+      else {
+        editData = ApiCompanyDModel.fromJson(value);
+      }
+    });
 
-    if (ApiCompanyController.to.qDataDetail != null) {
-      editData = ApiCompanyDModel.fromJson(ApiCompanyController.to.qDataDetail);
-    }
 
     showDialog(
       context: context,
@@ -90,17 +95,23 @@ class ApiCompanyListState extends State {
     dataList.clear();
     _SerchCount = 0;
 
-    await ApiCompanyController.to.getData(_type, _gbn);
-
-    if (this.mounted) {
-      setState(() {
-        ApiCompanyController.to.qData.forEach((e) {
+    await ApiCompanyController.to.getData(_type, _gbn).then((value) {
+      if (value == null) {
+        ISAlert(context, '정상조회가 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
+      }
+      else {
+        value.forEach((e) {
           _SerchCount++;
           ApiCompanyModel temp = ApiCompanyModel.fromJson(e);
           dataList.add(temp);
         });
+      }
+    });
+
+    //if (this.mounted) {
+      setState(() {
       });
-    }
+    //}
   }
 
   @override

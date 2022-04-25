@@ -8,10 +8,11 @@ import 'package:daeguro_admin_app/ISWidget/is_select.dart';
 import 'package:daeguro_admin_app/Model/shop/shop_history.dart';
 import 'package:daeguro_admin_app/Model/shop/shopbasic_info.dart';
 import 'package:daeguro_admin_app/Model/shop/shopposupdate.dart';
-import 'package:daeguro_admin_app/Provider/RestApiProvider.dart';
+import 'package:daeguro_admin_app/Network/DioClient.dart';
+
 import 'package:daeguro_admin_app/Util/auth_util.dart';
 import 'package:daeguro_admin_app/View/AgentManager/agentAccount_Controller.dart';
-import 'package:daeguro_admin_app/View/Common/tax_controller.dart';
+import 'package:daeguro_admin_app/View/ShopManager/Account/tax_controller.dart';
 import 'package:daeguro_admin_app/View/PostCode/postCodeRequest.dart';
 import 'package:daeguro_admin_app/View/ShopManager/Account/shopDetailNotifierData.dart';
 import 'package:daeguro_admin_app/View/ShopManager/Account/shopAccount_controller.dart';
@@ -19,6 +20,7 @@ import 'package:daeguro_admin_app/View/ShopManager/Account/shopMemoHistory.dart'
 import 'package:daeguro_admin_app/Util/multi_masked_formatter.dart';
 import 'package:daeguro_admin_app/Util/select_option_vo.dart';
 import 'package:daeguro_admin_app/Util/utils.dart';
+import 'package:daeguro_admin_app/constants/serverInfo.dart';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +32,6 @@ import 'package:get_storage/get_storage.dart';
 import 'package:kopo/kopo.dart';
 
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:http/http.dart' as http;
 
 class ShopBasicInfo extends StatefulWidget {
   final Stream<ShopDetailNotifierData> stream;
@@ -617,22 +618,22 @@ class ShopBasicInfoState extends State<ShopBasicInfo> with SingleTickerProviderS
                   onChange: (v) {
                     formData.memo = v;
                   },
-                  // suffixIcon: Container(
-                  //   width: 20,
-                  //   height: 100,
-                  //   alignment: Alignment.topRight,
-                  //   child: IconButton(
-                  //     onPressed: () {
-                  //       _ShopMemoHitory();
-                  //     },
-                  //     icon: Icon(
-                  //       Icons.history,
-                  //       color: Colors.blue,
-                  //       size: 30,
-                  //     ),
-                  //     tooltip: '메모 변경 이력',
-                  //   ),
-                  // ),
+                  suffixIcon: Container(
+                    width: 20,
+                    height: 100,
+                    alignment: Alignment.topRight,
+                    child: IconButton(
+                      onPressed: () {
+                        _ShopMemoHitory();
+                      },
+                      icon: Icon(
+                        Icons.history,
+                        color: Colors.blue,
+                        size: 21,
+                      ),
+                      tooltip: '메모 변경 이력',
+                    ),
+                  ),
                 ),
                 Divider(),
                 Container(
@@ -1071,40 +1072,26 @@ class ShopBasicInfoState extends State<ShopBasicInfo> with SingleTickerProviderS
                     shopPosUpdate.shop_token = formData.apiComCode;
                     shopPosUpdate.mod_ucode = GetStorage().read('logininfo')['uCode'];
 
-                    var headerData = {
-                      "Access-Control-Allow-Origin": "*",
-                      // Required for CORS support to work
-                      "Access-Control-Allow-Headers": "*",
-                      "Access-Control-Allow-Credentials": "true",
-                      "Access-Control-Allow-Methods": "*",
-                      "Content-Type": "application/json",
-                      "Authorization":
-                      "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6Im9yZGVyX2NvbXAiLCJhcHBfdHlwZSI6Im9yZGVyIiwiYXBwX25hbWUiOiJkYWd1cm9hcHAiLCJuYmYiOjE2NDExODcwMDAsImV4cCI6MTY3NTIwNjAwMCwiaWF0IjoxNjQxMTg3MDAwLCJpc3MiOiJodHRwczovL2xvY2FsaG9zdDoxNTQwOSIsImF1ZCI6Ikluc3VuZ1BPUyJ9.hVaYELqN7i9IQ3o00LRcF--sCv6up7slUq1i94WDw78",
-                      //"Accept": "application/json",
-                    };
-
                     var bodyData = {'"app_name"': '"대구로 어드민"', '"app_type"': '"admin-daeguroApp"', '"shop_info"': shopPosUpdate.toJson()};
 
-                    await RestApiProvider.to.postRestError('0', '/admin/ShopBasic : putBasicData', '[POS 가맹점 정보 저장] ' + bodyData.toString() + '|| ucode : ' + GetStorage().read('logininfo')['uCode'].toString() + ', name : ' + GetStorage().read('logininfo')['name'].toString());
+                    await DioClient().postRestLog('0', 'posApi/POSData/DaeguroApp_Process', '[POS 가맹점 정보 저장] ' + bodyData.toString() + '|| ucode : ' + GetStorage().read('logininfo')['uCode'].toString() + ', name : ' + GetStorage().read('logininfo')['name'].toString());
 
-                    await http.post(Uri.parse('https://pos.daeguro.co.kr:15412/posApi/POSData/DaeguroApp_Process'), headers: headerData, body: bodyData.toString()).then((http.Response response) async {
-                      if (response.statusCode == 200) {
-                        var decodeBody = jsonDecode(response.body);
-                      } else {
-                        var decodeBody = jsonDecode(response.body);
+                    await ShopController.to.postPosShopUpdate(ServerInfo.REST_URL_POS_APPPROCESS, bodyData.toString()).then((value) async {
+                      if(value == null){
+                        ISAlert(context, '[POS설정] POS API연동 오류. \n\n관리자에게 문의 바랍니다');
+                      }
+                      else{
+                        if (value.data['code'] != 0) {
+                          //ISAlert(context, '[POS설정] 정상적으로 저장되지 않았습니다. \n\n- [${value.data['code']}] ${value.data['message']}');
+
+                          await DioClient().postRestLog('0', 'posApi/POSData/DaeguroApp_Process', '[POS 가맹점 정보 저장 실패] - [${value.data['code']}] ${value.data['message']}\n' + bodyData.toString() + '|| ucode : ' + GetStorage().read('logininfo')['uCode'].toString() + ', name : ' + GetStorage().read('logininfo')['name'].toString());
+                        }
                       }
                     });
 
                     // 오퍼레이터 입력 시 담당배정으로 변경
-                    // 이미지 상태가(0:대기, 1:요청) 이거나 빈값일때 2:담당배정 으로 변경
                     if (formData.operatorCode != '') {
-                      if (detailData.selected_imageStatus == '') {
-                        await ShopController.to.putImageStatus(detailData.selected_shopCode, '2', context);
-                      } else {
-                        if (int.parse(detailData.selected_imageStatus) < 2) {
-                          await ShopController.to.putImageStatus(detailData.selected_shopCode, '2', context);
-                        }
-                      }
+                      await ShopController.to.putImageStatus(detailData.selected_shopCode, '2', context);
                     }
 
                     setState(()  {

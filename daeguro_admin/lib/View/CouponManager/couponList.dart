@@ -72,7 +72,7 @@ class CouponListState extends State {
     showDialog(
       context: context,
       builder: (BuildContext context) => Dialog(
-        child: CouponRegist(couponTypeItems: couponTypeItems),
+        child: CouponRegist(couponTypeItems: couponTypeItems, selectedCouponType: _couponType),
       ),
     ).then((v) async {
       if (v != null) {
@@ -85,7 +85,7 @@ class CouponListState extends State {
     showDialog(
       context: context,
       builder: (BuildContext context) => Dialog(
-        child: CouponEdit(couponTypeItems: couponTypeItems),
+        child: CouponEdit(couponTypeItems: couponTypeItems, selectedCouponType: _couponType),
       ),
     ).then((v) async {
       if (v != null) {
@@ -181,6 +181,7 @@ class CouponListState extends State {
             ],
           ),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Column(
                 children: [
@@ -486,7 +487,7 @@ class CouponListState extends State {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
                   child: Text('주문번호: ${item.orderNo.toString()}', style: TextStyle(fontSize: 13, color: Colors.white)),
                   onPressed: () async {
-                    await OrderController.to.getDetailData(item.orderNo.toString(), context);
+                    await OrderController.to.getDetailData(item.orderNo.toString());
 
                     showDialog(
                       context: context,
@@ -527,7 +528,7 @@ class CouponListState extends State {
 
   _detail({String orderNo}) async {
     //EasyLoading.show();
-    await OrderController.to.getDetailData(orderNo.toString(), context);
+    await OrderController.to.getDetailData(orderNo.toString());
     //EasyLoading.dismiss();
 
     showDialog(

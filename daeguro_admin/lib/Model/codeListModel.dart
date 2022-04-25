@@ -23,7 +23,7 @@ class codeListModel {
   String ETC_CODE_GBN9 = '';
   String ETC_CODE_GBN10 = '';
   String ETC_CODE1; // QR 코드 사용날짜 기한
-  String ETC_CODE2; // QR 여부
+  String ETC_CODE2 = ''; // QR 여부
   String USE_GBN;
   String INS_DATE;
   int INS_UCODE;

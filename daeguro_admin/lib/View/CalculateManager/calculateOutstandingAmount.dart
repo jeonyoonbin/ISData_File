@@ -169,58 +169,6 @@ class CalculateOutstandingAmountState extends State<CalculateOutstandingAmount> 
     });
 
     return;
-
-    await OrderController.to.getData(_mCode, '', '').then((value) {
-      if (this.mounted) {
-        if (value == null) {
-          ISAlert(context, '정상조회가 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
-        } else {
-          setState(() {
-            dataList.assignAll(list);
-
-            //데이터 로드후 합계 계산해서 값 추가
-            dataList.forEach((e) {
-              mInSum = mInSum + int.parse(e['적립금입금'] ?? '0');
-              mOutSum = mOutSum + int.parse(e['적립금출금'] ?? '0');
-              unpayed = unpayed + int.parse(e['미납액'] ?? '0');
-            });
-            balance = mInSum - mOutSum;
-            var sum = {
-              '주문번호': '합계',
-              '적립일자': '',
-              '적립구분': '',
-              '콜센터명': '',
-              '사업자번호': '',
-              '적립금입금': mInSum.toString(),
-              '적립금출금': mOutSum.toString(),
-              '적립잔액': balance.toString(),
-              '미납액': unpayed.toString(),
-              '작업자': '',
-              '메모': ''
-            };
-            dataList.add(sum);
-            // dataList.clear();
-            //
-            // value.forEach((e) {
-            //   OrderAccount temp = OrderAccount.fromJson(e);
-            //   if (temp.orderTime.contains('오전'))
-            //     temp.orderTime = temp.orderTime.replaceAll(' 오전 ', '\n오전');
-            //   else
-            //     temp.orderTime = temp.orderTime.replaceAll(' 오후 ', '\n오후');
-            //
-            //   String currentTodayTime = formatDate(DateTime.now(), [yyyy, '-', mm, '-', dd]);
-            //   if (temp.orderTime.contains(currentTodayTime) == true)
-            //     temp.orderTime = temp.orderTime.replaceAll(currentTodayTime+'\n', '');
-            //
-            //   // dataList.add(temp);
-            // });
-
-            _totalRowCnt = OrderController.to.totalRowCnt;
-            _totalPages = (_totalRowCnt / _selectedpagerows).ceil();
-          });
-        }
-      }
-    });
   }
 
   @override

@@ -72,6 +72,9 @@ class ShopMenuOptionGroupEditState extends State<ShopMenuOptionGroupEdit> {
             context: context,
             label: '옵션그룹명',
             maxLength: 25,
+            inputFormatters: <TextInputFormatter>[
+              BlacklistingTextInputFormatter(RegExp('[;]')),
+            ],
             onChange: (v) {
               formData.optionGroupName = v;
             },

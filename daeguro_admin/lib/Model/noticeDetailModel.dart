@@ -20,6 +20,7 @@ class noticeDetailModel {
   String insName;
   String modUCode;
   String modName;
+  String extUrlYn;
 
   factory noticeDetailModel.fromJson(Map<String,dynamic> json) => _$ModelFromJson(json);
   Map<String, dynamic> toJson() => _$ModelToJson(this);
@@ -42,7 +43,8 @@ noticeDetailModel _$ModelFromJson(Map<String, dynamic> json) {
     ..insUCode = json['insUCode'] as String
     ..insName = json['insName'] as String
     ..modUCode = json['modUCode'] as String
-    ..modName = json['modName'] as String;
+    ..modName = json['modName'] as String
+    ..extUrlYn = json['extUrlYn'] as String;
 }
 
 Map<String, dynamic> _$ModelToJson(noticeDetailModel instance) => <String, dynamic>{
@@ -62,4 +64,5 @@ Map<String, dynamic> _$ModelToJson(noticeDetailModel instance) => <String, dynam
   'insName': instance.insName,
   'modUCode': instance.modUCode,
   'modName': instance.modName,
+  'extUrlYn': instance.extUrlYn,
 };

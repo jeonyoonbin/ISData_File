@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:daeguro_admin_app/ISWidget/is_dialog.dart';
 import 'package:daeguro_admin_app/Model/noticeSortListModel.dart';
 import 'package:daeguro_admin_app/Util/utils.dart';
 import 'package:daeguro_admin_app/View/NoticeManager/notice_controller.dart';
@@ -48,228 +49,263 @@ class NoticeUpdateSortState extends State<NoticeUpdateSort> with SingleTickerPro
     sortListNotice.clear();
 
     // 이벤트 바인딩
-    await NoticeController.to.getNoticeSortList('3', context);
-
-    if (this.mounted) {
-      NoticeController.to.qDataSortList.forEach((e) {
-        noticeSortListModel temp = noticeSortListModel.fromJson(e);
-
-        temp.DISP_FR_DATE = Utils.getYearMonthDayFormat(temp.DISP_FR_DATE);
-        temp.DISP_TO_DATE = Utils.getYearMonthDayFormat(temp.DISP_TO_DATE);
-
-        sortListEvent.add(temp);
-      });
-
-      if (isSaveEnabled == true) {
-        await Future.delayed(Duration(milliseconds: 500), () async {
-          List<String> sortDataList = [];
-          sortListEvent.forEach((element) {
-            sortDataList.add(element.NOTICE_SEQ.toString());
-          });
-
-          if (sortDataList.length != 0) {
-            String jsonData = jsonEncode(sortDataList);
-            await NoticeController.to.updateSort(jsonData, context);
-          }
-
-          isSaveEnabled = false;
-        });
+    await NoticeController.to.getNoticeSortList('3').then((value) async{
+      if (value == null) {
+        ISAlert(context, '정상조회가 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
       }
+      else {
+        value.forEach((e) {
+          noticeSortListModel temp = noticeSortListModel.fromJson(e);
 
+          temp.DISP_FR_DATE = Utils.getYearMonthDayFormat(temp.DISP_FR_DATE);
+          temp.DISP_TO_DATE = Utils.getYearMonthDayFormat(temp.DISP_TO_DATE);
+
+          sortListEvent.add(temp);
+        });
+
+        if (isSaveEnabled == true) {
+          await Future.delayed(Duration(milliseconds: 500), () async {
+            List<String> sortDataList = [];
+            sortListEvent.forEach((element) {
+              sortDataList.add(element.NOTICE_SEQ.toString());
+            });
+
+            if (sortDataList.length != 0) {
+              String jsonData = jsonEncode(sortDataList);
+              await NoticeController.to.updateSort(jsonData, context);
+            }
+
+            isSaveEnabled = false;
+          });
+        }
+      }
+    });
+
+    //if (this.mounted) {
       setState(() {});
-    }
+    //}
 
     // 메인팝업 조회
-    await NoticeController.to.getNoticeSortList('5', context);
-
-    if (this.mounted) {
-      NoticeController.to.qDataSortList.forEach((e) {
-        noticeSortListModel temp = noticeSortListModel.fromJson(e);
-
-        temp.DISP_FR_DATE = Utils.getYearMonthDayFormat(temp.DISP_FR_DATE);
-        temp.DISP_TO_DATE = Utils.getYearMonthDayFormat(temp.DISP_TO_DATE);
-
-        sortListMainPopup.add(temp);
-      });
-
-      if (isSaveEnabled == true) {
-        await Future.delayed(Duration(milliseconds: 500), () async {
-          List<String> sortDataList = [];
-          sortListMainPopup.forEach((element) {
-            sortDataList.add(element.NOTICE_SEQ.toString());
-          });
-
-          if (sortDataList.length != 0) {
-            String jsonData = jsonEncode(sortDataList);
-            await NoticeController.to.updateSort(jsonData, context);
-          }
-
-          isSaveEnabled = false;
-        });
+    await NoticeController.to.getNoticeSortList('5').then((value) async {
+      if (value == null) {
+        ISAlert(context, '정상조회가 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
       }
+      else {
+        value.forEach((e) {
+          noticeSortListModel temp = noticeSortListModel.fromJson(e);
 
+          temp.DISP_FR_DATE = Utils.getYearMonthDayFormat(temp.DISP_FR_DATE);
+          temp.DISP_TO_DATE = Utils.getYearMonthDayFormat(temp.DISP_TO_DATE);
+
+          sortListMainPopup.add(temp);
+        });
+
+        if (isSaveEnabled == true) {
+          await Future.delayed(Duration(milliseconds: 500), () async {
+            List<String> sortDataList = [];
+            sortListMainPopup.forEach((element) {
+              sortDataList.add(element.NOTICE_SEQ.toString());
+            });
+
+            if (sortDataList.length != 0) {
+              String jsonData = jsonEncode(sortDataList);
+              await NoticeController.to.updateSort(jsonData, context);
+            }
+
+            isSaveEnabled = false;
+          });
+        }
+      }
+    });
+
+    //if (this.mounted) {
       setState(() {});
-    }
+    //}
 
     // 공지사항 바인딩
-    await NoticeController.to.getNoticeSortList('1', context);
-
-    if (this.mounted) {
-      NoticeController.to.qDataSortList.forEach((e) {
-        noticeSortListModel temp = noticeSortListModel.fromJson(e);
-
-        temp.DISP_FR_DATE = Utils.getYearMonthDayFormat(temp.DISP_FR_DATE);
-        temp.DISP_TO_DATE = Utils.getYearMonthDayFormat(temp.DISP_TO_DATE);
-
-        sortListNotice.add(temp);
-      });
-
-      if (isSaveEnabled == true) {
-        await Future.delayed(Duration(milliseconds: 500), () async {
-          List<String> sortDataList = [];
-          sortListNotice.forEach((element) {
-            sortDataList.add(element.NOTICE_SEQ.toString());
-          });
-
-          if (sortDataList.length != 0) {
-            String jsonData = jsonEncode(sortDataList);
-            await NoticeController.to.updateSort(jsonData, context);
-          }
-
-          isSaveEnabled = false;
-        });
+    await NoticeController.to.getNoticeSortList('1').then((value) async {
+      if (value == null) {
+        ISAlert(context, '정상조회가 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
       }
+      else {
+        value.forEach((e) {
+          noticeSortListModel temp = noticeSortListModel.fromJson(e);
 
+          temp.DISP_FR_DATE = Utils.getYearMonthDayFormat(temp.DISP_FR_DATE);
+          temp.DISP_TO_DATE = Utils.getYearMonthDayFormat(temp.DISP_TO_DATE);
+
+          sortListNotice.add(temp);
+        });
+
+        if (isSaveEnabled == true) {
+          await Future.delayed(Duration(milliseconds: 500), () async {
+            List<String> sortDataList = [];
+            sortListNotice.forEach((element) {
+              sortDataList.add(element.NOTICE_SEQ.toString());
+            });
+
+            if (sortDataList.length != 0) {
+              String jsonData = jsonEncode(sortDataList);
+              await NoticeController.to.updateSort(jsonData, context);
+            }
+
+            isSaveEnabled = false;
+          });
+        }
+      }
+    });
+
+    //if (this.mounted) {
       setState(() {});
-    }
+    //}
 
     // 사장님공지 바인딩
-    await NoticeController.to.getNoticeSortList('2', context);
-
-    if (this.mounted) {
-      NoticeController.to.qDataSortList.forEach((e) {
-        noticeSortListModel temp = noticeSortListModel.fromJson(e);
-
-        temp.DISP_FR_DATE = Utils.getYearMonthDayFormat(temp.DISP_FR_DATE);
-        temp.DISP_TO_DATE = Utils.getYearMonthDayFormat(temp.DISP_TO_DATE);
-
-        sortListOwnerNotice.add(temp);
-      });
-
-      if (isSaveEnabled == true) {
-        await Future.delayed(Duration(milliseconds: 500), () async {
-          List<String> sortDataList = [];
-          sortListOwnerNotice.forEach((element) {
-            sortDataList.add(element.NOTICE_SEQ.toString());
-          });
-
-          if (sortDataList.length != 0) {
-            String jsonData = jsonEncode(sortDataList);
-            await NoticeController.to.updateSort(jsonData, context);
-          }
-
-          isSaveEnabled = false;
-        });
+    await NoticeController.to.getNoticeSortList('2').then((value) async {
+      if (value == null) {
+        ISAlert(context, '정상조회가 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
       }
+      else {
+        value.forEach((e) {
+          noticeSortListModel temp = noticeSortListModel.fromJson(e);
 
+          temp.DISP_FR_DATE = Utils.getYearMonthDayFormat(temp.DISP_FR_DATE);
+          temp.DISP_TO_DATE = Utils.getYearMonthDayFormat(temp.DISP_TO_DATE);
+
+          sortListOwnerNotice.add(temp);
+        });
+
+        if (isSaveEnabled == true) {
+          await Future.delayed(Duration(milliseconds: 500), () async {
+            List<String> sortDataList = [];
+            sortListOwnerNotice.forEach((element) {
+              sortDataList.add(element.NOTICE_SEQ.toString());
+            });
+
+            if (sortDataList.length != 0) {
+              String jsonData = jsonEncode(sortDataList);
+              await NoticeController.to.updateSort(jsonData, context);
+            }
+
+            isSaveEnabled = false;
+          });
+        }
+      }
+    });
+
+    //if (this.mounted) {
       setState(() {});
-    }
+    //}
 
     // 사장님 이벤트 바인딩
-    await NoticeController.to.getNoticeSortList('4', context);
-
-    if (this.mounted) {
-      NoticeController.to.qDataSortList.forEach((e) {
-        noticeSortListModel temp = noticeSortListModel.fromJson(e);
-
-        temp.DISP_FR_DATE = Utils.getYearMonthDayFormat(temp.DISP_FR_DATE);
-        temp.DISP_TO_DATE = Utils.getYearMonthDayFormat(temp.DISP_TO_DATE);
-
-        sortListOwnerEvent .add(temp);
-      });
-
-      if (isSaveEnabled == true) {
-        await Future.delayed(Duration(milliseconds: 500), () async {
-          List<String> sortDataList = [];
-          sortListOwnerEvent .forEach((element) {
-            sortDataList.add(element.NOTICE_SEQ.toString());
-          });
-
-          if (sortDataList.length != 0) {
-            String jsonData = jsonEncode(sortDataList);
-            await NoticeController.to.updateSort(jsonData, context);
-          }
-
-          isSaveEnabled = false;
-        });
+    await NoticeController.to.getNoticeSortList('4').then((value) async {
+      if (value == null) {
+        ISAlert(context, '정상조회가 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
       }
+      else {
+        value.forEach((e) {
+          noticeSortListModel temp = noticeSortListModel.fromJson(e);
 
+          temp.DISP_FR_DATE = Utils.getYearMonthDayFormat(temp.DISP_FR_DATE);
+          temp.DISP_TO_DATE = Utils.getYearMonthDayFormat(temp.DISP_TO_DATE);
+
+          sortListOwnerEvent .add(temp);
+        });
+
+        if (isSaveEnabled == true) {
+          await Future.delayed(Duration(milliseconds: 500), () async {
+            List<String> sortDataList = [];
+            sortListOwnerEvent .forEach((element) {
+              sortDataList.add(element.NOTICE_SEQ.toString());
+            });
+
+            if (sortDataList.length != 0) {
+              String jsonData = jsonEncode(sortDataList);
+              await NoticeController.to.updateSort(jsonData, context);
+            }
+
+            isSaveEnabled = false;
+          });
+        }
+      }
+    });
+
+    //if (this.mounted) {
       setState(() {});
-    }
+    //}
 
     // 사장님 팝업 바인딩
-    await NoticeController.to.getNoticeSortList('6', context);
-
-    if (this.mounted) {
-      NoticeController.to.qDataSortList.forEach((e) {
-        noticeSortListModel temp = noticeSortListModel.fromJson(e);
-
-        temp.DISP_FR_DATE = Utils.getYearMonthDayFormat(temp.DISP_FR_DATE);
-        temp.DISP_TO_DATE = Utils.getYearMonthDayFormat(temp.DISP_TO_DATE);
-
-        sortListOwnerMainPopup .add(temp);
-      });
-
-      if (isSaveEnabled == true) {
-        await Future.delayed(Duration(milliseconds: 500), () async {
-          List<String> sortDataList = [];
-          sortListOwnerMainPopup .forEach((element) {
-            sortDataList.add(element.NOTICE_SEQ.toString());
-          });
-
-          if (sortDataList.length != 0) {
-            String jsonData = jsonEncode(sortDataList);
-            await NoticeController.to.updateSort(jsonData, context);
-          }
-
-          isSaveEnabled = false;
-        });
+    await NoticeController.to.getNoticeSortList('6').then((value) async {
+      if (value == null) {
+        ISAlert(context, '정상조회가 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
       }
+      else {
+        value.forEach((e) {
+          noticeSortListModel temp = noticeSortListModel.fromJson(e);
 
+          temp.DISP_FR_DATE = Utils.getYearMonthDayFormat(temp.DISP_FR_DATE);
+          temp.DISP_TO_DATE = Utils.getYearMonthDayFormat(temp.DISP_TO_DATE);
+
+          sortListOwnerMainPopup .add(temp);
+        });
+
+        if (isSaveEnabled == true) {
+          await Future.delayed(Duration(milliseconds: 500), () async {
+            List<String> sortDataList = [];
+            sortListOwnerMainPopup .forEach((element) {
+              sortDataList.add(element.NOTICE_SEQ.toString());
+            });
+
+            if (sortDataList.length != 0) {
+              String jsonData = jsonEncode(sortDataList);
+              await NoticeController.to.updateSort(jsonData, context);
+            }
+
+            isSaveEnabled = false;
+          });
+        }
+      }
+    });
+
+    //if (this.mounted) {
       setState(() {});
-    }
+    //}
 
     // 시정홍보 바인딩
-    await NoticeController.to.getNoticeSortList('7', context);
-
-    if (this.mounted) {
-      NoticeController.to.qDataSortList.forEach((e) {
-        noticeSortListModel temp = noticeSortListModel.fromJson(e);
-
-        temp.DISP_FR_DATE = Utils.getYearMonthDayFormat(temp.DISP_FR_DATE);
-        temp.DISP_TO_DATE = Utils.getYearMonthDayFormat(temp.DISP_TO_DATE);
-
-        sortListMunicipal .add(temp);
-      });
-
-      if (isSaveEnabled == true) {
-        await Future.delayed(Duration(milliseconds: 500), () async {
-          List<String> sortDataList = [];
-          sortListMunicipal .forEach((element) {
-            sortDataList.add(element.NOTICE_SEQ.toString());
-          });
-
-          if (sortDataList.length != 0) {
-            String jsonData = jsonEncode(sortDataList);
-            await NoticeController.to.updateSort(jsonData, context);
-          }
-
-          isSaveEnabled = false;
-        });
+    await NoticeController.to.getNoticeSortList('7').then((value) async {
+      if (value == null) {
+        ISAlert(context, '정상조회가 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
       }
+      else {
+        value.forEach((e) {
+          noticeSortListModel temp = noticeSortListModel.fromJson(e);
 
+          temp.DISP_FR_DATE = Utils.getYearMonthDayFormat(temp.DISP_FR_DATE);
+          temp.DISP_TO_DATE = Utils.getYearMonthDayFormat(temp.DISP_TO_DATE);
+
+          sortListMunicipal .add(temp);
+        });
+
+        if (isSaveEnabled == true) {
+          await Future.delayed(Duration(milliseconds: 500), () async {
+            List<String> sortDataList = [];
+            sortListMunicipal .forEach((element) {
+              sortDataList.add(element.NOTICE_SEQ.toString());
+            });
+
+            if (sortDataList.length != 0) {
+              String jsonData = jsonEncode(sortDataList);
+              await NoticeController.to.updateSort(jsonData, context);
+            }
+
+            isSaveEnabled = false;
+          });
+        }
+      }
+    });
+
+    //if (this.mounted) {
       setState(() {});
-    }
+    //}
   }
 
   _editListSort(List<String> sortDataList) async {

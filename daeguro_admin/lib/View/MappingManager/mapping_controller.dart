@@ -1,5 +1,8 @@
 import 'package:daeguro_admin_app/ISWidget/is_dialog.dart';
-import 'package:daeguro_admin_app/Provider/RestApiProvider.dart';
+import 'package:daeguro_admin_app/Network/DioClient.dart';
+
+import 'package:daeguro_admin_app/constants/serverInfo.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -7,78 +10,71 @@ class MappingController extends GetxController with SingleGetTickerProviderMixin
   static MappingController get to => Get.find();
   BuildContext context;
 
-  List<dynamic> qData = [];
-  dynamic qDataDetail;
   List qDataCCenterItems = [];
   List qDataMCodeItems = [];
-
-  String checkCount;
 
   int totalRowCnt = 0;
 
   RxString raw = ''.obs;
   RxString page = ''.obs;
-
-  //List<ResponseBodyApi> qData;
-
   RxString MCode = ''.obs;
 
   @override
   void onInit(){
-    Get.put(RestApiProvider());
-
     raw.value = '15';
     page.value = '1';
-
-    //getData();
 
     super.onInit();
   }
 
-  getData(String useGbn, String apiType, String shopName) async {
-    var result = await RestApiProvider.to.getMapping(useGbn, apiType, shopName, page.value.toString(), raw.value.toString());
+  Future<List<dynamic>> getData(String useGbn, String apiType, String shopName) async {
+    List<dynamic> qData = [];
 
-    totalRowCnt = int.parse(result.body['count'].toString());
+    final response = await DioClient().get(ServerInfo.REST_URL_MAPPING + '?usgGbn=$useGbn&apiType=$apiType&shopName=$shopName&page=${page.value.toString()}&rows=${raw.value.toString()}');
 
-    qData.assignAll(result.body['data']);
+    if (response.data['code'] == '00') {
+      totalRowCnt = int.parse(response.data['count'].toString());
 
-    if (result.body['code'] != '00') {
-      ISAlert(context, '정상조회가 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
+      qData.assignAll(response.data['data']);
     }
+    else
+      return null;
+
+    return qData;
   }
 
-  getDetailData(String seq) async {
-    var result = await RestApiProvider.to.getMappingDetail(seq);
+  Future<dynamic> getDetailData(String seq) async {
+    final response = await DioClient().get(ServerInfo.REST_URL_MAPPING + '/' + seq);
 
-    qDataDetail = result.body['data'];
-
-    if (result.body['code'] != '00') {
-      ISAlert(context, '정상조회가 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
+    if (response.data['code'] == '00') {
+      return response.data['data'];
     }
+
+    return null;
   }
 
-  getCheckApiMap(String shop_cd) async {
-    var result = await RestApiProvider.to.getCheckApiMap(shop_cd);
+  Future<dynamic> getCheckApiMap(String shop_cd) async {
+    final response = await DioClient().get(ServerInfo.REST_URL_MAPPING_CHECK + '/' + shop_cd);
 
-    checkCount = result.body['count'];
-
-    if (result.body['code'] != '00') {
-      ISAlert(context, '정상체크가 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
+    if (response.data['code'] == '00') {
+      return response.data['count'];
     }
+
+    return null;
   }
 
   postData(Map data, BuildContext context) async {
-    var result = await RestApiProvider.to.postMapping(data);
+    var response = await DioClient().post(ServerInfo.REST_URL_MAPPING, data: data);
 
-    if (result.body['code'] != '00') {
+    if (response.data['code'] != '00') {
       ISAlert(context, '정상적으로 저장 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
     }
   }
 
   putData(Map data, BuildContext context) async {
-    var result = await RestApiProvider.to.putMapping(data);
+    final response = await DioClient().put(ServerInfo.REST_URL_MAPPING, data: data);
 
-    if (result.body['code'] != '00') {
+    if (response.data['code'] != '00') {
       ISAlert(context, '정상적으로 수정이 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
     }
   }

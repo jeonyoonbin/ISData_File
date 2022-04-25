@@ -71,7 +71,7 @@ class RestListDetail_201State extends State<RestListDetail_201> with SingleTicke
   loadOperatorListData() async {
     selectBox_operator.clear();
 
-    await UserController.to.getUserCodeNameOperator('2', '6').then((value) {
+    await UserController.to.getUserCodeName('2', '6').then((value) {
       if (value == null) {
         ISAlert(context, '사용자ID 또는 비밀번호를 확인하십시오.');
       } else {
@@ -98,11 +98,12 @@ class RestListDetail_201State extends State<RestListDetail_201> with SingleTicke
   }
 
   loadData() async {
-    await RequestController.to.getDetailData(widget.seq, context);
-
-    if (this.mounted) {
-      setState(() {
-        formData = ServiceRequestDetail.fromJson(RequestController.to.qDataDetail);
+    await RequestController.to.getDetailData(widget.seq).then((value) {
+      if (value == null) {
+        ISAlert(context, '정상조회가 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
+      }
+      else {
+        formData = ServiceRequestDetail.fromJson(value);
 
         _alloc_ucode = formData.ALLOC_UCODE.toString();
         _alloc_uname = formData.ALLOC_UNAME;
@@ -129,8 +130,14 @@ class RestListDetail_201State extends State<RestListDetail_201> with SingleTicke
             setItemCd(_b_item_cd3) +
             '  →  ' +
             setItemCd(_a_item_cd3);
+      }
+    });
+
+    //if (this.mounted) {
+      setState(() {
+
       });
-    }
+    //}
   }
 
   @override

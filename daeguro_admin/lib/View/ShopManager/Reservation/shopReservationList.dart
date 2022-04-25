@@ -8,7 +8,7 @@ import 'package:daeguro_admin_app/ISWidget/search/is_search_dropdown.dart';
 import 'package:daeguro_admin_app/ISWidget/search/is_search_input.dart';
 import 'package:daeguro_admin_app/Model/search_items.dart';
 import 'package:daeguro_admin_app/Model/shop/shop_ReserListModel.dart';
-import 'package:daeguro_admin_app/Provider/BackendService.dart';
+import 'package:daeguro_admin_app/Network/BackendService.dart';
 import 'package:daeguro_admin_app/Util/utils.dart';
 
 import 'package:daeguro_admin_app/View/AgentManager/agentAccount_Controller.dart';
@@ -44,7 +44,7 @@ class ShopReservationListState extends State<ShopReservationList> {
   String searchKeyword = '';
 
   SearchItems _searchItems = new SearchItems();
-  String _status = '10';
+  String _status = 'ALL';
 
   String _searchGbn = '1';
   List MCodeListitems = List();
@@ -158,11 +158,15 @@ class ShopReservationListState extends State<ShopReservationList> {
         context: context,
         builder: (BuildContext context) => Dialog(
           child: ShopReservationDetail(data: data, shopName: _shopName),
-        )
-    );
+            ));
   }
 
   loadData() async {
+    if (_shopCd == '') {
+      ISAlert(context, '가맹점을 선택 해주십시오.');
+      return;
+    }
+
     await ISProgressDialog(context).show(status: 'Loading...');
 
     dataList.clear();
@@ -265,7 +269,7 @@ class ShopReservationListState extends State<ShopReservationList> {
     WidgetsBinding.instance.addPostFrameCallback((c) {
       loadMCodeListData();
       _reset();
-      _query();
+      //_query();
     });
 
     setState(() {
@@ -356,7 +360,6 @@ class ShopReservationListState extends State<ShopReservationList> {
                       setState(() {
                         _currentPage = 1;
                         _mCode = value;
-                        _query();
                       });
                     },
                     width: 240,
@@ -493,7 +496,6 @@ class ShopReservationListState extends State<ShopReservationList> {
                             setState(() {
                               _searchGbn = value;
                               _currentPage = 1;
-                              _query();
                             });
                           },
                           item: [
@@ -601,7 +603,7 @@ class ShopReservationListState extends State<ShopReservationList> {
                   alignment: Alignment.center,
                 )),
                 DataCell(Align(
-                  child: SelectableText('[' + item.custName.toString() + '] ' + Utils.getPhoneNumFormat(item.custTelno, true), showCursor: true),
+                  child: SelectableText('[' + Utils.getNameAbsoluteFormat(item.custName.toString(), true) + '] ' + Utils.getPhoneNumFormat(item.custTelno, true), showCursor: true),
                   alignment: Alignment.centerLeft,
                 )),
                 DataCell(Align(
@@ -614,9 +616,11 @@ class ShopReservationListState extends State<ShopReservationList> {
                 )),
                 DataCell(
                   Center(
-                    child: InkWell(onTap: () {
-                      _detail(data : item.toJson());
-                    }, child: Icon(Icons.receipt_long)),
+                    child: InkWell(
+                        onTap: () {
+                          _detail(data: item.toJson());
+                        },
+                        child: Icon(Icons.receipt_long)),
                   ),
                 ),
               ]);

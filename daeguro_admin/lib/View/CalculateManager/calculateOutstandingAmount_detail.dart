@@ -110,7 +110,7 @@ class CalculateOutstandingAmountDetailState extends State<CalculateOutstandingAm
   }
 
   _detail({String orderNo}) async {
-    await OrderController.to.getDetailData(orderNo.toString(), context);
+    await OrderController.to.getDetailData(orderNo.toString());
 
     showDialog(
       context: context,

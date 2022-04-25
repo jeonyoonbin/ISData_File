@@ -41,7 +41,6 @@ import 'package:daeguro_admin_app/View/RequestManager/requestList_main.dart';
 import 'package:daeguro_admin_app/View/ReviewManager/review_main.dart';
 import 'package:daeguro_admin_app/View/ShopManager/Account/shopFoodSafety_main.dart';
 import 'package:daeguro_admin_app/View/ShopManager/Event/shopEvent_main.dart';
-import 'package:daeguro_admin_app/View/ShopManager/ImageManager/shopImage_main.dart';
 import 'package:daeguro_admin_app/View/ShopManager/Account/shopRegNoList_main.dart';
 import 'package:daeguro_admin_app/View/ShopManager/Account/shopAccount_main.dart';
 import 'package:daeguro_admin_app/View/ShopManager/Reservation/shopReservation_main.dart';
@@ -50,6 +49,13 @@ import 'package:daeguro_admin_app/View/StatManager/Customer/stat_Customermain.da
 import 'package:daeguro_admin_app/View/StatManager/Mileage/stat_Mileagemain.dart';
 import 'package:daeguro_admin_app/View/StatManager/Order/stat_Ordermain.dart';
 import 'package:daeguro_admin_app/View/StatManager/Shop/stat_Shopmain.dart';
+import 'package:daeguro_admin_app/View/TaxiManager/taxiCallCenter_main.dart';
+import 'package:daeguro_admin_app/View/TaxiManager/taxiCoupon_main.dart';
+import 'package:daeguro_admin_app/View/TaxiManager/taxiFAQ_main.dart';
+import 'package:daeguro_admin_app/View/TaxiManager/taxiNotice_main.dart';
+import 'package:daeguro_admin_app/View/TaxiManager/taxiOrder_main.dart';
+import 'package:daeguro_admin_app/View/TaxiManager/taxiRegi_main.dart';
+import 'package:daeguro_admin_app/View/TaxiManager/taxiToday_main.dart';
 import 'package:daeguro_admin_app/View/Today/dashboard_screen.dart';
 import 'package:daeguro_admin_app/View/AuthManager/AuthManager_main.dart';
 import 'package:daeguro_admin_app/View/UserManager/user_main.dart';
@@ -71,7 +77,7 @@ Map<String, Widget> layoutRoutesData = {
 
   '/shopAccountManager': ShopAccountMain(),
   '/shopAccountModificationRegNo': ShopRegNoListMain(),
-  '/shopImageManager': ShopImageMain(),
+  //'/shopImageManager': ShopImageMain(),
   '/ShopEventList': ShopEventMain(),
   '/ShopFoodSafety': ShopFoodSafetyMain(),
   '/ShopReservationMain': ShopReservationMain(),
@@ -141,6 +147,14 @@ Map<String, Widget> layoutRoutesData = {
   '/ReviewListManager': ReviewMain(),
 
   '/VoucherListManager': VoucherMain(),
+
+  '/TaxiToday': TaxiTodayMain(),
+  '/TaxiNoticeManager': TaxiNoticeMain(),
+  '/TaxiCouponManager': TaxiCouponMain(),
+  '/TaxiCallCenterManager': TaxiCallCenterMain(),
+  '/TaxiOrderManager': TaxiOrderMain(),
+  '/TaxiRegiManager': TaxiRegiMain(),
+  '/TaxiFAQManager': TaxiFAQMain(),
 
 
   '/layout401': Page401(),

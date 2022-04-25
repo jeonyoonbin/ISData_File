@@ -10,7 +10,7 @@ import 'package:daeguro_admin_app/Model/reserNoticeRegistModel.dart';
 import 'package:daeguro_admin_app/Util/select_option_vo.dart';
 import 'package:daeguro_admin_app/View/CouponManager/coupon_controller.dart';
 
-import 'package:daeguro_admin_app/Provider/FileUpLoader.dart';
+import 'package:daeguro_admin_app/Network/FileUpLoader.dart';
 import 'package:daeguro_admin_app/View/NoticeManager/noticeFileUpload.dart';
 
 import 'package:date_format/date_format.dart';

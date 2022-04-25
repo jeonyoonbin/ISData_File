@@ -301,9 +301,7 @@ class ShopCalcInfoState extends State<ShopCalcInfo> with AutomaticKeepAliveClien
               // controller 작업 진행 중
               //await ShopController.to.postCalcConfirmData(bodyData, formData.toJson(), detailData.selected_shopCode, context);
 
-              await http
-                  .post(Uri.parse(ServerInfo.REST_URL_SHOPCALC_CONFIRM), headers: headerData, body: bodyData.toString())
-                  .then((http.Response response) async {
+              await http.post(Uri.parse(ServerInfo.REST_URL_SHOPCALC_CONFIRM), headers: headerData, body: bodyData.toString()).then((http.Response response) async {
                 //String responseBody = utf8.decode(res.bodyBytes);
                 if (response.statusCode == 200) {
                   var decodeBody = jsonDecode(response.body);

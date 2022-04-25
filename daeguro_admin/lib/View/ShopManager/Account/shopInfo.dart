@@ -6,6 +6,8 @@ import 'dart:async';
 import 'package:bubble_tab_indicator/bubble_tab_indicator.dart';
 import 'package:daeguro_admin_app/ISWidget/is_progressDialog.dart';
 import 'package:daeguro_admin_app/Model/shop/shopImageHistory.dart';
+import 'package:daeguro_admin_app/Model/shop/shopposupdate.dart';
+import 'package:daeguro_admin_app/Network/DioClient.dart';
 import 'package:daeguro_admin_app/Util/auth_util.dart';
 import 'package:daeguro_admin_app/View/ShopManager/Account/shopDetailNotifierData.dart';
 import 'package:daeguro_admin_app/constants/serverInfo.dart';
@@ -13,10 +15,11 @@ import 'package:daeguro_admin_app/ISWidget/is_dialog.dart';
 import 'package:daeguro_admin_app/Model/shop/shop_divcode.dart';
 import 'package:daeguro_admin_app/Model/shop/shop_info.dart';
 import 'package:daeguro_admin_app/View/ShopManager/Account/shopAccount_controller.dart';
-import 'package:daeguro_admin_app/Provider/FileUpLoader.dart';
+import 'package:daeguro_admin_app/Network/FileUpLoader.dart';
 import 'package:daeguro_admin_app/Util/multi_masked_formatter.dart';
 import 'package:daeguro_admin_app/Util/select_option_vo.dart';
 import 'package:daeguro_admin_app/Util/utils.dart';
+import 'package:date_time_picker/date_time_picker.dart';
 
 import 'package:image_picker/image_picker.dart';
 import 'package:js/js.dart';
@@ -49,12 +52,13 @@ class ShopInfo extends StatefulWidget {
   }
 }
 
-enum RadioGbn { gbn1, gbn2, gbn3 }
+//enum RadioGbn { gbn1, gbn2, gbn3, gbn4 }
 
 class ShopInfoState extends State<ShopInfo> with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   ShopInfoModel formData = ShopInfoModel();
-  RadioGbn _radioGbn;
+  // RadioGbn _radioGbn;
+  // RadioGbn _radioGbn_reserve;
   String RepImagePath;
 
   var _file;
@@ -79,12 +83,23 @@ class ShopInfoState extends State<ShopInfo> with SingleTickerProviderStateMixin,
   bool isListSaveEnabled = false;
   bool isReceiveDataEnabled = false;
 
+  bool _shopTypeGbn3 = false;
+  bool _shopTypeGbn5 = false;
+  bool _shopTypeGbn7 = false;
+  bool _shopTypeGbn9 = false;
+
+
   void refreshWidget(ShopDetailNotifierData element){
     detailData = element;
     if (detailData != null) {
       //print('shopInfo refreshWidget() is not NULL -> [${element.selected_shopCode}]');
 
       RepImagePath = null;
+
+      _shopTypeGbn3 = false;
+      _shopTypeGbn5 = false;
+      _shopTypeGbn7 = false;
+      _shopTypeGbn9 = false;
 
       loadImageURLData();
       loadData();
@@ -109,6 +124,11 @@ class ShopInfoState extends State<ShopInfo> with SingleTickerProviderStateMixin,
       imageHistoryList.clear();
 
       RepImagePath = null;
+
+      _shopTypeGbn3 = false;
+      _shopTypeGbn5 = false;
+      _shopTypeGbn7 = false;
+      _shopTypeGbn9 = false;
 
       isReceiveDataEnabled = false;
 
@@ -163,7 +183,19 @@ class ShopInfoState extends State<ShopInfo> with SingleTickerProviderStateMixin,
   loadData() async {
     imageHistoryList.clear();
 
-    await ShopController.to.getImageHistoryData(detailData.selected_shopCode, '1', '10000');
+    await ShopController.to.getImageHistoryData(detailData.selected_shopCode, '1', '10000').then((value) {
+      if (value == null) {
+        ISAlert(context, '정상조회가 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
+      }
+      else {
+        // 이미지 변경내역
+        value.forEach((element) {
+          ShopImageHistoryModel hisData = ShopImageHistoryModel.fromJson(element);
+          if (hisData.histDate != null) hisData.histDate = hisData.histDate.replaceAll('T', '  ');
+          imageHistoryList.add(hisData);
+        });
+      }
+    });
 
     await ShopController.to.getInfoData(detailData.selected_shopCode).then((value) {
       if (value == null) {
@@ -172,24 +204,14 @@ class ShopInfoState extends State<ShopInfo> with SingleTickerProviderStateMixin,
       else {
         formData = ShopInfoModel.fromJson(value);
 
-        // 이미지 변경내역
-        ShopController.to.qImageHistoryList.forEach((element) {
-          ShopImageHistoryModel hisData = ShopImageHistoryModel.fromJson(element);
-          if (hisData.histDate != null) hisData.histDate = hisData.histDate.replaceAll('T', '  ');
-          imageHistoryList.add(hisData);
-        });
-
         formData.current = formData.shopPass;
-
-        //print('---> telNo:${formData.telNo}');
-
-        if (formData.shopType == '7') {
-          _radioGbn = RadioGbn.gbn1;
-        } else if (formData.shopType == '5') {
-          _radioGbn = RadioGbn.gbn2;
-        } else if (formData.shopType == '5,7' || formData.shopType == '7,5') {
-          _radioGbn = RadioGbn.gbn3;
-        }
+        List<String> _shopTypeItems = formData.shopType.split(',');
+        _shopTypeItems.forEach((element) {
+          if (element == '3')         _shopTypeGbn3 = true;
+          if (element == '5')         _shopTypeGbn5 = true;
+          if (element == '7')         _shopTypeGbn7 = true;
+          if (element == '9')         _shopTypeGbn9 = true;
+        });
 
         if (formData.bussImg == 'Y')        _shopimgGbn[0] = true;
         if (formData.idcardImg == 'Y')      _shopimgGbn[1] = true;
@@ -317,35 +339,46 @@ class ShopInfoState extends State<ShopInfo> with SingleTickerProviderStateMixin,
                         children: [
                           Container(
                             child: Text('매장 유형', style: TextStyle(fontSize: 10, color: Colors.black54),),
-                            margin: EdgeInsets.all(5),
+                            margin: EdgeInsets.only(top: 5, bottom: 5, left:20, right: 10)//.all(5),
                           ),
-                          Radio(value: RadioGbn.gbn1, groupValue: _radioGbn,
-                              onChanged: (v) {
-                                setState(() {
-                                  _radioGbn = v;
-                                });
-                              }),
-                          Text('포장', style: TextStyle(fontSize: 12)),
-                          Container(
-                            margin: EdgeInsets.fromLTRB(10, 0, 0, 0),
-                            child: Radio(value: RadioGbn.gbn2, groupValue: _radioGbn,
+                          Row(
+                            children: <Widget>[
+                              Checkbox(value: _shopTypeGbn7,
                                 onChanged: (v) {
                                   setState(() {
-                                    _radioGbn = v;
+                                    _shopTypeGbn7 = v;
                                   });
-                                }),
+                                },
+                              ),
+                              Text('포장', style: TextStyle(fontSize: 12)),
+                            ],
                           ),
-                          Text('배달', style: TextStyle(fontSize: 12)),
-                          Container(
-                            margin: EdgeInsets.fromLTRB(10, 0, 0, 0),
-                            child: Radio(value: RadioGbn.gbn3, groupValue: _radioGbn,
+                          SizedBox(width: 5,),
+                          Row(
+                            children: <Widget>[
+                              Checkbox(value: _shopTypeGbn5,
                                 onChanged: (v) {
                                   setState(() {
-                                    _radioGbn = v;
+                                    _shopTypeGbn5 = v;
                                   });
-                                }),
+                                },
+                              ),
+                              Text('배달', style: TextStyle(fontSize: 12)),
+                            ],
                           ),
-                          Text('포장/배달', style: TextStyle(fontSize: 12)),
+                          SizedBox(width: 5,),
+                          Row(
+                            children: <Widget>[
+                              Checkbox(value: _shopTypeGbn9,
+                                onChanged: (v) {
+                                  setState(() {
+                                    _shopTypeGbn9 = v;
+                                  });
+                                },
+                              ),
+                              Text('예약', style: TextStyle(fontSize: 12)),
+                            ],
+                          ),
                         ],
                       ),
                     ),
@@ -429,20 +462,26 @@ class ShopInfoState extends State<ShopInfo> with SingleTickerProviderStateMixin,
                                 form.save();
 
                                 ISConfirm(context, '비밀번호 초기화', '비밀번호를 초기화 하시겠습니까?', (context) async {
-                                  if (_radioGbn == RadioGbn.gbn1) {
-                                    formData.shopType = '7';
-                                  } else if (_radioGbn == RadioGbn.gbn2) {
-                                    formData.shopType = '5';
-                                  } else if (_radioGbn == RadioGbn.gbn3) {
-                                    formData.shopType = '5,7';
-                                  }
+                                  List<String> _shopTypeParam = [];
+                                  if (_shopTypeGbn3 == true)                  _shopTypeParam.add('3');
+                                  if (_shopTypeGbn5 == true)                  _shopTypeParam.add('5');
+                                  if (_shopTypeGbn7 == true)                  _shopTypeParam.add('7');
+                                  if (_shopTypeGbn9 == true)                  _shopTypeParam.add('9');
 
-                                  //print('등록 Success!!!');
+                                  String editShopType = _shopTypeParam.join(',');
+
+                                  formData.shopType = editShopType;
+
                                   formData.modUCode = GetStorage().read('logininfo')['uCode'];
                                   formData.modName = GetStorage().read('logininfo')['name'];
-                                  //print('formData--> '+formData.toJson().toString());
 
                                   formData.shopPass = 'eornfh';
+
+                                  if (formData.shopType.contains('9') == false)
+                                    formData.reserveYn = 'N';
+
+                                  await Future.delayed(Duration(milliseconds: 500), (){
+                                  });
 
                                   ShopController.to.putInfoData(int.parse(detailData.selected_mCode), detailData.selected_ccCode, formData.toJson(), context);
                                   setState(() {});
@@ -724,32 +763,75 @@ class ShopInfoState extends State<ShopInfo> with SingleTickerProviderStateMixin,
                 //     (context) async {
                 // });
 
-                if (_radioGbn == RadioGbn.gbn1) {
-                  formData.shopType = '7';
-                } else if (_radioGbn == RadioGbn.gbn2) {
-                  formData.shopType = '5';
-                } else if (_radioGbn == RadioGbn.gbn3) {
-                  formData.shopType = '5,7';
-                }
+                List<String> _shopTypeParam = [];
+                if (_shopTypeGbn3 == true)                  _shopTypeParam.add('3');
+                if (_shopTypeGbn5 == true)                  _shopTypeParam.add('5');
+                if (_shopTypeGbn7 == true)                  _shopTypeParam.add('7');
+                if (_shopTypeGbn9 == true)                  _shopTypeParam.add('9');
 
-                //print('등록 Success!!!');
+                String editShopType = _shopTypeParam.join(',');
+
+                formData.shopType = editShopType;
                 formData.modUCode = GetStorage().read('logininfo')['uCode'];
                 formData.modName = GetStorage().read('logininfo')['name'];
-                //print('formData--> '+formData.toJson().toString());
 
-                ShopController.to.putInfoData(int.parse(detailData.selected_mCode), detailData.selected_ccCode, formData.toJson(), context);
+                //formData.shopType.contains('9') == true ? formData.reserveYn = 'Y' :  formData.reserveYn = 'N';
+                if (formData.shopType.contains('9') == false)
+                  formData.reserveYn = 'N';
 
+                //=================================================================================
+                String posAppOrderYn = '1';
+                String posReserveYn = '1';
 
-                //Navigator.pop(context, true);
+                // 매장 유형이 배달(5) or 포장(7) 포함 된 경우
+                if (formData.shopType.contains('5') || formData.shopType.contains('7')) {
+                  posAppOrderYn = '1';
+                } else {
+                  posAppOrderYn = '0';
+                }
 
-                await Future.delayed(Duration(milliseconds: 500), (){
-                  setState(()  {
-                    isListSaveEnabled = true;
-                  });
+                if (formData.shopType.contains('9')) {
+                  posReserveYn = '1';
+                }
+                else
+                  posReserveYn = '0';
 
-                  widget.callback();
+                var bodyPosData = {'"app_name"': '"대구로 어드민"', '"app_type"': '"admin-daeguroApp"',
+                  '"shop_info"': '{"job_gbn" :"STOREUSE_UPDATE", "use_gbn" : "' + formData.useGbn +
+                      '", "shop_token" : "' + detailData.selected_apiComCode +
+                      '", "is_fooddelivery" : "' + posAppOrderYn +
+                      '", "is_reserve" : "' + posReserveYn +
+                      '", "mod_ucode" : "' + GetStorage().read('logininfo')['uCode'] + '"}'
+                };
+
+                await DioClient().postRestLog('0', 'shopInfo/postAppProcess', '[POS 가맹점 정보 저장] ' + bodyPosData.toString() + '|| ucode : ' + GetStorage().read('logininfo')['uCode'].toString() + ', name : ' + GetStorage().read('logininfo')['name'].toString());
+
+                await ShopController.to.postPosShopUpdate(ServerInfo.REST_URL_POS_APPPROCESS, bodyPosData.toString()).then((value) async {
+                  if(value == null){
+                    ISAlert(context, '[POS설정] POS API연동 오류. \n\n관리자에게 문의 바랍니다');
+                  }
+                  else{
+                    if (value.data['code'] != 0) {
+                      await DioClient().postRestLog('0', 'shopInfo/postAppProcess', '[POS 가맹점 정보 저장 실패] - [${value.data['code']}] ${value.data['message']}\n' + bodyPosData.toString() + '|| ucode : ' + GetStorage().read('logininfo')['uCode'].toString() + ', name : ' + GetStorage().read('logininfo')['name'].toString());
+
+                      ISAlert(context, '[POS설정] 정상적으로 저장되지 않았습니다. \n\n- [${value.data['code']}] ${value.data['message']}');
+                    }
+                    else{
+                      ShopController.to.putInfoData(int.parse(detailData.selected_mCode), detailData.selected_ccCode, formData.toJson(), context);
+                    }
+
+                    await Future.delayed(Duration(milliseconds: 500), (){
+                      if (value.data['code'] == 0){
+                        setState(()  {
+                          isListSaveEnabled = true;
+                        });
+                      }
+
+                      widget.callback();
+                    });
+                  }
                 });
-
+                //=================================================================================
               },
             ),
           ],

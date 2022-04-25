@@ -1,4 +1,5 @@
-import 'package:daeguro_admin_app/Provider/RestApiProvider.dart';
+
+import 'package:daeguro_admin_app/Network/DioClient.dart';
 import 'package:daeguro_admin_app/constants/serverInfo.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
@@ -22,12 +23,8 @@ class HistoryController extends GetxController with SingleGetTickerProviderMixin
 
   @override
   void onInit() {
-    Get.put(RestApiProvider());
-
     raw.value = 15;
     page.value = 1;
-
-    //getData(context);
 
     super.onInit();
   }
@@ -35,11 +32,7 @@ class HistoryController extends GetxController with SingleGetTickerProviderMixin
   getHistoryMileageData() async {
     List<dynamic> qHistoryData = [];
 
-    //var result = await RestApiProvider.to.getHistoryMileage(fromDate.value.toString(), toDate.value.toString(), page.value.toString(), raw.value.toString());
-
-    // dio 패키지
-    var dio = Dio();
-    final response = await dio.get(ServerInfo.REST_URL_MILEAGEHISTORY +
+    final response = await DioClient().get(ServerInfo.REST_URL_MILEAGEHISTORY +
         '?date_begin=' +
         fromDate.value.toString() +
         '&date_end=' +
@@ -48,9 +41,6 @@ class HistoryController extends GetxController with SingleGetTickerProviderMixin
         page.value.toString() +
         '&rows=' +
         raw.value.toString());
-
-    dio.clear();
-    dio.close();
 
     if (response.data['code'] == '00') {
       totalHistoryCnt = response.data['totalCount'].toString();

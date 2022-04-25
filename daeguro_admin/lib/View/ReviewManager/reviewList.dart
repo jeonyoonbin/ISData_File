@@ -593,7 +593,7 @@ class ReviewListState extends State<ReviewList>  with SingleTickerProviderStateM
                                   items: [
                                     DropdownMenuItem(value: 'A', child: Text('전체 공개'),),
                                     DropdownMenuItem(value: 'B', child: Text('블라인드 처리'),),
-                                    DropdownMenuItem(value: 'R', child: Text('블라인드 요청중'),),
+                                    DropdownMenuItem(value: 'R', child: Text('블라인드 요청중'), enabled: false),
                                   ].cast<DropdownMenuItem<String>>(),
                                 ),
                               ),
@@ -712,7 +712,7 @@ class ReviewListState extends State<ReviewList>  with SingleTickerProviderStateM
                       child: Text(nSelectedOrderTitle ?? '--', style: TextStyle(color: Colors.black, fontSize: 12)),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
                       onPressed: () async {
-                        await OrderController.to.getDetailData(nSelectedOrderSeq, context);
+                        await OrderController.to.getDetailData(nSelectedOrderSeq);
                         //EasyLoading.dismiss();
 
                         showDialog(

@@ -1,5 +1,6 @@
 import 'package:daeguro_admin_app/ISWidget/is_dialog.dart';
-import 'package:daeguro_admin_app/Provider/RestApiProvider.dart';
+import 'package:daeguro_admin_app/Network/DioClient.dart';
+
 import 'package:daeguro_admin_app/constants/serverInfo.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +11,6 @@ class LogController extends GetxController with SingleGetTickerProviderMixin {
   static LogController get to => Get.find();
   BuildContext context;
 
-  //List<dynamic> qData = [];
   List<dynamic> qDataDetail = [];
 
   int total_count = 0;
@@ -25,13 +25,12 @@ class LogController extends GetxController with SingleGetTickerProviderMixin {
   RxString keyword = ''.obs;
 
   RxString div = ''.obs;
-  RxString uname = ''.obs;
+  RxString userName = ''.obs;
+  RxString modName = ''.obs;
   RxString type_gbn = ''.obs;
 
   @override
   void onInit() {
-    Get.put(RestApiProvider());
-
     rows.value = 30;//15;
     page.value = 1;
 
@@ -40,11 +39,8 @@ class LogController extends GetxController with SingleGetTickerProviderMixin {
 
   Future<List<dynamic>> getErrorLogData() async {
     List<dynamic> qData = [];
-    var dio = Dio();
-    final response = await dio.get(ServerInfo.REST_URL_LOG_ERROR + '?divKey=${divKey.value.toString()}&keyword=${keyword.value.toString()}&date_begin=${startDate.value.toString()}&date_end=${endDate.value.toString()}&page=${page.value.toString()}&rows=${rows.value.toString()}');
 
-    dio.clear();
-    dio.close();
+    final response = await DioClient().get(ServerInfo.REST_URL_LOG_ERROR + '?divKey=${divKey.value.toString()}&keyword=${keyword.value.toString()}&date_begin=${startDate.value.toString()}&date_end=${endDate.value.toString()}&page=${page.value.toString()}&rows=${rows.value.toString()}');
 
     qData.clear();
 
@@ -60,24 +56,20 @@ class LogController extends GetxController with SingleGetTickerProviderMixin {
     return qData;
   }
 
-  getDetailData(String seq) async {
-    var result = await RestApiProvider.to.getErrorLogDetail(seq);
+  Future<List<dynamic>> getDetailData(String seq) async {
+    final response = await DioClient().get(ServerInfo.REST_URL_LOG_ERROR + '/$seq');
 
-    qDataDetail = result.body['data'];
-    //print('${qDataDetail}하히후헤호');
-
-    if(result.body['code'] != '00') {
-      ISAlert(context, '정상조회가 되지 않았습니다. \n\n관리자에게 문의 바랍니다.');
+    if (response.data['code'] == '00') {
+      qDataDetail = response.data['data'];
     }
+
+    return null;
   }
 
   Future<List<dynamic>> getPrivacyLogData() async {
     List<dynamic> qData = [];
-    var dio = Dio();
-    final response = await dio.get(ServerInfo.REST_URL_LOG_PRIVACY + '?divKey=${divKey.value.toString()}&keyword=${keyword.value.toString()}&date_begin=${startDate.value.toString()}&date_end=${endDate.value.toString()}&page=${page.value.toString()}&rows=${rows.value.toString()}');
 
-    dio.clear();
-    dio.close();
+    final response = await DioClient().get(ServerInfo.REST_URL_LOG_PRIVACY + '?divKey=${divKey.value.toString()}&keyword=${keyword.value.toString()}&date_begin=${startDate.value.toString()}&date_end=${endDate.value.toString()}&page=${page.value.toString()}&rows=${rows.value.toString()}');
 
     qData.clear();
 
@@ -95,11 +87,8 @@ class LogController extends GetxController with SingleGetTickerProviderMixin {
 
   Future<List<dynamic>> getCouponLogData() async {
     List<dynamic> qData = [];
-    var dio = Dio();
-    final response = await dio.get(ServerInfo.REST_URL_COUPONHIST + '?div=${div.value.toString()}&type_gbn=${type_gbn.value.toString()}&divKey=${divKey.value.toString()}&keyword=${keyword.value.toString()}&date_begin=${startDate.value.toString()}&date_end=${endDate.value.toString()}&page=${page.value.toString()}&rows=${rows.value.toString()}');
 
-    dio.clear();
-    dio.close();
+    final response = await DioClient().get(ServerInfo.REST_URL_COUPONHIST + '?div=${div.value.toString()}&type_gbn=${type_gbn.value.toString()}&divKey=${divKey.value.toString()}&keyword=${keyword.value.toString()}&date_begin=${startDate.value.toString()}&date_end=${endDate.value.toString()}&page=${page.value.toString()}&rows=${rows.value.toString()}');
 
     qData.clear();
 
@@ -117,12 +106,8 @@ class LogController extends GetxController with SingleGetTickerProviderMixin {
 
   Future<List<dynamic>> getRoleHistLogData() async {
     List<dynamic> qData = [];
-    var dio = Dio();
-    //print(ServerInfo.REST_URL_ROLEHIST + '?&uname=${uname.value.toString()}&page=${page.value.toString()}&rows=${rows.value.toString()}');
-    final response = await dio.get(ServerInfo.REST_URL_ROLEHIST + '?&uname=${uname.value.toString()}&page=${page.value.toString()}&rows=${rows.value.toString()}');
 
-    dio.clear();
-    dio.close();
+    final response = await DioClient().get(ServerInfo.REST_URL_ROLEHIST + '?div=${divKey.value.toString()}&keyword=${keyword.value.toString()}&dateBegin=${startDate.value.toString()}&dateEnd=${endDate.value.toString()}&page=${page.value.toString()}&rows=${rows.value.toString()}');
 
     qData.clear();
     if (response.data['code'] == '00') {

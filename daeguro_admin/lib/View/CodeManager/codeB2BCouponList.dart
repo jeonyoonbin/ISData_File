@@ -255,63 +255,63 @@ class CodeB2BCouponListManagerState extends State<CodeB2BCouponListManager> {
                         ),
                         alignment: Alignment.center)
                     ),
-                    DataCell(Container(
-                      child: ISSearchSelectDate(
-                        context,
-                        width: 110,
-                        value: Utils.getYearMonthDayFormat(item.ETC_CODE1),
-                        onTap: () async {
-                          if (AuthUtil.isAuthEditEnabled('44') == false){
-                            ISAlert(context, '변경 권한이 없습니다. \n\n관리자에게 문의 바랍니다');
-                            return;
-                          }
-
-                          DateTime valueDt = DateTime.now();
-
-                          await showDatePicker(
-                            context: context,
-                            initialDate: valueDt,
-                            firstDate: DateTime(1900, 1),
-                            lastDate: DateTime(2031, 12),
-                          ).then((value) async {
-                            if (value != null) {
-                              ISConfirm(context, '쿠폰코드 사용종료일 변경', '쿠폰 사용종료일을 변경 하시겠습니까?', (context) async {
-                                Navigator.of(context).pop();
-
-                                await CodeController.to.putListData(
-                                    context,
-                                    item.CODE_GRP,
-                                    item.CODE,
-                                    item.CODE_NM,
-                                    item.MEMO,
-                                    formatDate(value, [yyyy, mm, dd]),
-                                    item.USE_GBN,
-                                item.ETC_CODE2,
-                                    item.ETC_AMT1.toString(),
-                                    item.ETC_AMT2.toString(),
-                                    item.ETC_AMT3.toString(),
-                                    item.ETC_AMT4.toString(),
-                                    item.ETC_CODE_GBN1,
-                                    item.ETC_CODE_GBN3,
-                                    item.ETC_CODE_GBN4,
-                                    item.ETC_CODE_GBN5,
-                                    item.ETC_CODE_GBN6,
-                                item.ETC_CODE_GBN7,
-                                item.ETC_CODE_GBN8);
-
-                                await Future.delayed(Duration(milliseconds: 1000), () {
-                                  loadData();
-                                });
-                              });
-                            }
-
-                            //setState(() async {});
-                          });
-                        },
-                      ),
-                      margin: EdgeInsets.all(3),
-                      alignment: Alignment.center,
-                    )),
+                    // DataCell(Container(
+                    //   child: ISSearchSelectDate(
+                    //     context,
+                    //     width: 110,
+                    //     value: Utils.getYearMonthDayFormat(item.ETC_CODE1),
+                    //     onTap: () async {
+                    //       if (AuthUtil.isAuthEditEnabled('44') == false){
+                    //         ISAlert(context, '변경 권한이 없습니다. \n\n관리자에게 문의 바랍니다');
+                    //         return;
+                    //       }
+                    //
+                    //       DateTime valueDt = DateTime.now();
+                    //
+                    //       await showDatePicker(
+                    //         context: context,
+                    //         initialDate: valueDt,
+                    //         firstDate: DateTime(1900, 1),
+                    //         lastDate: DateTime(2031, 12),
+                    //       ).then((value) async {
+                    //         if (value != null) {
+                    //           ISConfirm(context, '쿠폰코드 사용종료일 변경', '쿠폰 사용종료일을 변경 하시겠습니까?', (context) async {
+                    //             Navigator.of(context).pop();
+                    //
+                    //             await CodeController.to.putListData(
+                    //                 context,
+                    //                 item.CODE_GRP,
+                    //                 item.CODE,
+                    //                 item.CODE_NM,
+                    //                 item.MEMO,
+                    //                 formatDate(value, [yyyy, mm, dd]),
+                    //                 item.USE_GBN,
+                    //             item.ETC_CODE2,
+                    //                 item.ETC_AMT1.toString(),
+                    //                 item.ETC_AMT2.toString(),
+                    //                 item.ETC_AMT3.toString(),
+                    //                 item.ETC_AMT4.toString(),
+                    //                 item.ETC_CODE_GBN1,
+                    //                 item.ETC_CODE_GBN3,
+                    //                 item.ETC_CODE_GBN4,
+                    //                 item.ETC_CODE_GBN5,
+                    //                 item.ETC_CODE_GBN6,
+                    //             item.ETC_CODE_GBN7,
+                    //             item.ETC_CODE_GBN8);
+                    //
+                    //             await Future.delayed(Duration(milliseconds: 1000), () {
+                    //               loadData();
+                    //             });
+                    //           });
+                    //         }
+                    //
+                    //         //setState(() async {});
+                    //       });
+                    //     },
+                    //   ),
+                    //   margin: EdgeInsets.all(3),
+                    //   alignment: Alignment.center,
+                    // )),
                     DataCell(Align(
                         child: SelectableText((item.ETC_AMT1 == null ? '' : Utils.getCashComma(item.ETC_AMT1.toString())),
                             style: TextStyle(color: Colors.black, fontSize: 12), showCursor: true),
@@ -469,7 +469,7 @@ class CodeB2BCouponListManagerState extends State<CodeB2BCouponListManager> {
               DataColumn(label: Expanded(child: Text('코드메모', textAlign: TextAlign.left)),),
               DataColumn(label: Expanded(child: Text('QR 사용', textAlign: TextAlign.center)),),
               DataColumn(label: Expanded(child: Text('사용구분', textAlign: TextAlign.center)),),
-              DataColumn(label: Expanded(child: Text('사용종료일', textAlign: TextAlign.center)),),
+              //DataColumn(label: Expanded(child: Text('사용종료일', textAlign: TextAlign.center)),),
               DataColumn(label: Expanded(child: Text('쿠폰금액', textAlign: TextAlign.right)),),
               DataColumn(label: Expanded(child: Text('발급기준', textAlign: TextAlign.center)),),
               DataColumn(label: Expanded(child: Text('중복사용', textAlign: TextAlign.center)),),

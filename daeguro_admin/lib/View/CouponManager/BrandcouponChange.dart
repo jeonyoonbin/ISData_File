@@ -19,7 +19,11 @@ import 'package:get_storage/get_storage.dart';
 
 
 class BrandCouponChange extends StatefulWidget {
-  const BrandCouponChange({Key key}) : super(key: key);
+  final List<SelectOptionVO> brandNameItems;
+  final String selectedChainCode;
+  final String selectedCouponType;
+
+  const BrandCouponChange({Key key, this.brandNameItems, this.selectedChainCode, this.selectedCouponType}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -48,37 +52,6 @@ class BrandCouponChangeState extends State<BrandCouponChange> {
   String _chainCode = ' ';
   String _couponType = ' ';
 
-  // loadTypeData() async {
-  //   await CouponController.to.getDataB2BCodeItems(context);
-  //
-  //   //print('codeList:${CouponController.to.qB2BDataItems.toString()}');
-  //
-  //   //codeItems = CouponController.to.qB2BDataItems;
-  //   CouponController.to.qB2BDataItems.forEach((element) {
-  //     selectBox_couponType.add(new SelectOptionVO(value: element['code'], label: element['codeName']));
-  //   });
-  //
-  //   setState(() {});
-  // }
-
-  loadBrandListData() async {
-    BrandNameItems.clear();
-
-    await CouponController.to.getBrandListItems().then((value) {
-      BrandNameItems.add(new SelectOptionVO(value: ' ', label: '', label2: '',));
-
-      value.forEach((element) {
-        CouponBrandCodeListModel tempData = CouponBrandCodeListModel.fromJson(element);
-
-        //ChainListItems.add(new SelectOptionVO(value: tempData.CODE, label: '[' + tempData.CODE + '] ' + tempData.CODE_NM, label2: tempData.CODE_NM,));
-        BrandNameItems.add(new SelectOptionVO(value: tempData.CODE, label: tempData.CODE_NM, label2: tempData.CODE_NM,));
-      });
-
-      setState(() {
-      });
-    });
-  }
-
   loadBrandCouponListData(String _chainCode) async {
     BrandCouponTypeItems.clear();
 
@@ -103,21 +76,20 @@ class BrandCouponChangeState extends State<BrandCouponChange> {
 
     Get.put(CouponController());
 
-
-    // CouponController.to.qDataItems.forEach((element) {
-    //   selectBox_couponType.add(new SelectOptionVO(
-    //       value: element['code'], label: element['codeName']));
-    // });
+    BrandNameItems.clear();
+    BrandNameItems = widget.brandNameItems;
 
     formData = couponEditModel();
+
+    _chainCode = widget.selectedChainCode;
+    _couponType = widget.selectedCouponType;
 
     formData.couponType = '';
     formData.jobUcode = GetStorage().read('logininfo')['uCode'];
     formData.jobName = GetStorage().read('logininfo')['name'];
 
     WidgetsBinding.instance.addPostFrameCallback((c) {
-      loadBrandListData();
-      loadBrandCouponListData('');
+      loadBrandCouponListData(widget.selectedChainCode);
     });
   }
 

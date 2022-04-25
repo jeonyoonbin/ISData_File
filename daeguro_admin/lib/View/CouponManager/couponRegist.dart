@@ -1,9 +1,7 @@
-
-
-
 import 'package:daeguro_admin_app/ISWidget/is_button.dart';
 import 'package:daeguro_admin_app/ISWidget/is_input.dart';
 import 'package:daeguro_admin_app/ISWidget/is_select.dart';
+import 'package:daeguro_admin_app/ISWidget/is_select_date.dart';
 import 'package:daeguro_admin_app/Model/coupon/couponRegistModel.dart';
 import 'package:daeguro_admin_app/Util/select_option_vo.dart';
 import 'package:daeguro_admin_app/View/CouponManager/coupon_controller.dart';
@@ -15,11 +13,11 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
-
-
 class CouponRegist extends StatefulWidget {
   final List couponTypeItems;
-  const CouponRegist({Key key, this.couponTypeItems}) : super(key: key);
+  final String selectedCouponType;
+
+  const CouponRegist({Key key, this.couponTypeItems, this.selectedCouponType}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -31,7 +29,10 @@ class CouponRegistState extends State<CouponRegist> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   couponRegistModel formData;
   String _couponCnt;
-  String _startDate;
+
+  String _expDate;
+  String _expDateFormat;
+  bool _expDateVisible = false;
 
   List<SelectOptionVO> selectBox_couponType = List();
 
@@ -40,17 +41,27 @@ class CouponRegistState extends State<CouponRegist> {
     super.initState();
 
     Get.put(CouponController());
+    formData = couponRegistModel();
 
     //items = CouponController.to.qDataItems;
     widget.couponTypeItems.forEach((element) {
-      selectBox_couponType.add(new SelectOptionVO(value: element['code'], label: '[${element['code']}] '+element['codeName']));
+      selectBox_couponType
+          .add(new SelectOptionVO(value: element['code'], label: '[${element['code']}] ' + element['codeName'], label2: element['limit'].toString()));
+
+      if (element['code'] == widget.selectedCouponType) {
+        if (element['limit'] == 0) {
+          formData.exp_date = formatDate(DateTime.now(), [yyyy, '', mm, '', dd]);
+          _expDateVisible = true;
+        } else {
+          formData.exp_date = '';
+          _expDateVisible = false;
+        }
+      }
     });
 
-    formData = couponRegistModel();
-
-    formData.couponType = 'IS_C100';
-    //formData.startDate = formatDate(DateTime.now(), [yyyy, '-', mm, '-', dd]);
-    _startDate = formatDate(DateTime.now(), [yyyy, '', mm, '', dd]);
+    formData.couponType = widget.selectedCouponType; //'IS_C100';
+    _expDate = formatDate(DateTime.now(), [yyyy, '-', mm, '-', dd]);
+    //_expDateFormat = formatDate(DateTime.now(), [yyyy, '', mm, '', dd]);
     formData.isdAmt = '0';
     formData.insertUcode = GetStorage().read('logininfo')['uCode'];
     formData.insertName = GetStorage().read('logininfo')['name'];
@@ -84,6 +95,23 @@ class CouponRegistState extends State<CouponRegist> {
                     setState(() {
                       formData.couponType = value;
 
+                      // 쿠폰타입의 limit 값을 가져와서 비교
+                      selectBox_couponType.forEach((element) {
+                        if (element.value == value) {
+                          if (element.label2.toString() == '0') {
+                            _expDateVisible = true;
+                            _expDate = formatDate(DateTime.now(), [yyyy, '-', mm, '-', dd]);
+                            formData.exp_date = formatDate(DateTime.now(), [yyyy, '', mm, '', dd]);
+                          } else {
+                            _expDateVisible = false;
+                            _expDate = '';
+                            formData.exp_date = '';
+                          }
+                        }
+                      });
+
+                      setState(() {});
+
                       formKey.currentState.save();
                     });
                   },
@@ -91,7 +119,6 @@ class CouponRegistState extends State<CouponRegist> {
               ),
             ],
           ),
-
           Row(
             children: <Widget>[
               Flexible(
@@ -104,9 +131,7 @@ class CouponRegistState extends State<CouponRegist> {
                     return v.isEmpty ? '수량을 입력해주세요' : null;
                   },
                   keyboardType: TextInputType.number,
-                  inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))
-                  ],
+                  inputFormatters: <TextInputFormatter>[FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))],
                   onSaved: (v) {
                     formData.couponCount = v;
                   },
@@ -122,62 +147,39 @@ class CouponRegistState extends State<CouponRegist> {
                   //   return v.isEmpty ? '금액을 입력해주세요' : null;
                   // },
                   keyboardType: TextInputType.number,
-                  inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))
-                  ],
+                  inputFormatters: <TextInputFormatter>[FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))],
                   onSaved: (v) {
                     formData.isdAmt = v;
                   },
                 ),
               ),
-              // Flexible(
-              //   flex: 1,
-              //   child: ISSelectDate(
-              //     context,
-              //     label: '시작일',
-              //     value: formData.startDate,
-              //     onTap: () async {
-              //       DateTime valueDt = DateTime.now();
-              //       final DateTime picked = await showDatePicker(
-              //         context: context,
-              //         initialDate: valueDt,
-              //         firstDate: DateTime(1900, 1),
-              //         lastDate: DateTime(2031, 12),
-              //       );
-              //
-              //       setState(() {
-              //         if (picked != null) {
-              //           formData.startDate = formatDate(picked, [yyyy, '-', mm, '-', dd]);
-              //         }
-              //       });
-              //
-              //       formKey.currentState.save();
-              //     },
-              //   ),
-              // ),
-              // Flexible(
-              //   flex: 1,
-              //   child: ISInput(
-              //     value: formData.insertUcode,
-              //     readOnly: true,
-              //     label: '등록자 ID',
-              //     onSaved: (v) {
-              //       formData.insertUcode = v;
-              //     },
-              //   ),
-              // ),
-              // Flexible(
-              //   flex: 1,
-              //   child: ISInput(
-              //     value: formData.insertName,
-              //     readOnly: true,
-              //     label: '등록자 명',
-              //     onSaved: (v) {
-              //       formData.insertName = v;
-              //     },
-              //   ),
-              // ),
             ],
+          ),
+          Visibility(
+            visible: _expDateVisible,
+            child: ISSelectDate(
+              context,
+              label: '사용기한',
+              value: _expDate,
+              onTap: () async {
+                DateTime valueDt = DateTime.now();
+                final DateTime picked = await showDatePicker(
+                  context: context,
+                  initialDate: valueDt,
+                  firstDate: DateTime(1900, 1),
+                  lastDate: DateTime(2031, 12),
+                );
+
+                setState(() {
+                  if (picked != null) {
+                    _expDate = formatDate(picked, [yyyy, '-', mm, '-', dd]);
+                    formData.exp_date = formatDate(picked, [yyyy, '', mm, '', dd]);
+                  }
+                });
+
+                formKey.currentState.save();
+              },
+            ),
           ),
         ],
       ),
@@ -221,10 +223,7 @@ class CouponRegistState extends State<CouponRegist> {
         child: Column(
           children: [
             SizedBox(height: 10),
-            Container(
-                padding: EdgeInsets.symmetric(horizontal: 8.0),
-                child: form
-            ),
+            Container(padding: EdgeInsets.symmetric(horizontal: 8.0), child: form),
           ],
         ),
       ),
@@ -232,7 +231,7 @@ class CouponRegistState extends State<CouponRegist> {
     );
     return SizedBox(
       width: 360,
-      height: 260,
+      height: 300,
       child: result,
     );
   }

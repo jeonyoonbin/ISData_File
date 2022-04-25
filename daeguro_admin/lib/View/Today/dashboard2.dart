@@ -450,49 +450,6 @@ class Dashboard2State extends State<Dashboard2> {
     return Responsive.isMobile(context) ? mobileContent : content;
   }
 
-  // _initMarquee(){
-  //   _tipMarqueeList.clear();
-  //   _tipMarqueeList.addAll(["[공지] 대구로 서비스 [달서구, 달성군] 오픈 예정- 2021.08.10", "[공지] 대구로 서비스 [전지역] 오픈 예정- 2021.08.25", "[안내] 대구로 오픈 프로모션:쿠폰지원 - 2021.08.10", "[공지] 대구로 운영시간 확대 운영 안내 - 2021.05.30", "[안내] DG행복페이 결제 시스템 점검(4월 17일(토)~18(일)) - 2021.04.17", "대구로 서비스 시스템 점검(4월 23일(금) 오전 7시 ~ 9시 30분) - 2021.05.01"]);
-  // }
-
-  Widget _buildMarquee() {
-    return InkWell(
-      child: Container(
-        height: 20.0,
-        //color: Colors.lightBlueAccent.shade100,
-        child: ISMarquee(
-          textList: _tipMarqueeList,
-          textStyle: TextStyle(color: Colors.black87, fontFamily: 'NotoSansKR', fontSize: 14, fontWeight: FontWeight.bold),
-          scrollDuration: Duration(milliseconds: 500),
-          stopDuration: Duration(seconds: 2),
-          tapToNext: false,
-          controller: controller,
-        ),
-      ),
-      onTap: () async {
-        //print('controller.position: ${controller.position}');
-        if (controller.position != null) {
-          String selectTitle = _tipMarqueeList.elementAt(controller.position).toString();
-          int selectSeq = getCompareNoticeData(selectTitle);
-
-          noticeDetailModel editData = null;
-          await NoticeController.to.getDetailData(selectSeq.toString(), context);
-
-          if (NoticeController.to.qDataDetail != null) {
-            editData = noticeDetailModel.fromJson(NoticeController.to.qDataDetail);
-          }
-
-          showDialog(
-            context: context,
-            builder: (BuildContext context) => Dialog(
-              child: DashboardNoticePopup(sData: editData),
-            ),
-          ).then((v) async {});
-        }
-      },
-    );
-  }
-
   int getCompareNoticeData(String title) {
     int temp = -1;
     for (final element in dataNoticeList) {
@@ -1133,45 +1090,4 @@ class Dashboard2State extends State<Dashboard2> {
           )
         ]);
   }
-
-// Widget _WeeklyCustomerChart(){
-//   return SfCartesianChart(
-//       selectionType: SelectionType.series,
-//       isTransposed: false,
-//       selectionGesture: ActivationMode.singleTap,
-//       primaryXAxis: CategoryAxis(isVisible: true, opposedPosition: false, isInversed: false, labelStyle: TextStyle(fontFamily: 'NotoSansKR')),
-//       primaryYAxis: NumericAxis(title: AxisTitle(text: '건수', textStyle: ChartTextStyle(color: Colors.black87, fontFamily: 'NotoSansKR', fontSize: 12, fontWeight: FontWeight.bold)),),
-//       axes: <ChartAxis>[
-//         NumericAxis(name: 'xAxis', opposedPosition: true, interval: 1, minimum: 0, maximum: 5, labelStyle: TextStyle(fontFamily: 'NotoSansKR',)),
-//         NumericAxis(name: 'yAxis', opposedPosition: true, labelStyle: TextStyle(fontFamily: 'NotoSansKR',))
-//       ],
-//       legend: Legend(isVisible: true, toggleSeriesVisibility: true, position: LegendPosition.bottom, overflowMode: LegendItemOverflowMode.wrap, alignment: ChartAlignment.center, textStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, fontFamily: 'NotoSansKR'),),
-//       crosshairBehavior: CrosshairBehavior(lineType: CrosshairLineType.horizontal, enable: true, shouldAlwaysShow: false, activationMode: ActivationMode.singleTap,),
-//       tooltipBehavior: TooltipBehavior(enable: true, shared: true, activationMode: ActivationMode.singleTap, textStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, fontFamily: 'NotoSansKR'),),
-//       series: <ChartSeries>[
-//         LineSeries<DashBoardWeekCustomerModel, String>(
-//             name: '설치건수',
-//             dataSource: dataWeekCustomerList,
-//             xValueMapper: (DashBoardWeekCustomerModel charts, _) => charts.INSERT_DATE,
-//             yValueMapper: (DashBoardWeekCustomerModel charts, _) => charts.INSTALL_COUNT,
-//             dataLabelSettings: DataLabelSettings(
-//               isVisible: false,
-//             ),
-//             //Modify data points (show circles)
-//             markerSettings: MarkerSettings(isVisible: true),
-//             yAxisName: 'yAxis'),
-//         LineSeries<DashBoardWeekCustomerModel, String>(
-//             name: '신규회원',
-//             dataSource: dataWeekCustomerList,
-//             xValueMapper: (DashBoardWeekCustomerModel charts, _) => charts.INSERT_DATE,
-//             yValueMapper: (DashBoardWeekCustomerModel charts, _) => charts.NEW_COSTOMER_COUNT,
-//             dataLabelSettings: DataLabelSettings(
-//               isVisible: false,
-//             ),
-//             //Modify data points (show circles)
-//             markerSettings: MarkerSettings(isVisible: true),
-//             yAxisName: 'yAxis')
-//       ]
-//   );
-// }
 }

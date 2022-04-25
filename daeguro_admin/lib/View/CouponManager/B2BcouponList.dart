@@ -69,7 +69,7 @@ class B2BCouponListState extends State {
     showDialog(
       context: context,
       builder: (BuildContext context) => Dialog(
-        child: B2BCouponRegist(),
+        child: B2BCouponRegist(couponTypeItems: codeItems, selectedCouponType: _couponType),
       ),
     ).then((v) async {
       if (v == true) {
@@ -84,7 +84,7 @@ class B2BCouponListState extends State {
     showDialog(
       context: context,
       builder: (BuildContext context) => Dialog(
-        child: B2BCouponChange(),
+        child: B2BCouponChange(couponTypeItems: codeItems, selectedCouponType: _couponType),
       ),
     ).then((v) async {
       if (v == true) {
@@ -194,6 +194,7 @@ class B2BCouponListState extends State {
             ],
           ),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Column(
                 children: [
@@ -388,7 +389,7 @@ class B2BCouponListState extends State {
 
   _detail({String orderNo}) async {
     //EasyLoading.show();
-    await OrderController.to.getDetailData(orderNo.toString(), context);
+    await OrderController.to.getDetailData(orderNo.toString());
     //EasyLoading.dismiss();
 
     showDialog(

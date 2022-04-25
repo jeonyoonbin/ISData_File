@@ -20,6 +20,7 @@ import 'package:daeguro_admin_app/View/Layout/responsive.dart';
 import 'package:daeguro_admin_app/View/OrderManager/orderDetail.dart';
 import 'package:daeguro_admin_app/View/OrderManager/orderManager_controller.dart';
 import 'package:daeguro_admin_app/View/ShopManager/Account/shopAccountList.dart';
+import 'package:daeguro_admin_app/View/VoucherManager/voucherHistory.dart';
 import 'package:daeguro_admin_app/View/VoucherManager/voucherRegist.dart';
 import 'package:daeguro_admin_app/View/VoucherManager/voucher_controller.dart';
 import 'package:daeguro_admin_app/constants/constant.dart';
@@ -43,8 +44,7 @@ class VoucherListState extends State {
   List codeItems = List();
   final List<voucherListModel> dataList = <voucherListModel>[];
 
-  List<SelectOptionVO> BrandNameItems = [];
-  List<SelectOptionVO> VoucherTypeItems = [];
+  // List<SelectOptionVO> BrandNameItems = [];
 
   //int rowsPerPage = 10;
 
@@ -63,13 +63,22 @@ class VoucherListState extends State {
   String _disYn = ' ';
   String _extensionYn = ' ';
 
+  _showVoucherHistory(var key){
+    showDialog(
+      context: context,
+      builder: (BuildContext context) => Dialog(
+        child: VoucherHistory(voucherNo: key),
+      ),
+    ).then((v) async {});
+  }
+
+
   void _pageMove(int _page) {
     _query();
   }
 
   _reset() {
     formKey.currentState.reset();
-    VoucherTypeItems.clear();
 
     _voucherType = ' ';
     _voucherStatus = ' ';
@@ -96,8 +105,7 @@ class VoucherListState extends State {
     showDialog(
       context: context,
       builder: (BuildContext context) => Dialog(
-        //child: VoucherRegist(),
-        // child: BrandCouponRegist(),
+        child: VoucherRegist(),
       ),
     ).then((v) async {
       if (v == true) {
@@ -155,6 +163,7 @@ class VoucherListState extends State {
   // }
   //
   loadVoucherTypeItemsListData() async {
+    List<SelectOptionVO> VoucherTypeItems = [];
     VoucherTypeItems.clear();
     String _div = _testYn=='Y' ? '1': '' ; //1이면 테스트 상품권, 그 외엔 상용
     await VoucherController.to.getVoucherControllerListItems(_div).then((value) {
@@ -166,7 +175,6 @@ class VoucherListState extends State {
         VoucherTypeItems.add(new SelectOptionVO(value: tempData.CODE, label: '[${tempData.CODE}] '+ tempData.CODE_NM, label2: '[${tempData.CODE}] '+ tempData.CODE_NM));
       });
       VoucherController.to.VoucherTypeItems.value = VoucherTypeItems;
-
       setState(() {
       });
     });
@@ -176,7 +184,7 @@ class VoucherListState extends State {
     await ISProgressDialog(context).show(status: 'Loading...');
     dataList.clear();
 
-    await VoucherController.to.getData(_testYn,_extensionYn,_voucherType,_voucherStatus,_keyword.trim()).then((value){
+    await VoucherController.to.getData(_testYn,_voucherType,_voucherStatus,_keyword.trim()).then((value){
       if(value==null){
         ISAlert(context, '정상조회가 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
       }else{
@@ -281,30 +289,22 @@ class VoucherListState extends State {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // ISSearchDropdown(
-                  //   label: '상품권 타입',
-                  //   value: _chainCode,
-                  //   width: 170,
-                  //   item: BrandNameItems.map((item) {
-                  //     return new DropdownMenuItem<String>(
-                  //         child: new Text(item.label, style: TextStyle(fontSize: 13, color: Colors.black),),
-                  //         value: item.value);
-                  //   }).toList(),
-                  //   onChange: (v) {
-                  //     // BrandNameItems.forEach((element) {
-                  //     //   if (v == element.value) {
-                  //     //     _chainCode = element.value;
-                  //     //   }
-                  //     // });
-                  //     //
-                  //     // _couponType = ' ';
-                  //     //
-                  //     // loadBrandCouponListData(v);
-                  //     // _currentPage = 1;
-                  //     // _query();
-                  //   },
-                  // ),
-
+                  ISSearchDropdown(
+                    label: '구분',
+                    width: 170,
+                    value: _testYn,
+                    onChange: (value) {
+                      setState(() {
+                        _currentPage = 1;
+                        _testYn = value;
+                        _query();
+                      });
+                    },
+                    item: [
+                      DropdownMenuItem(value: 'N', child: Text('상용')),
+                      DropdownMenuItem(value: 'Y', child: Text('테스트')),
+                    ].cast<DropdownMenuItem<String>>(),
+                  ),
                   SizedBox(height: 8,),
                   ISSearchDropdown(
                     label: '상태',
@@ -331,45 +331,6 @@ class VoucherListState extends State {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   ISSearchDropdown(
-                    label: '구분',
-                    width: 170,
-                    value: _testYn,
-                    onChange: (value) {
-                      setState(() {
-                        _currentPage = 1;
-                        _testYn = value;
-                        _query();
-                      });
-                    },
-                    item: [
-                      DropdownMenuItem(value: 'N', child: Text('상용')),
-                      DropdownMenuItem(value: 'Y', child: Text('테스트')),
-                    ].cast<DropdownMenuItem<String>>(),
-                  ),
-                  SizedBox(height: 8,),
-                  ISSearchDropdown(
-                    label: '유효기간 연장유무',
-                    width: 170,
-                    value: _extensionYn,
-                    onChange: (value) {
-                      setState(() {
-                        _currentPage = 1;
-                        _extensionYn = value;
-                        _query();
-                      });
-                    },
-                    item: [
-                      DropdownMenuItem(value: ' ', child: Text('전체')),
-                      DropdownMenuItem(value: 'Y', child: Text('연장')),
-                      DropdownMenuItem(value: 'N', child: Text('미연장')),
-                    ].cast<DropdownMenuItem<String>>(),
-                  ),
-                ],
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ISSearchDropdown(
                     label: '상품권 타입',
                     value: _voucherType,
                     width: 232,
@@ -384,7 +345,6 @@ class VoucherListState extends State {
                           _voucherType = element.value;
                         }
                       });
-
                       _currentPage = 1;
                       _query();
                     },
@@ -403,6 +363,23 @@ class VoucherListState extends State {
                       _query();
                     },
                   ),
+                  // ISSearchDropdown(
+                  //   label: '유효기간 연장유무',
+                  //   width: 170,
+                  //   value: _extensionYn,
+                  //   onChange: (value) {
+                  //     setState(() {
+                  //       _currentPage = 1;
+                  //       _extensionYn = value;
+                  //       _query();
+                  //     });
+                  //   },
+                  //   item: [
+                  //     DropdownMenuItem(value: ' ', child: Text('전체')),
+                  //     DropdownMenuItem(value: 'Y', child: Text('연장')),
+                  //     DropdownMenuItem(value: 'N', child: Text('미연장')),
+                  //   ].cast<DropdownMenuItem<String>>(),
+                  // ),
                 ],
               ),
               Column(
@@ -422,22 +399,16 @@ class VoucherListState extends State {
                     child: Row(
                       children: [
                         ISSearchButton(
-                            width: 104,
-                            label: '단일발송',
+                            width: 120,
+                            label: '상품권 발송',
                             iconData: Icons.add,
                             onPressed: () => _regist()),
-                        SizedBox(width: 8),
-                        ISSearchButton(
-                            width: 104,
-                            label: '대량발송',
-                            iconData: Icons.post_add_outlined,
-                            onPressed: () => _change()),
                       ],
                     ),
                   ),
                   SizedBox(height: 8,),
                   ISSearchButton(
-                      width: 216,
+                      width: 120,
                       label: '조회',
                       iconData: Icons.search,
                       onPressed: () => {_currentPage = 1, _query()}),
@@ -472,13 +443,13 @@ class VoucherListState extends State {
                 DataCell(Center(child: SelectableText(item.REG_DATE.toString() == ' ' ? '--' : DateFormat("yyyy-MM-dd").format(DateTime.parse(item.REG_DATE.toString())).toString(), style: TextStyle(color: Colors.black), showCursor: true))),
                 DataCell(Center(child: SelectableText(item.REG_EXP_DATE.toString() == ' ' ? '--' : DateFormat("yyyy-MM-dd").format(DateTime.parse(item.REG_EXP_DATE.toString())).toString(), style: TextStyle(color: Colors.black), showCursor: true))),
                 // DataCell(Center(child: SelectableText('--'))),
-                // DataCell(Center(child: SelectableText(item.USE_EXP_DATE.toString() == ' ' ? '--' : DateFormat("yyyy-MM-dd").format(DateTime.parse(item.USE_EXP_DATE.toString())).toString(), style: TextStyle(color: Colors.black), showCursor: true))),
+                DataCell(Center(child: SelectableText(item.USE_EXP_DATE.toString() == ' ' ? '--' : DateFormat("yyyy-MM-dd").format(DateTime.parse(item.USE_EXP_DATE.toString())).toString(), style: TextStyle(color: Colors.black), showCursor: true))),
                 DataCell(Center(child: SelectableText(item.INS_DATE.toString() == ' ' ? '--' : DateFormat("yyyy-MM-dd").format(DateTime.parse(item.INS_DATE.toString())).toString(), style: TextStyle(color: Colors.black), showCursor: true))),
                 DataCell(Center(child: SelectableText(item.INS_NAME.toString() == ' ' ? '--' : '[${item.INS_UCODE}]'+item.INS_NAME.toString(), style: TextStyle(color: Colors.black), showCursor: true))),
                 //DataCell(Center(child: SelectableText(item.DIS_USE_DATE.toString() == ' ' ? '--' : DateFormat("yyyy-MM-dd").format(DateTime.parse(item.DIS_USE_DATE.toString())).toString(), style: TextStyle(color: Colors.black), showCursor: true))),
-                DataCell(Center(child: SelectableText(item.CUST_NAME.toString() == ' ' ? '--' : '[${item.CUST_CODE}]'+item.CUST_NAME.toString(), style: TextStyle(color: Colors.black), showCursor: true))),
+                DataCell(Center(child: SelectableText(item.CUST_NAME.toString() == ' ' ? '--' : '[${item.CUST_CODE}]'+Utils.getNameAbsoluteFormat(item.CUST_NAME.toString(), true), style: TextStyle(color: Colors.black), showCursor: true))),
                 DataCell(Center(child: SelectableText(item.CUST_TELNO.toString() == ' ' ? '--' : Utils.getPhoneNumFormat(item.CUST_TELNO.toString(), true), style: TextStyle(color: Colors.black), showCursor: true))),
-                DataCell(Align(child: SelectableText(item.EXTENSION_YN.toString() ?? '--', style: TextStyle(color: Colors.black), showCursor: true,), alignment: Alignment.center)),
+                // DataCell(Align(child: SelectableText(item.EXTENSION_YN.toString() ?? '--', style: TextStyle(color: Colors.black), showCursor: true,), alignment: Alignment.center)),
                 DataCell(Center(child: MaterialButton(
                   height: 36.0,
                   color: Colors.blue,
@@ -494,6 +465,7 @@ class VoucherListState extends State {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
                   child: Text('변경이력', style: TextStyle(fontSize: 13, color: Colors.white)),
                   onPressed: () async {
+                    _showVoucherHistory(item.VOUCHER_NO);
                   },
                 )),
                 ),
@@ -508,12 +480,12 @@ class VoucherListState extends State {
               DataColumn(label: Expanded(child: Text('상태', textAlign: TextAlign.center)),),
               DataColumn(label: Expanded(child: Text('등록일자', textAlign: TextAlign.center)),),
               DataColumn(label: Expanded(child: Text('등록유효기한', textAlign: TextAlign.center)),),
-              // DataColumn(label: Expanded(child: Text('사용유효기한', textAlign: TextAlign.center)),),
+              DataColumn(label: Expanded(child: Text('사용유효기한', textAlign: TextAlign.center)),),
               DataColumn(label: Expanded(child: Text('발송날짜', textAlign: TextAlign.center)),),
               DataColumn(label: Expanded(child: Text('발송담당자', textAlign: TextAlign.center)),),
               DataColumn(label: Expanded(child: Text('회원명', textAlign: TextAlign.center)),),
               DataColumn(label: Expanded(child: Text('회원전화', textAlign: TextAlign.center)),),
-              DataColumn(label: Expanded(child: Text('유효기간연장', textAlign: TextAlign.center)),),
+              // DataColumn(label: Expanded(child: Text('유효기간연장', textAlign: TextAlign.center)),),
               DataColumn(label: Expanded(child: Text('환불처리', textAlign: TextAlign.center))),
               DataColumn(label: Expanded(child: Text('변경이력', textAlign: TextAlign.center)),
               ),
@@ -529,7 +501,7 @@ class VoucherListState extends State {
 
   _detail({String orderNo}) async {
     //EasyLoading.show();
-    await OrderController.to.getDetailData(orderNo.toString(), context);
+    await OrderController.to.getDetailData(orderNo.toString());
     //EasyLoading.dismiss();
 
     showDialog(
@@ -621,17 +593,17 @@ class VoucherListState extends State {
     );
   }
 
-  // String _getStatus(String value) {
-  //   String retValue = '--';
-  //
-  //   if (value.toString().compareTo('N') == 0)
-  //     retValue = '미사용';
-  //   else if (value.toString().compareTo('U') == 0)
-  //     retValue = '사용중';
-  //   else if (value.toString().compareTo('C') == 0)
-  //     retValue = '사용완료';
-  //   else if (value.toString().compareTo('E') == 0)
-  //     retValue = '기간만료';
-  //   return retValue;
-  // }
+// String _getStatus(String value) {
+//   String retValue = '--';
+//
+//   if (value.toString().compareTo('N') == 0)
+//     retValue = '미사용';
+//   else if (value.toString().compareTo('U') == 0)
+//     retValue = '사용중';
+//   else if (value.toString().compareTo('C') == 0)
+//     retValue = '사용완료';
+//   else if (value.toString().compareTo('E') == 0)
+//     retValue = '기간만료';
+//   return retValue;
+// }
 }

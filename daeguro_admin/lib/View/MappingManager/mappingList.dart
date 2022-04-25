@@ -1,4 +1,5 @@
 import 'package:daeguro_admin_app/ISWidget/is_datatable.dart';
+import 'package:daeguro_admin_app/ISWidget/is_dialog.dart';
 import 'package:daeguro_admin_app/ISWidget/search/is_search_button.dart';
 import 'package:daeguro_admin_app/ISWidget/search/is_search_dropdown.dart';
 import 'package:daeguro_admin_app/ISWidget/search/is_search_input.dart';
@@ -71,16 +72,21 @@ class MappingListState extends State {
       if (v != null) {
         dataList.clear();
 
-        await MappingController.to.getData(_useGbn, _apiType, _searchItems.code);
+        await MappingController.to.getData(_useGbn, _apiType, _searchItems.code).then((value) {
+          if (value == null) {
+            ISAlert(context, '정상조회가 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
+          }
+          else {
+            value.forEach((e) {
+              MappingListModel temp = MappingListModel.fromJson(e);
+              dataList.add(temp);
+            });
 
-        MappingController.to.qData.forEach((e) {
-          MappingListModel temp = MappingListModel.fromJson(e);
-          dataList.add(temp);
+            _totalPages = 1;
+            _totalRowCnt = MappingController.to.totalRowCnt;
+            _totalPages = (_totalRowCnt / _selectedpagerows).ceil();
+          }
         });
-
-        _totalPages = 1;
-        _totalRowCnt = MappingController.to.totalRowCnt;
-        _totalPages = (_totalRowCnt / _selectedpagerows).ceil();
 
         setState(() {});
       }
@@ -90,11 +96,14 @@ class MappingListState extends State {
   _edit({String seq}) async {
     MappingDModel editData = null;
 
-    await MappingController.to.getDetailData(seq.toString());
-
-    if (MappingController.to.qDataDetail != null) {
-      editData = MappingDModel.fromJson(MappingController.to.qDataDetail);
-    }
+    await MappingController.to.getDetailData(seq.toString()).then((value) {
+      if (value == null) {
+        ISAlert(context, '정상조회가 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
+      }
+      else {
+        editData = MappingDModel.fromJson(value);
+      }
+    });
 
     showDialog(
       context: context,
@@ -115,21 +124,28 @@ class MappingListState extends State {
   loadData() async {
     dataList.clear();
 
-    await MappingController.to.getData(_useGbn, _apiType, _searchItems.code);
-
-    //print(_searchItems.code);
-
-    if (this.mounted) {
-      setState(() {
-        MappingController.to.qData.forEach((e) {
+    await MappingController.to.getData(_useGbn, _apiType, _searchItems.code).then((value) {
+      if (value == null) {
+        ISAlert(context, '정상조회가 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
+      }
+      else {
+        value.forEach((e) {
           MappingListModel temp = MappingListModel.fromJson(e);
           dataList.add(temp);
         });
 
         _totalRowCnt = MappingController.to.totalRowCnt;
         _totalPages = (_totalRowCnt / _selectedpagerows).ceil();
+      }
+    });
+
+    //print(_searchItems.code);
+
+    //if (this.mounted) {
+      setState(() {
+
       });
-    }
+    //}
   }
 
   @override

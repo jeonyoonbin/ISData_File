@@ -6,7 +6,7 @@ class ShopDetailNotifierData{
   String selected_mCode = '';
   String selected_ccCode = '';
   String selected_apiComCode = '';
-  String selected_imageStatus = '';
+  String selected_shopStatus = '';
 
   String selected_calcYn  = 'Y';       //정산정보
   String selected_shopInfoYn = 'Y';    //매장정보

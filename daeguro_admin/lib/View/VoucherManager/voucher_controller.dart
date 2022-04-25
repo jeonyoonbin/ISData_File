@@ -1,16 +1,7 @@
-import 'dart:convert';
-
-import 'package:daeguro_admin_app/ISWidget/is_dialog.dart';
-import 'package:daeguro_admin_app/ISWidget/is_progressDialog.dart';
-import 'package:daeguro_admin_app/Model/shop/shop_changepass.dart';
-import 'package:daeguro_admin_app/Model/shop/shop_reviewStoreConfirm.dart';
-import 'package:daeguro_admin_app/Model/voucher/VoucherTypeList.dart';
-import 'package:daeguro_admin_app/Provider/RestApiProvider.dart';
+import 'package:daeguro_admin_app/Network/DioClient.dart';
 import 'package:daeguro_admin_app/Util/select_option_vo.dart';
 import 'package:daeguro_admin_app/constants/serverInfo.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
@@ -22,33 +13,27 @@ class VoucherController extends GetxController with SingleGetTickerProviderMixin
   RxInt rows = 0.obs;
   RxInt page = 0.obs;
   RxList<SelectOptionVO> VoucherTypeItems = <SelectOptionVO>[].obs;
-  int notUse = 0;
-  int use = 0;
-  int clear = 0;
-  int exp = 0;
+  RxList<SelectOptionVO> VoucherTypeItemsRegist = <SelectOptionVO>[].obs;
+  RxInt notUse = 0.obs;
+  RxInt use = 0.obs;
+  RxInt clear = 0.obs;
+  RxInt exp = 0.obs;
 
-  Future<List<dynamic>> getData(String testYn, String extensionYn, String voucherType, String status, String keyword) async{
-    //String testYn, String extensionYn, String voucherType, String status, String keyword
+  Future<List<dynamic>> getData(String testYn, String voucherType, String status, String keyword) async{
     List<dynamic> qData = [];
 
-    var dio = Dio();
-    //print(ServerInfo.REST_URL_VOUCHER + '?testYn=$testYn&extensionYn=$extensionYn&voucherType=$voucherType&status=$status&page=${page.value.toString()}&rows=${rows.value.toString()}&keyword=$keyword');
-    final response = await dio.get(ServerInfo.REST_URL_VOUCHER + '?testYn=$testYn&extensionYn=$extensionYn&voucherType=$voucherType&status=$status&page=${page.value.toString()}&rows=${rows.value.toString()}&keyword=$keyword');
-    // final response = await dio.get(ServerInfo.REST_URL_VOUCHER + '?&page=${page.value.toString()}&rows=${rows.value.toString()}');
-
-    dio.clear();
-    dio.close();
+    final response = await DioClient().get(ServerInfo.REST_URL_VOUCHER + '?testYn=$testYn&voucherType=$voucherType&status=$status&page=${page.value.toString()}&rows=${rows.value.toString()}&keyword=$keyword');
 
     qData.clear();
-    //print(response.data['data']);
+    //print('getData:${response.toString()}');
     if (response.data['code'] == '00') {
       total_count = int.parse(response.data['total_count'].toString());
       totalRowCnt = int.parse(response.data['count'].toString());
 
-      notUse = int.parse(response.data['notUse'].toString());
-      use = int.parse(response.data['use'].toString());
-      clear = int.parse(response.data['clear'].toString());
-      exp = int.parse(response.data['exp'].toString());
+      notUse.value = int.parse(response.data['notUse'].toString());
+      use.value = int.parse(response.data['use'].toString());
+      clear.value = int.parse(response.data['clear'].toString());
+      exp.value = int.parse(response.data['exp'].toString());
 
       qData.assignAll(response.data['data']);
     }
@@ -62,12 +47,7 @@ class VoucherController extends GetxController with SingleGetTickerProviderMixin
   Future<List> getVoucherControllerListItems(String div) async {
     List<dynamic> retData = [];
 
-    var dio = Dio();
-    final result = await dio.get(ServerInfo.REST_URL_VOUCHER_GETVOUCHERLIST + '?div=$div');
-
-    dio.clear();
-    dio.close();
-
+    final result = await DioClient().get(ServerInfo.REST_URL_VOUCHER_GETVOUCHERLIST + '?div=$div');
 
     if (result.data['code'] == '00')
       retData.assignAll(result.data['data']);
@@ -77,6 +57,28 @@ class VoucherController extends GetxController with SingleGetTickerProviderMixin
     return retData;
   }
 
+  /// 상품권 단일, 단체 등록
+  Future<String> postVoucher(String voucherType,dynamic data) async {
+    String uCode = GetStorage().read('logininfo')['uCode'];
 
+    final response = await DioClient().post(ServerInfo.REST_URL_VOUCHER_SETVOUCHERAPPCUSTOMER+'?voucher_type=${voucherType}&ucode=${uCode}', data : data);
+
+    return response.data['code'] ;
+  }
+
+  Future<List<dynamic>> getHistoryData(String voucherNo, String page, String rows) async {
+    List<dynamic> qDataOptionHistoryList = [];
+
+    final response = await DioClient().get(ServerInfo.REST_URL_VOUCHER_HIST + '/$voucherNo?page=1&rows=1000');
+
+    qDataOptionHistoryList.clear();
+
+    if (response.data['code'] == '00') {
+      qDataOptionHistoryList.assignAll(response.data['data']);
+    } else
+      return null;
+
+    return qDataOptionHistoryList;
+  }
 
 }

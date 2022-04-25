@@ -203,7 +203,7 @@ class CustomerInfoState extends State<CustomerInfo> with SingleTickerProviderSta
                         || GetStorage().read('logininfo')['uCode'] == '3' // 이인찬 부장
                         ? formData.CUST_ID_GBN == '네이버' ? false : false
                         : false,
-                    width: 230,
+                    //width: 230,
                     textStyle: TextStyle(fontSize: 12),
                     label: '아이디',
                     value: formData.CUST_ID ?? '',
@@ -213,7 +213,7 @@ class CustomerInfoState extends State<CustomerInfo> with SingleTickerProviderSta
                     },
                   ),
               ),
-              Flexible(flex: 1, child: ISInput(readOnly: true, textStyle: TextStyle(fontSize: 12), label: '패스워드', value: formData.CUST_PASSWORD ?? '', )),
+              //Flexible(flex: 1, child: ISInput(readOnly: true, textStyle: TextStyle(fontSize: 12), label: '패스워드', value: formData.CUST_PASSWORD ?? '', )),
             ],
           ),
           ISInput(readOnly: true, textStyle: TextStyle(fontSize: 12), label: '구 주소(지번)', value: formData.OLD_ADDR ?? '', prefixIcon: Icon(Icons.home, color: Colors.grey,),),

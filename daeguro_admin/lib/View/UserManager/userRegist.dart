@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 class UserRegist extends StatefulWidget {
   const UserRegist({Key key}) : super(key: key);
@@ -98,6 +99,7 @@ class UserRegistState extends State<UserRegist> {
 
     formData.level = '1';
     formData.working = '1';
+    formData.modName = GetStorage().read('logininfo')['name'];  // 03.28 등록자명 추가
   }
 
   @override
@@ -235,21 +237,21 @@ class UserRegistState extends State<UserRegist> {
                   });
                 }
                 else {
-                  await UserController.to.getIdCheck(formData.id, context);
-
-                  if (this.mounted) {
-                    if (UserController.to.IdCheck == 'Y') {
-                      ISAlert(context, '이미 사용중인 ID 입니다.');
-                      setState(() {
-                        idchk_gbn = false;
-                      });
-                    } else {
-                      ISAlert(context, '사용 가능한 ID 입니다.');
-                      setState(() {
-                        idchk_gbn = true;
-                      });
+                  await UserController.to.getIdCheck(formData.id, context).then((value) {
+                    if (value != null){
+                      if (value == 'Y') {
+                        ISAlert(context, '이미 사용중인 ID 입니다.');
+                        setState(() {
+                          idchk_gbn = false;
+                        });
+                      } else {
+                        ISAlert(context, '사용 가능한 ID 입니다.');
+                        setState(() {
+                          idchk_gbn = true;
+                        });
+                      }
                     }
-                  }
+                  });
                 }
               },
             ),

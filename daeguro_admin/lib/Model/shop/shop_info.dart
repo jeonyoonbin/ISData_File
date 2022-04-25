@@ -22,6 +22,8 @@ class ShopInfoModel {
   String bussImg;
   String idcardImg;
   String bankImg;
+  String reserveYn;
+  String useGbn;
 
   factory ShopInfoModel.fromJson(Map<String, dynamic> json) =>
       _$ModelFromJson(json);
@@ -48,7 +50,9 @@ ShopInfoModel _$ModelFromJson(Map<String, dynamic> json) {
     ..shopImg = json['shopImg'] as String
     ..bussImg = json['bussImg'] as String
     ..idcardImg = json['idcardImg'] as String
-    ..bankImg = json['bankImg'] as String;
+    ..bankImg = json['bankImg'] as String
+    ..reserveYn = json['reserveYn'] as String
+    ..useGbn = json['useGbn'] as String;
 
 }
 
@@ -70,5 +74,7 @@ Map<String, dynamic> _$ModelToJson(ShopInfoModel instance) => <String, dynamic>{
   'shopImg': instance.shopImg,
   'bussImg': instance.bussImg,
   'idcardImg': instance.idcardImg,
-  'bankImg': instance.bankImg
+  'bankImg': instance.bankImg,
+  'reserveYn': instance.reserveYn,
+  'useGbn': instance.useGbn
 };

@@ -75,7 +75,7 @@ class RestListDetail_300State extends State<RestListDetail_300> with SingleTicke
   loadOperatorListData() async {
     selectBox_operator.clear();
 
-    await UserController.to.getUserCodeNameOperator('2', '6').then((value) {
+    await UserController.to.getUserCodeName('2', '6').then((value) {
       if (value == null) {
         ISAlert(context, '사용자ID 또는 비밀번호를 확인하십시오.');
       } else {
@@ -102,27 +102,34 @@ class RestListDetail_300State extends State<RestListDetail_300> with SingleTicke
   }
 
   loadData() async {
-    await RequestController.to.getDetailData(widget.seq, context);
+    await RequestController.to.getDetailData(widget.seq).then((value) async {
+      if (value == null) {
+        ISAlert(context, '정상조회가 되지 않았습니다. \n\n관리자에게 문의 바랍니다');
+      }
+      else {
+        formData = ServiceRequestDetail.fromJson(value);
 
-    formData = ServiceRequestDetail.fromJson(RequestController.to.qDataDetail);
+        _alloc_ucode = formData.ALLOC_UCODE.toString();
+        _alloc_uname = formData.ALLOC_UNAME;
 
-    _alloc_ucode = formData.ALLOC_UCODE.toString();
-    _alloc_uname = formData.ALLOC_UNAME;
+        Map<String, dynamic> _tojson = jsonDecode(formData.SERVICE_DATA);
 
-    Map<String, dynamic> _tojson = jsonDecode(formData.SERVICE_DATA);
+        groupCd = _tojson['groupCd'];
+        menuCd = _tojson['menuCd'];
+        imageName = _tojson['imageName'];
 
-    groupCd = _tojson['groupCd'];
-    menuCd = _tojson['menuCd'];
-    imageName = _tojson['imageName'];
+        image_url = _tojson['image_url'];
+        afterImageURL = _tojson['afterImageURL'];
 
-    image_url = _tojson['image_url'];
-    afterImageURL = _tojson['afterImageURL'];
+        await ShopController.to.getMenuGoupDetailData(groupCd);
+        await ShopController.to.getMenuDetailData(menuCd);
 
-    await ShopController.to.getMenuGoupDetailData(groupCd);
-    await ShopController.to.getMenuDetailData(menuCd);
+        groupName = ShopController.to.qDataMenuGroupDetail['menuGroupName'];
+        menuName = ShopController.to.qDataMenuDetail['menuName'];
+      }
+    });
 
-    groupName = ShopController.to.qDataMenuGroupDetail['menuGroupName'];
-    menuName = ShopController.to.qDataMenuDetail['menuName'];
+
 
     //formData.SERVICE_DATA = '[메뉴 그룹명]\n ' + ShopController.to.qDataMenuGroupDetail['menuGroupName'] + '\n[메뉴명]\n ' + ShopController.to.qDataMenuDetail['menuName'];
 

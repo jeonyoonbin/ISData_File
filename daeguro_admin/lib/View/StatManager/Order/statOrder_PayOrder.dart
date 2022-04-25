@@ -371,7 +371,7 @@ class StatOrderPayListState extends State {
                       label: Container(
                           color: Colors.blue[50],
                           alignment: Alignment.center,
-                          child: Text('만나서 카드',
+                          child: Text('만나서 현금',
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(color: Colors.black45, fontWeight: FontWeight.bold, fontFamily: 'NotoSansKR', fontSize: 13)))),
                   GridColumn(
@@ -398,7 +398,7 @@ class StatOrderPayListState extends State {
                       label: Container(
                           color: Colors.blue[50],
                           alignment: Alignment.center,
-                          child: Text('만나서카드',
+                          child: Text('만나서 카드',
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(color: Colors.black45, fontWeight: FontWeight.bold, fontFamily: 'NotoSansKR', fontSize: 13)))),
                   GridColumn(

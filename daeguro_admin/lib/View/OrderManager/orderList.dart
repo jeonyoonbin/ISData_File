@@ -12,7 +12,9 @@ import 'package:daeguro_admin_app/Model/PayCancelModel.dart';
 import 'package:daeguro_admin_app/Model/order/order.dart';
 import 'package:daeguro_admin_app/Model/order/orderStatusEditModel.dart';
 import 'package:daeguro_admin_app/Model/search_items.dart';
-import 'package:daeguro_admin_app/Provider/RestApiProvider.dart';
+import 'package:daeguro_admin_app/Network/DioClient.dart';
+import 'package:daeguro_admin_app/Network/DioClientPos.dart';
+
 import 'package:daeguro_admin_app/Util/auth_util.dart';
 import 'package:daeguro_admin_app/View/AgentManager/agentAccount_Controller.dart';
 import 'package:daeguro_admin_app/View/CustomerManager/customerList.dart';
@@ -23,6 +25,7 @@ import 'package:daeguro_admin_app/View/OrderManager/orderManager_controller.dart
 import 'package:daeguro_admin_app/View/ShopManager/Account/shopAccountList.dart';
 import 'package:daeguro_admin_app/Util/utils.dart';
 import 'package:daeguro_admin_app/constants/constant.dart';
+import 'package:daeguro_admin_app/constants/serverInfo.dart';
 
 
 import 'package:date_format/date_format.dart';
@@ -190,7 +193,7 @@ class OrderListState extends State<OrderList> {
 
   _detail({String orderNo}) async {
     //EasyLoading.show();
-    await OrderController.to.getDetailData(orderNo.toString(), context);
+    await OrderController.to.getDetailData(orderNo.toString());
     //EasyLoading.dismiss();
 
     showDialog(
@@ -649,30 +652,7 @@ class OrderListState extends State<OrderList> {
                           return;
                         }
 
-                        var headerData = {
-                          "Access-Control-Allow-Origin": "*",
-                          // Required for CORS support to work
-                          "Access-Control-Allow-Headers": "*",
-                          "Access-Control-Allow-Credentials": "true",
-                          "Access-Control-Allow-Methods": "*",
-                          "Authorization": "QzI1QTgyNEVFQkVEQ0U5RkM2NTUzODFCNTc3MUJENTc=",
-                          "Method": "DELETE",
-                          "Content-Type": "application/json",
-                        };
-
-                        var PosheaderData = {
-                          "Access-Control-Allow-Origin": "*",
-                          // Required for CORS support to work
-                          "Access-Control-Allow-Headers": "*",
-                          "Access-Control-Allow-Credentials": "true",
-                          "Access-Control-Allow-Methods": "*",
-                          "Content-Type": "application/json",
-                          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6Im9yZGVyX2NvbXAiLCJhcHBfdHlwZSI6Im9yZGVyIiwiYXBwX25hbWUiOiJkYWd1cm9hcHAiLCJuYmYiOjE2NDExODcwMDAsImV4cCI6MTY3NTIwNjAwMCwiaWF0IjoxNjQxMTg3MDAwLCJpc3MiOiJodHRwczovL2xvY2FsaG9zdDoxNTQwOSIsImF1ZCI6Ikluc3VuZ1BPUyJ9.hVaYELqN7i9IQ3o00LRcF--sCv6up7slUq1i94WDw78",
-                          //"Accept": "application/json",
-                        };
-
-                        if(item.API_COM_CODE == null)
-                        {
+                        if(item.API_COM_CODE == null) {
                           ISAlert(context, '해당 가맹점은 POS 매핑이 되어있지 않습니다.');
                           return;
                         }
@@ -699,6 +679,9 @@ class OrderListState extends State<OrderList> {
                               payCancelData.order_no = item.ORDER_NO.toString();
                               payCancelData.trade_kcp_no = item.TUID;
 
+                              // 취소일경우 취소사유 POS 정보에 새로 전달
+                              PosbodyData = {'"order_no"': '"' + item.ORDER_NO.toString() + '"', '"order_status"': '"' + value + '"', '"shop_token"': '"' + item.API_COM_CODE + '"', '"cancel_msg"': '"' + v[1] + '"'};
+
                               // 카드결제 유무 판단
                               String _card_approval_gbn = await OrderController.to.getOrderCardApprovalGbn(item.ORDER_NO.toString());
 
@@ -708,14 +691,15 @@ class OrderListState extends State<OrderList> {
                                 if (item.TUID != '') {
                                   if (item.PAY_GBN == 'N' || item.PAY_GBN == 'K' || item.PAY_GBN == 'S') {
                                     // 네이버 페이 결제, 카카오페이 결제, 삼성페이 결제
-                                    await OrderController.to.postPayApiCancel(headerData, payCancelData.toJson(), saveStatusData.toJson(), PosheaderData, PosbodyData, context);
+                                    await OrderController.to.postPayApiCancel(payCancelData.toJson(), saveStatusData.toJson(), PosbodyData, context);
                                   }
                                   else if (item.CUST_ID_GBN == 'Z') {
                                     // 비회원
-                                    await OrderController.to.postPayBasicCancel(headerData, payCancelData.toJson(), saveStatusData.toJson(), PosheaderData, PosbodyData, context);
-                                  } else {
+                                    await OrderController.to.postPayBasicCancel(payCancelData.toJson(), saveStatusData.toJson(), PosbodyData, context);
+                                  }
+                                  else {
                                     // 회원
-                                    await OrderController.to.postPaySmartCancel(headerData, payCancelData.toJson(), saveStatusData.toJson(), PosheaderData, PosbodyData, context);
+                                    await OrderController.to.postPaySmartCancel(payCancelData.toJson(), saveStatusData.toJson(), PosbodyData, context);
                                   }
                                 }
                                 else {
@@ -723,27 +707,9 @@ class OrderListState extends State<OrderList> {
 
                                   if (result == '00') {
                                     // POS REQUEST 정보
-                                    await RestApiProvider.to.postRestError('0', '/admin/Order : putData', '[POS 상태변경 요청] ' + PosbodyData.toString() + '|| ucode : ' + GetStorage().read('logininfo')['uCode'].toString() + ', name : ' + GetStorage().read('logininfo')['name'].toString());
+                                    await DioClient().postRestLog('0', '/Order/putData', '[POS 오더상태변경 요청] ' + PosbodyData.toString() + '|| ucode : ' + GetStorage().read('logininfo')['uCode'].toString() + ', name : ' + GetStorage().read('logininfo')['name'].toString());
 
-                                    await http
-                                        .post(Uri.parse('https://pos.daeguro.co.kr:15409/orderApi/POSOrder/B2B_OrderStatus_Change_Manage'), headers: PosheaderData, body: PosbodyData.toString())
-                                        .then((http.Response response) async {
-                                      if (response.statusCode == 200) {
-                                        var decodeBody = jsonDecode(response.body);
-
-                                        if (decodeBody['code'] != 0) {
-                                          await RestApiProvider.to.postRestError('0', '/admin/Order : putData',
-                                              '[POS 상태변경 실패] ' + PosbodyData.toString() + ' || return : [' + response.statusCode.toString() + ']' + decodeBody.toString());
-                                        } else {
-                                          await RestApiProvider.to.postRestError('0', '/admin/Order : putData',
-                                              '[POS 상태변경 성공] ' + PosbodyData.toString() + ' || return : [' + response.statusCode.toString() + ']' + decodeBody.toString());
-                                        }
-                                      } else {
-                                        var decodeBody = jsonDecode(response.body);
-                                        await RestApiProvider.to.postRestError(
-                                            '0', '/admin/Order : putData', '[POS 상태변경 통신 실패] ' + PosbodyData.toString() + ' || return : [' + response.statusCode.toString() + ']' + decodeBody.toString());
-                                      }
-                                    });
+                                    await OrderController.to.setPosOrderChange(PosbodyData.toString(), '/Order/putData');
                                   }
                                 }
                               }
@@ -751,26 +717,9 @@ class OrderListState extends State<OrderList> {
                                 var result = await OrderController.to.putData(saveStatusData.toJson(), context);
 
                                 if (result == '00') {
-                                  await RestApiProvider.to.postRestError('0', '/admin/Order : putData', '[POS 상태변경 요청] ' + PosbodyData.toString() + '|| ucode : ' + GetStorage().read('logininfo')['uCode'].toString() + ', name : ' + GetStorage().read('logininfo')['name'].toString());
-                                  await http
-                                      .post(Uri.parse('https://pos.daeguro.co.kr:15409/orderApi/POSOrder/B2B_OrderStatus_Change_Manage'), headers: PosheaderData, body: PosbodyData.toString())
-                                      .then((http.Response response) async {
-                                    if (response.statusCode == 200) {
-                                      var decodeBody = jsonDecode(response.body);
+                                  await DioClient().postRestLog('0', '/Order/putData', '[POS 오더상태변경 요청] ' + PosbodyData.toString() + '|| ucode : ' + GetStorage().read('logininfo')['uCode'].toString() + ', name : ' + GetStorage().read('logininfo')['name'].toString());
 
-                                      if (decodeBody['code'] != 0) {
-                                        await RestApiProvider.to.postRestError('0', '/admin/Order : putData',
-                                            '[POS 상태변경 실패] ' + PosbodyData.toString() + ' || return : [' + response.statusCode.toString() + ']' + decodeBody.toString());
-                                      } else {
-                                        await RestApiProvider.to.postRestError('0', '/admin/Order : putData',
-                                            '[POS 상태변경 성공] ' + PosbodyData.toString() + ' || return : [' + response.statusCode.toString() + ']' + decodeBody.toString());
-                                      }
-                                    } else {
-                                      var decodeBody = jsonDecode(response.body);
-                                      await RestApiProvider.to.postRestError(
-                                          '0', '/admin/Order : putData', '[POS 상태변경 통신 실패] ' + PosbodyData.toString() + ' || return : [' + response.statusCode.toString() + ']' + decodeBody.toString());
-                                    }
-                                  });
+                                  await OrderController.to.setPosOrderChange(PosbodyData.toString(), '/Order/putData');
                                 }
                               }
 
@@ -797,28 +746,9 @@ class OrderListState extends State<OrderList> {
                             var result = await OrderController.to.putData(saveStatusData.toJson(), context);
 
                             if (value == '40' && result == '00') {
-                              await RestApiProvider.to.postRestError('0', '/admin/Order : putData', '[POS 상태변경 요청] ' + PosbodyData.toString() + '|| ucode : ' + GetStorage().read('logininfo')['uCode'].toString() + ', name : ' + GetStorage().read('logininfo')['name'].toString());
+                              await DioClient().postRestLog('0', '/Order/putData', '[POS 오더상태변경 요청] ' + PosbodyData.toString() + '|| ucode : ' + GetStorage().read('logininfo')['uCode'].toString() + ', name : ' + GetStorage().read('logininfo')['name'].toString());
 
-                              await http.post(Uri.parse('https://pos.daeguro.co.kr:15409/orderApi/POSOrder/B2B_OrderStatus_Change_Manage'), headers: PosheaderData, body: PosbodyData.toString())
-                                  .then((http.Response response) async {
-                                if (response.statusCode == 200) {
-                                  var decodeBody = jsonDecode(response.body);
-
-                                  // pos 저장 실패시 로그 저장
-                                  if (decodeBody['code'] != 0) {
-                                    await RestApiProvider.to.postRestError(
-                                        '0', '/admin/Order : putData', '[POS 상태변경 실패] ' + PosbodyData.toString() + ' || return : [' + response.statusCode.toString() + ']' + decodeBody.toString());
-                                  } else {
-                                    await RestApiProvider.to.postRestError(
-                                        '0', '/admin/Order : putData', '[POS 상태변경 성공] ' + PosbodyData.toString() + ' || return : [' + response.statusCode.toString() + ']' + decodeBody.toString());
-                                  }
-                                } else {
-                                  var decodeBody = jsonDecode(response.body);
-
-                                  await RestApiProvider.to.postRestError(
-                                      '0', '/admin/Order : putData', '[POS 상태변경 통신 실패] ' + PosbodyData.toString() + ' || return : [' + response.statusCode.toString() + ']' + decodeBody.toString());
-                                }
-                              });
+                              await OrderController.to.setPosOrderChange(PosbodyData.toString(), '/Order/putData');
                             }
 
                             await Future.delayed(Duration(milliseconds: 1000), () {
@@ -942,7 +872,7 @@ class OrderListState extends State<OrderList> {
               //DataColumn(label: Expanded(child: Text('구분2', textAlign: TextAlign.center)),),
               DataColumn(label: Expanded(child: Text('상점명', textAlign: TextAlign.center)),),
               DataColumn(label: Expanded(child: Text('상점전화', textAlign: TextAlign.left)),),
-              DataColumn(label: Expanded(child: Text('POS상태\n(설치/로그인)', textAlign: TextAlign.center, style: TextStyle(fontSize: 12),))),
+              DataColumn(label: Expanded(child: Text('POS상태\n(설치/로그인)', textAlign: TextAlign.center, style: TextStyle(fontSize: 10),))),
               DataColumn(label: Expanded(child: Text('결제수단', textAlign: TextAlign.center)),),
               DataColumn(label: Expanded(child: Text('결제금액', textAlign: TextAlign.right)),),
               DataColumn(label: Container(width: 10,)),
@@ -952,8 +882,8 @@ class OrderListState extends State<OrderList> {
               //DataColumn(label: Expanded(child: Text('카드승인정보', textAlign: TextAlign.left)),),
               //DataColumn(label: Expanded(child: Text('승인금액', textAlign: TextAlign.left)),),
               DataColumn(label: Expanded(child: Text('할인', textAlign: TextAlign.center)),),
-              DataColumn(label: Expanded(child: Text('고객\n요청사항', textAlign: TextAlign.center, style: TextStyle(fontSize: 12),))),
-              DataColumn(label: Expanded(child: Text('배달\n요청사항', textAlign: TextAlign.center, style: TextStyle(fontSize: 12),))),
+              DataColumn(label: Expanded(child: Text('고객\n요청사항', textAlign: TextAlign.center, style: TextStyle(fontSize: 10),))),
+              DataColumn(label: Expanded(child: Text('배달\n요청사항', textAlign: TextAlign.center, style: TextStyle(fontSize: 10),))),
               DataColumn(label: Expanded(child: Text('상세', textAlign: TextAlign.center)),),
             ],
           ),

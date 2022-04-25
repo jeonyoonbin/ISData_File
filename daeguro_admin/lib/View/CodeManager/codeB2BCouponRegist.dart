@@ -164,39 +164,39 @@ class CodeB2BCouponRegistState extends State<CodeB2BCouponRegist> {
                     },
                   )
               ),
-              Flexible(
-                flex: 1,
-                child: Container(
-                  padding: EdgeInsets.only(right: 8),
-                  child: ISSearchSelectDate(
-                    context,
-                    label: '사용종료일',
-                    value: Utils.getYearMonthDayFormat(formData.ETC_CODE1),
-                    onTap: () async {
-                      DateTime valueDt;
-                      if(formData.ETC_CODE1 == null)
-                      {
-                        valueDt = DateTime.now();
-                      } else {
-                        valueDt = DateTime.parse(formData.ETC_CODE1);
-                      }
-
-                      final DateTime picked = await showDatePicker(
-                        context: context,
-                        initialDate: valueDt,
-                        firstDate: DateTime(1900, 1),
-                        lastDate: DateTime(2031, 12),
-                      );
-
-                      setState(() {
-                        if (picked != null) {
-                          formData.ETC_CODE1 = formatDate(picked, [yyyy, '-', mm, '-', dd]);
-                        }
-                      });
-                    },
-                  ),
-                ),
-              ),
+              // Flexible(
+              //   flex: 1,
+              //   child: Container(
+              //     padding: EdgeInsets.only(right: 8),
+              //     child: ISSearchSelectDate(
+              //       context,
+              //       label: '사용종료일',
+              //       value: Utils.getYearMonthDayFormat(formData.ETC_CODE1),
+              //       onTap: () async {
+              //         DateTime valueDt;
+              //         if(formData.ETC_CODE1 == null)
+              //         {
+              //           valueDt = DateTime.now();
+              //         } else {
+              //           valueDt = DateTime.parse(formData.ETC_CODE1);
+              //         }
+              //
+              //         final DateTime picked = await showDatePicker(
+              //           context: context,
+              //           initialDate: valueDt,
+              //           firstDate: DateTime(1900, 1),
+              //           lastDate: DateTime(2031, 12),
+              //         );
+              //
+              //         setState(() {
+              //           if (picked != null) {
+              //             formData.ETC_CODE1 = formatDate(picked, [yyyy, '-', mm, '-', dd]);
+              //           }
+              //         });
+              //       },
+              //     ),
+              //   ),
+              // ),
               Flexible(
                 flex: 1,
                 child: ISSelect(

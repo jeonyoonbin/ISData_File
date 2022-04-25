@@ -10,6 +10,7 @@ class ISButton extends StatelessWidget {
   final bool enable;
   final Color iconColor;
   final double height;
+  final Color buttonColor;
 
   ISButton(
       {this.label,
@@ -20,7 +21,8 @@ class ISButton extends StatelessWidget {
       this.textStyle,
       this.enable = true,
       this.iconColor,
-      this.height});
+      this.height,
+      this.buttonColor});
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +35,7 @@ class ISButton extends StatelessWidget {
         result = Container(
           height: height ?? 30,
           decoration: BoxDecoration(
-            color: Colors.blue,
+            color: buttonColor ?? Colors.blue,
             borderRadius: BorderRadius.circular(6.0),
           ),
           child: IconButton(
@@ -46,6 +48,7 @@ class ISButton extends StatelessWidget {
         result = Container(
           height: height ?? 30,
           child: RaisedButton.icon(
+            color: buttonColor ?? Colors.blue,
             elevation: 0,
             highlightElevation: 0,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6.0)),
@@ -60,6 +63,7 @@ class ISButton extends StatelessWidget {
       result = Container(
         height: height ?? 30,
         child: RaisedButton(
+          color: buttonColor ?? Colors.blue,
           elevation: 0,
           highlightElevation: 0,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6.0)),

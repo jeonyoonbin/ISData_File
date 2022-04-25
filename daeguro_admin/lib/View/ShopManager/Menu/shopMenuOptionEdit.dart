@@ -76,6 +76,9 @@ class ShopMenuOptionEditState extends State<ShopMenuOptionEdit> {
                   label: '옵션명',
                   maxLength: 25,
                   context: context,
+                  inputFormatters: <TextInputFormatter>[
+                    BlacklistingTextInputFormatter(RegExp('[;]')),
+                  ],
                   onChange: (v) {
                     formData.optionName = v;
                   },

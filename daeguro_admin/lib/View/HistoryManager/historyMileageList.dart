@@ -232,7 +232,7 @@ class HistoryMileageListState extends State {
                   height: 30.0,
                   color: Color.fromRGBO(0, 168, 181, 1),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
-                  child: Text(item.CUST_NAME.toString(), style: TextStyle(fontSize: 13, color: Colors.white)),
+                  child: Text(Utils.getNameAbsoluteFormat(item.CUST_NAME.toString(), true), style: TextStyle(fontSize: 13, color: Colors.white)),
                   onPressed: () {
                     double poupWidth = 700;
                     double poupHeight = 600;
@@ -288,7 +288,7 @@ class HistoryMileageListState extends State {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
                   child: Text('주문번호: ${item.ORDER_NO.toString()}', style: TextStyle(fontSize: 13, color: Colors.white)),
                   onPressed: () async {
-                    await OrderController.to.getDetailData(item.ORDER_NO.toString(), context);
+                    await OrderController.to.getDetailData(item.ORDER_NO.toString());
 
                     showDialog(
                       context: context,

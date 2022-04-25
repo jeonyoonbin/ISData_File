@@ -87,8 +87,8 @@ class AuthManagerListState extends State<AuthManagerList>  with SingleTickerProv
 
   bool menuAdminEnable = false;
 
-  String _sidebarPID = '4';
-  String _sidebarEnabled = '*';
+  String _sidebarPID = '#';
+  //String _sidebarEnabled = '*';
 
   void _pageMove(int _page) {
     _query();
@@ -199,21 +199,19 @@ class AuthManagerListState extends State<AuthManagerList>  with SingleTickerProv
           dataAuthList.add(temp);
 
           value.forEach((element) {
-            if(_sidebarEnabled == '*' || _sidebarEnabled == element['SIDEBAR_YN']){
-              UserAuthManagerListModel temp = UserAuthManagerListModel();//UserAuthManagerListModel.fromJson(element);
-              temp.defaultItem = false;
+            UserAuthManagerListModel temp = UserAuthManagerListModel();//UserAuthManagerListModel.fromJson(element);
+            temp.defaultItem = false;
 
-              temp.ID = element['ID'];
-              temp.NAME = element['NAME'];
-              temp.SIDEBAR_YN = element['SIDEBAR_YN'];
-              temp.READ_YN = element['READ_YN'];
-              temp.UPDATE_YN = element['UPDATE_YN'];
-              temp.CREATE_YN = element['CREATE_YN'];
-              temp.DELETE_YN = element['DELETE_YN'];
-              temp.DOWNLOAD_YN = element['DOWNLOAD_YN'];
+            temp.ID = element['ID'];
+            temp.NAME = element['NAME'];
+            temp.SIDEBAR_YN = element['SIDEBAR_YN'];
+            temp.READ_YN = element['READ_YN'];
+            temp.UPDATE_YN = element['UPDATE_YN'];
+            temp.CREATE_YN = element['CREATE_YN'];
+            temp.DELETE_YN = element['DELETE_YN'];
+            temp.DOWNLOAD_YN = element['DOWNLOAD_YN'];
 
-              dataAuthList.add(temp);
-            }
+            dataAuthList.add(temp);
           });
 
           refreshDefaultItem('Y', 0);
@@ -358,6 +356,7 @@ class AuthManagerListState extends State<AuthManagerList>  with SingleTickerProv
                     child: ISButton(
                       height: 24.0,
                       label: '사이드바 메뉴 순서',
+                      buttonColor: Colors.green,
                       textStyle: TextStyle(color: Colors.white, fontSize: 11),
                       onPressed: () async {
                         _sort();
@@ -370,6 +369,7 @@ class AuthManagerListState extends State<AuthManagerList>  with SingleTickerProv
                     child: ISButton(
                       height: 24.0,
                       label: 'PG 추가',
+                      buttonColor: Colors.green,
                       textStyle: TextStyle(color: Colors.white, fontSize: 11),
                       onPressed: () async {
                         _regist();
@@ -548,9 +548,9 @@ class AuthManagerListState extends State<AuthManagerList>  with SingleTickerProv
                             },
                             cells: [
                               //DataCell(Center(child: Text(item.uCode.toString() ?? '--', style: TextStyle(color: Colors.black, fontSize: 12),))),
-                              //DataCell(Align(child: Text(item.id.toString() ?? '--', style: TextStyle(color: Colors.black),), alignment: Alignment.centerLeft)),
                               DataCell(Align(child: Text('[${item.uCode.toString()}] ${item.name.toString()}' ?? '--', style: TextStyle(color: Colors.black, fontSize: 12),), alignment: Alignment.centerLeft)),
-                              DataCell(Align(child: Text(_getCcName(item.ccCode.toString()) ?? '--', style: TextStyle(color: Colors.black, fontSize: 12)), alignment: Alignment.centerLeft),),
+                              DataCell(Align(child: Text(item.id.toString() ?? '--', style: TextStyle(color: Colors.black),), alignment: Alignment.centerLeft)),
+                              DataCell(Align(child: Text(_getCcName(item.ccCode.toString()) ?? '--', style: TextStyle(color: Colors.black, fontSize: 12)), alignment: Alignment.center),),
                               DataCell(Center(child: Text(_getLevel(item.level.toString()) ?? '--', style: TextStyle(color: Colors.black, fontSize: 12)),),),
                               DataCell(Center(child: Text(_getWorking(item.working.toString()) ?? '--', style: TextStyle(color: Colors.black, fontSize: 12)),),),
                               DataCell(Align(child: Text(item.memo.toString() ?? '--', style: TextStyle(color: Colors.black, fontSize: 12)), alignment: Alignment.centerLeft)),
@@ -569,9 +569,9 @@ class AuthManagerListState extends State<AuthManagerList>  with SingleTickerProv
                       }).toList(),
                       columns: <DataColumn>[
                         //DataColumn(label: Expanded(child: Text('사용자코드', textAlign: TextAlign.center)),),
-                        //DataColumn(label: Expanded(child: Text('아이디', textAlign: TextAlign.left)),),
                         DataColumn(label: Expanded(child: Text('사용자', textAlign: TextAlign.center)),),
-                        DataColumn(label: Expanded(child: Text('콜센터', textAlign: TextAlign.left)),),
+                        DataColumn(label: Expanded(child: Text('아이디', textAlign: TextAlign.left)),),
+                        DataColumn(label: Expanded(child: Text('콜센터', textAlign: TextAlign.center)),),
                         DataColumn(label: Expanded(child: Text('접속권한', textAlign: TextAlign.center)),),
                         DataColumn(label: Expanded(child: Text('업무상태', textAlign: TextAlign.center)),),
                         DataColumn(label: Expanded(child: Text('메모', textAlign: TextAlign.left)),),
@@ -607,23 +607,9 @@ class AuthManagerListState extends State<AuthManagerList>  with SingleTickerProv
           Row(
             children: [
               Flexible(
-                  flex: 2,
+                  flex: 1,
                   child: ISSelect(
-                    label: '사이드바 유무',
-                    value: _sidebarEnabled,
-                    dataList: selectBox_sideBarEnabled,
-                    onChange: (v) {
-                      setState(() {
-                        _sidebarEnabled = v;
-                        loadAuthData(_selectedUcode);
-                      });
-                    },
-                  )
-              ),
-              Flexible(
-                  flex: 3,
-                  child: ISSelect(
-                    label: '사이드바 메뉴명',
+                    label: '메뉴 카테고리',
                     value: _sidebarPID,
                     dataList: selectBox_piditem,
                     onChange: (v) {
@@ -773,6 +759,7 @@ class AuthManagerListState extends State<AuthManagerList>  with SingleTickerProv
                                   child: ISButton(
                                     height: 24.0,
                                     label: '일괄 반영',
+                                    buttonColor: Colors.green,
                                     textStyle: TextStyle(color: Colors.white, fontSize: 11),
                                     onPressed: () async {
                                       ISConfirm(context, '일괄반영', '모든 사용자에 대해 일괄 반영 하시겠습니까?', (context) async {
@@ -802,6 +789,7 @@ class AuthManagerListState extends State<AuthManagerList>  with SingleTickerProv
                                   child: ISButton(
                                     height: 24.0,
                                     label: '수정',
+                                    buttonColor: Colors.green,
                                     textStyle: TextStyle(color: Colors.white, fontSize: 11),
                                     onPressed: () async {
                                       print('edit id:${item.ID.toString()}');

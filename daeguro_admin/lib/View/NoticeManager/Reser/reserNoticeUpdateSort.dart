@@ -248,7 +248,7 @@ class ReserNoticeUpdateSortState extends State<ReserNoticeUpdateSort> with Singl
     }
 
     // 시정홍보 바인딩
-    await NoticeController.to.getNoticeSortList('7', context);
+    await ReserNoticeController.to.getNoticeSortList('7', context);
 
     if (this.mounted) {
       ReserNoticeController.to.qDataSortList.forEach((e) {
@@ -257,19 +257,19 @@ class ReserNoticeUpdateSortState extends State<ReserNoticeUpdateSort> with Singl
         temp.frDate = Utils.getYearMonthDayFormat(temp.frDate);
         temp.toDate = Utils.getYearMonthDayFormat(temp.toDate);
 
-        sortListMunicipal .add(temp);
+        sortListOwnerMainPopup .add(temp);
       });
 
       if (isSaveEnabled == true) {
         await Future.delayed(Duration(milliseconds: 500), () async {
           List<String> sortDataList = [];
-          sortListMunicipal .forEach((element) {
+          sortListOwnerMainPopup .forEach((element) {
             sortDataList.add(element.noticeSeq.toString());
           });
 
           if (sortDataList.length != 0) {
             String jsonData = jsonEncode(sortDataList);
-            await NoticeController.to.updateSort(jsonData, context);
+            await ReserNoticeController.to.updateSort(jsonData, context);
           }
 
           isSaveEnabled = false;

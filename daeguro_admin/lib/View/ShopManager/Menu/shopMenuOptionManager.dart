@@ -277,8 +277,7 @@ class ShopMenuOptionManagerState extends State<ShopMenuOptionManager> {
   }
 
   _deleteOptionGroup(String optionGroupCode) {
-    ISConfirm(context, '옵션그룹 삭제', '옵션그룹을 삭제합니다. \n\n계속 진행 하시겠습니까?',
-            (context) async {
+    ISConfirm(context, '옵션그룹 삭제', '옵션그룹을 삭제합니다. \n\n계속 진행 하시겠습니까?', (context) async {
           await ShopController.to.deleteOptionGroupDetailData(optionGroupCode, context);
 
           Navigator.of(context).pop();

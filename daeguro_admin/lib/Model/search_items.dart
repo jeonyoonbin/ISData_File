@@ -11,12 +11,13 @@ class SearchItems{
   String address = '';
   String memo = '';
   int useyn = 0;
-  String status;
+  //String imagestatus;
+  String shopstatus;
   String img_yn = '';
   // DateTime startdate = DateTime.now();
   // DateTime enddate= DateTime.now();
   String startdate = '';
   String enddate= '';
   String chargeGbn = ' ';
-  String reserve_yn = ' ';
+  String shop_type = ' ';
 }

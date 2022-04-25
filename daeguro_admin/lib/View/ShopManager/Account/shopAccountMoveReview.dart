@@ -3,7 +3,7 @@ import 'dart:async';
 
 import 'package:daeguro_admin_app/ISWidget/is_dialog.dart';
 import 'package:daeguro_admin_app/ISWidget/is_progressDialog.dart';
-import 'package:daeguro_admin_app/Provider/BackendService.dart';
+import 'package:daeguro_admin_app/Network/BackendService.dart';
 import 'package:daeguro_admin_app/Util/auth_util.dart';
 import 'package:daeguro_admin_app/View/ShopManager/Account/shopAccount_controller.dart';
 import 'package:flutter/cupertino.dart';

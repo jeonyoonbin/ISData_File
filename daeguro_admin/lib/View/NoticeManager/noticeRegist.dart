@@ -8,7 +8,7 @@ import 'package:daeguro_admin_app/Model/noticeRegistModel.dart';
 import 'package:daeguro_admin_app/Util/select_option_vo.dart';
 import 'package:daeguro_admin_app/View/CouponManager/coupon_controller.dart';
 
-import 'package:daeguro_admin_app/Provider/FileUpLoader.dart';
+import 'package:daeguro_admin_app/Network/FileUpLoader.dart';
 import 'package:daeguro_admin_app/View/NoticeManager/noticeFileUpload.dart';
 
 import 'package:date_format/date_format.dart';
@@ -71,6 +71,7 @@ class NoticeRegistState extends State<NoticeRegist> {
     selectBox_noticeGbn.add(new SelectOptionVO(value: '7', label: '시정홍보'));
 
     formData = noticeRegistModel();
+    formData.extUrlYn = 'N';
     formData.dispGbn = 'Y';
     formData.noticeGbn = '1';
     formData.orderDate = formatDate(DateTime.now(), [yyyy, '-', mm, '-', dd]);
@@ -111,6 +112,30 @@ class NoticeRegistState extends State<NoticeRegist> {
               ),
               Flexible(
                 flex: 1,
+                child: Container(
+                  margin: EdgeInsets.all(8.0),
+                  decoration: new BoxDecoration(
+                      color: formData.extUrlYn == 'Y' ? Colors.blue[200] : Colors.red[200],
+                      borderRadius: new BorderRadius.circular(6)),
+                  child: SwitchListTile(
+                    dense: true,
+                    value: formData.extUrlYn == 'Y' ? true : false,
+                    title: Text('외부URL 사용 유무', style: TextStyle(fontSize: 10, color: Colors.white),),
+                    onChanged: (v) {
+                      setState(() {
+                        formData.extUrlYn = v ? 'Y' : 'N';
+                        formKey.currentState.save();
+                      });
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Row(
+            children: <Widget>[
+              Flexible(
+                flex: 1,
                 child: ISSelect(
                   label: '구분',
                   value: formData.noticeGbn,
@@ -122,11 +147,7 @@ class NoticeRegistState extends State<NoticeRegist> {
                     });
                   },
                 ),
-              )
-            ],
           ),
-          Row(
-            children: <Widget>[
               Flexible(
                 flex: 1,
                 child: ISSelectDate(
@@ -308,7 +329,7 @@ class NoticeRegistState extends State<NoticeRegist> {
             FileUpLoadProvider provider = FileUpLoadProvider();
             provider.setResource('image', _file);
             provider.makeNoticePostResourceRequest(formData.noticeGbn, formData.dispGbn, formData.dispFromDate, formData.dispToDate, formData.noticeTitle, formData.noticeContents,
-                formData.noticeUrl_1, formData.noticeUrl_2, formData.orderDate, formData.insDate, formData.insUCode, formData.insName);
+                formData.noticeUrl_1, formData.noticeUrl_2, formData.orderDate, formData.insDate, formData.insUCode, formData.insName, formData.extUrlYn);
 
             await Future.delayed(Duration(milliseconds: 500), () {
               setState(() {
@@ -347,7 +368,7 @@ class NoticeRegistState extends State<NoticeRegist> {
       bottomNavigationBar: buttonBar,
     );
     return SizedBox(
-      width: 440,
+      width: 480,
       height: 700,
       child: result,
     );

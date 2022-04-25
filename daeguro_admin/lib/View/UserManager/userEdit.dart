@@ -235,21 +235,25 @@ class UserEditState extends State<UserEdit> {
                     idchk_gbn = false;
                   });
                 } else {
-                  await UserController.to.getIdCheck(formData.id, context);
-
-                  if (this.mounted) {
-                    if (UserController.to.IdCheck != 'Y' || beforeId == editData.id) {
-                      ISAlert(context, '사용 가능한 ID 입니다.');
-                      setState(() {
-                        idchk_gbn = true;
-                      });
-                    } else {
-                      ISAlert(context, '이미 사용중인 ID 입니다.');
-                      setState(() {
-                        idchk_gbn = false;
-                      });
+                  await UserController.to.getIdCheck(formData.id, context).then((value) {
+                    if (value != null){
+                      if (value != 'Y' || beforeId == editData.id) {
+                        ISAlert(context, '사용 가능한 ID 입니다.');
+                        setState(() {
+                          idchk_gbn = true;
+                        });
+                      } else {
+                        ISAlert(context, '이미 사용중인 ID 입니다.');
+                        setState(() {
+                          idchk_gbn = false;
+                        });
+                      }
                     }
-                  }
+                  });
+
+                  // if (this.mounted) {
+                  //
+                  // }
                 }
               },
             ),

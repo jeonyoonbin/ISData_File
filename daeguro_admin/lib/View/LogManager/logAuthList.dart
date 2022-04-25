@@ -35,7 +35,8 @@ class LogAuthListManagerState extends State<LogAuthListManager> {
   int _currentPage = 1;
   int _totalPages = 0;
 
-  String _div = ' ';
+  String _divKey = '1';
+  String _keyWordLabel = '사용자명';
 
   void _pageMove(int _page) {
     _query();
@@ -43,18 +44,24 @@ class LogAuthListManagerState extends State<LogAuthListManager> {
 
   _reset() {
     dataList.clear();
+
     _searchItems = null;
     _searchItems = new SearchItems();
 
-    _searchItems.name = ' ';
+    _searchItems.startdate = formatDate(DateTime.now(), [yyyy, '-', mm, '-', dd]);
+    _searchItems.enddate = formatDate(DateTime.now(), [yyyy, '-', mm, '-', dd]);
+    _searchItems.memo = '';
+
   }
 
   _query() {
     formKey.currentState.save();
 
     /* 로그컨트롤러에 접근해서 데이터 저장*/
-    // LogController.to.div.value = _div;
-    LogController.to.uname.value = _searchItems.name;
+    LogController.to.startDate.value = _searchItems.startdate.replaceAll('-', '');
+    LogController.to.endDate.value = _searchItems.enddate.replaceAll('-', '');
+    LogController.to.divKey.value = _divKey;
+    LogController.to.keyword.value = _searchItems.memo;
 
     LogController.to.page.value = _currentPage;
     LogController.to.rows.value = _selectedpagerows;
@@ -85,10 +92,10 @@ class LogAuthListManagerState extends State<LogAuthListManager> {
         _totalPages = (_totalRowCnt / _selectedpagerows).ceil();
       }
     });
-    //if (this.mounted) {
+    // if (this.mounted) {
     setState(() {
     });
-    //}
+    // }
 
     await ISProgressDialog(context).dismiss();
   }
@@ -98,6 +105,8 @@ class LogAuthListManagerState extends State<LogAuthListManager> {
     super.initState();
 
     Get.put(LogController());
+
+
     WidgetsBinding.instance.addPostFrameCallback((c) {
       _reset();
       _query();
@@ -106,7 +115,6 @@ class LogAuthListManagerState extends State<LogAuthListManager> {
 
   @override
   Widget build(BuildContext context) {
-
     var form = Form(
       key: formKey,
       child: Wrap(
@@ -129,21 +137,92 @@ class LogAuthListManagerState extends State<LogAuthListManager> {
               ],
             ),
             Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                ISSearchSelectDate(
+                  context,
+                  label: '시작일',
+                  width: 120,
+                  value: _searchItems.startdate.toString(),
+                  onTap: () async {
+                    DateTime valueDt = isBlank ? DateTime.now() : DateTime.parse(_searchItems.startdate);
+                    final DateTime picked = await showDatePicker(
+                      context: context,
+                      initialDate: valueDt,
+                      firstDate: DateTime(1900, 1),
+                      lastDate: DateTime(2031, 12),
+                    );
+
+                    setState(() {
+                      if (picked != null) {
+                        _searchItems.startdate = formatDate(picked, [yyyy, '-', mm, '-', dd]);
+                      }
+                    });
+                  },
+                ),
+                ISSearchSelectDate(
+                  context,
+                  label: '종료일',
+                  width: 120,
+                  value: _searchItems.enddate.toString(),
+                  onTap: () async {
+                    DateTime valueDt = isBlank ? DateTime.now() : DateTime.parse(_searchItems.enddate);
+                    final DateTime picked = await showDatePicker(
+                      context: context,
+                      initialDate: valueDt,
+                      firstDate: DateTime(1900, 1),
+                      lastDate: DateTime(2031, 12),
+                    );
+
+                    setState(() {
+                      if (picked != null) {
+                        _searchItems.enddate = formatDate(picked, [yyyy, '-', mm, '-', dd]);
+                      }
+                    });
+                  },
+                ),
+                ISSearchDropdown(
+                  label: '로그구분',
+                  width: 150,
+                  value: _divKey,
+                  onChange: (value) {
+                    setState(() {
+                      _divKey = value;
+                      //_currentPage = 1;
+                      if (value == '1') {
+                        _keyWordLabel = '대상자명';
+                      } else if (value == '2') {
+                        _keyWordLabel = '프로그램명';
+                      } else if (value == '3') {
+                        _keyWordLabel = '수정자명';
+                      }
+                      //_query();
+                    });
+                  },
+                  item: [
+                    DropdownMenuItem(value: '1', child: Text('대상자명')),
+                    DropdownMenuItem(value: '2', child: Text('수정자명'),),
+                    DropdownMenuItem(value: '3', child: Text('프로그램명'),),
+                  ].cast<DropdownMenuItem<String>>(),
+                ),
+                Container(
+                  child: Stack(
+                    alignment: Alignment.centerRight,
                 children: [
                   ISSearchInput(
-                    label: '사용자명',
-                    width: 240,
-                    value: _searchItems.name,
+                        label: _keyWordLabel,
+                        width: 300,
+                        value: _searchItems.memo,
                     onChange: (v) {
-                      _searchItems.name = v.trim();
+                          _searchItems.memo = v;
                     },
-                    onFieldSubmitted: (value) {
+                        onFieldSubmitted: (v) {
                       _currentPage = 1;
                       _query();
                     },
                   ),
-                  SizedBox(width: 5),
+                    ],
+                  ),
+                ),
                   ISSearchButton(
                       label: '조회',
                       iconData: Icons.search,
@@ -151,7 +230,8 @@ class LogAuthListManagerState extends State<LogAuthListManager> {
                         _currentPage = 1,
                         _query(),
                       }),
-                ]
+
+              ],
             )
           ]
 
@@ -168,46 +248,28 @@ class LogAuthListManagerState extends State<LogAuthListManager> {
           buttonBar,
           Divider(),
           ISDatatable(
-            panelHeight: (MediaQuery.of(context).size.height - defaultContentsHeight),
+            panelHeight: (MediaQuery.of(context).size.height-defaultContentsHeight),
             listWidth: Responsive.getResponsiveWidth(context, 720),
             dataRowHeight: 30,
             rows: dataList.map((item) {
               return DataRow(cells: [
                 DataCell(Center(child: SelectableText(item.NO.toString() ?? '--', style: TextStyle(color: Colors.black, fontSize: 12), showCursor: true))),
-                DataCell(Center(child: SelectableText(item.USER_NAME.toString() ?? '--', style: TextStyle(color: Colors.black, fontSize: 12), showCursor: true))),
-                //DataCell(Center(child: SelectableText(item.ID.toString() ?? '--', style: TextStyle(color: Colors.black, fontSize: 12), showCursor: true))),
-                DataCell(Center(child: SelectableText('[${item.ID.toString()}] ${item.NAME.toString()}' ?? '--', style: TextStyle(color: Colors.black, fontSize: 12), showCursor: true))),
-                DataCell(Center(child: SelectableText(item.MEMO.toString() ?? '--', style: TextStyle(color: Colors.black, fontSize: 12), showCursor: true))),
-                DataCell(Center(child: SelectableText(item.HIST_DATE.toString() ?? '--', style: TextStyle(color: Colors.black, fontSize: 12), showCursor: true))),
-                DataCell(Center(child: SelectableText( item.MOD_UCODE.toString() == 'null' ? '--' : '[${item.MOD_UCODE.toString()}]' + item.MOD_NAME.toString(), style: TextStyle(color: Colors.black, fontSize: 12), showCursor: true))),
-                // DataCell(Center(child: SelectableText(item.DIV.toString() ?? '--', style: TextStyle(color: Colors.black, fontSize: 12), showCursor: true))),
+                DataCell(Center(child: SelectableText(item.USER_NAME.toString()  ?? '--', style: TextStyle(color: Colors.black, fontSize: 12), showCursor: true,))),
+                DataCell(Center(child: SelectableText(item.ID.toString()  ?? '--', style: TextStyle(color: Colors.black, fontSize: 12), showCursor: true))),
+                DataCell(Center(child: SelectableText(item.NAME.toString() ?? '--', style: TextStyle(color: Colors.black, fontSize: 12), showCursor: true))),
+                DataCell(Center(child: SelectableText(item.MEMO.toString()?? '--', style: TextStyle(color: Colors.black, fontSize: 12), showCursor: true))),
+                DataCell(Align(child: SelectableText(item.HIST_DATE.toString()  ?? '--', style: TextStyle(color: Colors.black, fontSize: 12, fontFamily: 'NotoSansKR'), showCursor: true), alignment: Alignment.center)),
+                DataCell(Align(child: SelectableText(item.MOD_UCODE.toString() == 'null' ? '--' : '[${item.MOD_UCODE.toString()}]' + item.MOD_NAME.toString(), style: TextStyle(color: Colors.black, fontSize: 12, fontFamily: 'NotoSansKR'), showCursor: true), alignment: Alignment.center)),
               ]);
             }).toList(),
             columns: <DataColumn>[
-              DataColumn(
-                label: Expanded(child: Text('No', textAlign: TextAlign.center)),
-              ),
-              DataColumn(
-                label: Expanded(child: Text('대상자', textAlign: TextAlign.center)),
-              ),
-              // DataColumn(
-              //   label: Expanded(child: Text('PG ID', textAlign: TextAlign.center)),
-              // ),
-              DataColumn(
-                label: Expanded(child: Text('PG명', textAlign: TextAlign.center)),
-              ),
-              DataColumn(
-                label: Expanded(child: Text('변경사항', textAlign: TextAlign.center)),
-              ),
-              DataColumn(
-                label: Expanded(child: Text('변경일자', textAlign: TextAlign.center)),
-              ),
-              DataColumn(
-                label: Expanded(child: Text('수정자', textAlign: TextAlign.center)),
-              ),
-              // DataColumn(
-              //   label: Expanded(child: Text('삭제여부', textAlign: TextAlign.center)),
-              // ),
+              DataColumn(label: Expanded(child: Text('No', textAlign: TextAlign.center)),),
+              DataColumn(label: Expanded(child: Text('대상자', textAlign: TextAlign.center)),),
+              DataColumn(label: Expanded(child: Text('PG ID', textAlign: TextAlign.center)),),
+              DataColumn(label: Expanded(child: Text('프로그램명', textAlign: TextAlign.center)),),
+              DataColumn(label: Expanded(child: Text('변경사항', textAlign: TextAlign.center)),),
+              DataColumn(label: Expanded(child: Text('변경일자', textAlign: TextAlign.center)),),
+              DataColumn(label: Expanded(child: Text('수정자', textAlign: TextAlign.center)),),
             ],
           ),
           Divider(),
@@ -220,13 +282,14 @@ class LogAuthListManagerState extends State<LogAuthListManager> {
     );
   }
 
+
   Container showPagerBar() {
     return Container(
       //padding: const EdgeInsets.only(left: 20.0, right: 20.0),
       child: Row(
         children: <Widget>[
           Flexible(
-            flex: 1,
+
             child: Container(),
           ),
           Flexible(
