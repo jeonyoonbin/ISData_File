@@ -1,0 +1,295 @@
+
+import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:daeguro_admin_ext/ISWidget/is_button.dart';
+import 'package:daeguro_admin_ext/ISWidget/is_dialog.dart';
+import 'package:daeguro_admin_ext/ISWidget/is_input.dart';
+import 'package:daeguro_admin_ext/ISWidget/is_progressDialog.dart';
+import 'package:daeguro_admin_ext/ISWidget/is_select.dart';
+import 'package:daeguro_admin_ext/Network/FileUpLoader.dart';
+import 'package:daeguro_admin_ext/Util/select_option_vo.dart';
+import 'package:daeguro_admin_ext/constants/serverInfo.dart';
+import 'package:file_picker/file_picker.dart';
+
+
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+
+import 'package:http/http.dart' as http;
+import 'package:image/image.dart' as Im;
+import 'package:flutter/foundation.dart' show compute;
+import 'package:image_picker/image_picker.dart';
+
+
+class ShopReserveStoreImageAdd extends StatefulWidget {
+  final String shopCd;
+  final String ccCode;
+
+  const ShopReserveStoreImageAdd({Key key, this.shopCd, this.ccCode}) : super(key: key);
+
+  @override
+  State<StatefulWidget> createState() {
+    return ShopReserveStoreImageAddState();
+  }
+}
+
+class ShopReserveStoreImageAddState extends State<ShopReserveStoreImageAdd> {
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
+  String _pickedImagePath = '';
+  var _fileImage = null;
+  var _returnResult = '';
+
+  //bool isImageSaveEnabled = false;
+  //bool isFileSaveEnabled = false;
+
+  String selectedImageType = '0001';
+
+  List<SelectOptionVO> selectBox_imageType = [
+    new SelectOptionVO(value: '0001', label: '음식'),
+    new SelectOptionVO(value: '0002', label: '내부'),
+    new SelectOptionVO(value: '0003', label: '외부'),
+    new SelectOptionVO(value: '0004', label: '주차장'),
+  ];
+
+  @override
+  void dispose(){
+    PaintingBinding.instance.imageCache.clearLiveImages();
+    PaintingBinding.instance.imageCache.clear();
+
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var form = Form(
+      key: formKey,
+      child: Wrap(
+        children: <Widget>[
+          Row(
+            children: [
+              Flexible(
+                flex: 2,
+                child: ISSelect(
+                  label: '매장 이미지 유형',
+                  value: selectedImageType,
+                  dataList: selectBox_imageType,
+                  onChange: (v) {
+                    setState(() {
+                      selectedImageType = v;
+                    });
+                  },
+                ),
+              ),
+              Flexible(
+                flex: 5,
+                child: ISInput(
+                  value: _pickedImagePath,
+                  readOnly: true,
+                  context: context,
+                  label: '업로드 이미지',
+                  //hintText: '클릭 후, 파일 선택',
+                  // onTap: () async {
+                  //
+                  // },
+                  prefixIcon: Icon(_fileImage == null ? Icons.help_outline : Icons.check_circle_outline, color: _fileImage == null ? Colors.red : Colors.blue, size: 18,),
+                  suffixIcon: MaterialButton(
+                    color: Colors.blue,
+                    minWidth: 40,
+                    child: Icon(Icons.search, color: Colors.white, size: 18,),//Text('저장', style: TextStyle(color: Colors.white, fontSize: 14),),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(3.0)),
+                    onPressed: () async {
+                      ImagePicker imagePicker = ImagePicker();
+                      imagePicker.getImage(source: ImageSource.gallery).then((file) async {
+                        String fileName = file.path;
+                        _pickedImagePath = fileName;
+
+                        setState(() {
+                          _fileImage = file;
+                        });
+                      });
+
+                      return;
+
+                      FilePickerResult result = await FilePicker.platform.pickFiles(type: FileType.image, withReadStream: false);
+
+                      if (result != null) {
+                        _fileImage = null;
+                        _fileImage = result;
+
+                        String fileName = result.files.first.name;
+                        _pickedImagePath = fileName;
+
+                        //print('ccCode:${widget.ccCode}, shopCd:${widget.shopCd}, path:${_pickedImagePath}');
+                      }
+                      else {
+                        // User canceled the picker
+                      }
+
+                      setState(() {});
+                    },
+                  ),
+                  onChange: (v) {
+                    //editData.noticeTitle = v;
+                  },
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+
+    ButtonBar buttonBar = ButtonBar(
+      alignment: MainAxisAlignment.center,
+      children: <Widget>[
+        ISButton(
+          label: '등록',
+          iconData: Icons.add,
+          textStyle: TextStyle(color: Colors.white),
+          iconColor: Colors.white,
+          onPressed: () async {
+            if (_fileImage == null || _pickedImagePath == '') {
+              ISAlert(context, '선택된 파일이 없습니다.');
+              return;
+            }
+
+            await ISProgressDialog(context).show(status: '이미지 업로드중...');
+            Future.delayed(Duration(milliseconds: 300), () async {
+              var request = await http.MultipartRequest('PUT', Uri.parse(ServerInfo.REST_RESERVEURL+'/shopPicture/insert'));
+              request.headers.addAll({'Content-Type' : 'multipart/form-data'});
+              request.fields['ccCode'] = widget.ccCode;
+              request.fields['shopCode'] = widget.shopCd;
+              request.fields['temaCode'] = selectedImageType;
+
+              var bytes;
+              String filename;
+
+              var responseData;
+
+              print('1111111111');
+              Uint8List data = await _fileImage.readAsBytes();
+              print('22222222222');
+              List<int> list = data.cast();
+              print('3333333333333');
+              request.files.add(http.MultipartFile.fromBytes('file', list, filename: 'upload_temp.png'));
+              print('444444444444');
+              var response = await request.send();
+
+              response.stream.bytesToString().asStream().listen((event) {
+                responseData = json.decode(event);
+              });
+
+              return;
+
+              //print('image process start');
+
+              Im.Image image = await compressImage(bytes);
+
+              request.files.add(http.MultipartFile.fromBytes('file', Im.encodeJpg(image, quality: 100), filename: filename));
+              //print('image process end');
+              //request.files.add(http.MultipartFile.fromBytes('file', bytes, filename: filename));
+
+              request.send().then((response) async {
+                //print('image upload complete[${response.statusCode}]');
+
+                if (response.statusCode == 200) {
+                  response.stream.bytesToString().asStream().listen((event) async {
+                    var responseData = json.decode(event);
+                    print('response [Success] code:${response.statusCode}, responseData:${responseData.toString()}');
+                    print('response [Success] msg:${responseData['msg'].toString()}');
+                  });
+                }
+                else{
+                  print('response [FAIL] code:${response.statusCode}');
+                  //_showResult = '[전송오류] 관리자에게 문의하세요.';
+
+                  //await ISProgressDialog(context).dismiss();
+                }
+              });
+            });
+
+
+            await Future.delayed(Duration(milliseconds: 500), () {
+              Navigator.pop(context, true);
+
+              setState(() {
+                _deleteImageFromCache();
+              });
+            });
+
+            await ISProgressDialog(context).dismiss();
+
+          },
+        ),
+        ISButton(
+          label: '닫기',
+          iconData: Icons.cancel,
+          onPressed: () {
+            Navigator.pop(context, _returnResult);
+          },
+        )
+      ],
+    );
+
+    var result = Scaffold(
+      appBar: AppBar(
+        title: Text('예약 매장이미지 업로드'),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            SizedBox(height: 20),
+            Container(
+                padding: EdgeInsets.symmetric(horizontal: 8.0),
+                child: form
+            ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: buttonBar,
+    );
+    return SizedBox(
+      width: 460,
+      height: 200,
+      child: result,
+    );
+  }
+
+  static Future<Im.Image> compressImage(List<int> list) async {
+    return compute(_decodeImage, list);
+  }
+
+  static Im.Image _decodeImage(List<int> list) {
+    Im.Image retImage = null;
+
+    Im.Image image = Im.decodeImage(list);
+    //print('original_image w:${image.width}, h:${image.height}, length:${image.length}');
+    if (image.width > 1280) {
+      retImage = Im.copyResize(image, width: 1280); // choose the size here, it will maintain aspect ratio
+      //print('resize_image w:${retImage.width}, h:${retImage.height}, length:${retImage.length}');
+    }
+    else
+      retImage = image;
+
+    return retImage;
+  }
+
+  Future _deleteImageFromCache() async {
+    //await CachedNetworkImage.evictFromCache(url);
+
+    PaintingBinding.instance.imageCache.clearLiveImages();
+    PaintingBinding.instance.imageCache.clear();
+
+    //await DefaultCacheManager().removeFile(key);
+    //await DefaultCacheManager().emptyCache();
+    setState(() {});
+  }
+}
