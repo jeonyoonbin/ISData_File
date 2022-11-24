@@ -13301,6 +13301,9 @@ shared_preferences_linux
 shared_preferences_macos
 shared_preferences_web
 shared_preferences_windows
+video_player
+video_player_platform_interface
+video_player_web
 
 Copyright 2013 The Flutter Authors. All rights reserved.
 
