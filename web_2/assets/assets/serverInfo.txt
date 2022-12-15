@@ -1,7 +1,0 @@
-{
-  "appVersion": "검수중",
-  "publishUrl": "https://dgpub.282.co.kr:8500",
-  "imageUrl": "",
-  "apiUrl": "/api",
-  "reserveUrl": "/Reserveapi"
-}
