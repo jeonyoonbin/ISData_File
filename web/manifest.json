@@ -1,6 +1,6 @@
 {
-    "name": "daeguro_admin_app",
-    "short_name": "daeguro_admin_app",
+    "name": "daeguro_admin_ext",
+    "short_name": "daeguro_admin_ext",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
