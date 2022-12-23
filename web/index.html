@@ -17,14 +17,15 @@
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="DaeguroAdminApp">
+  <meta name="referrer" content="no-referrer-when-downgrade">
 
   <!-- iOS meta tags & icons -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="daeguro_admin_ext">
+  <meta name="apple-mobile-web-app-title" content="daeguro_admin_app">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
-  <title>daeguro_admin_ext</title>
+  <title>대구로 관리앱</title>
   <link rel="manifest" href="manifest.json">
 </head>
 <body>
@@ -38,9 +39,10 @@
 <div id="userSelectedType"></div>
 <div id="hname"></div>
 <div id="bname2"></div>
-<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<div id="buildingName"></div>
+<div id="autoJibunAddress"></div>
 
-<div id="Getip"></div>
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
 
 <script>
@@ -62,14 +64,17 @@
 
                   document.getElementById("roadAddress").innerText = data.roadAddress; // 도로명 주소 변수
                   document.getElementById("jibunAddress").innerText = data.jibunAddress; // 지번 주소 변수
-                document.getElementById("zonecode").innerText = data.zonecode; // 우편코드 주소 변수
-                document.getElementById("sido").innerText = data.sido; // 도시 주소 변수
-                document.getElementById("sigungu").innerText = data.sigungu; // 시군구 주소 변수
-                document.getElementById("bname1").innerText = data.bname1; // 법정동/법정리 주소 변수
-                document.getElementById("roadname").innerText = data.roadname; // 도로명주소 주소 변수
+                  document.getElementById("zonecode").innerText = data.zonecode; // 우편코드 주소 변수
+                  document.getElementById("sido").innerText = data.sido; // 도시 주소 변수
+                  document.getElementById("sigungu").innerText = data.sigungu; // 시군구 주소 변수
+                  document.getElementById("bname1").innerText = data.bname1; // 법정동/법정리 주소 변수
+                  document.getElementById("roadname").innerText = data.roadname; // 도로명주소 주소 변수
                   document.getElementById("userSelectedType").innerText = data.userSelectedType; // 주소타입 변수
-                document.getElementById("hname").innerText = data.hname; // 행정정동/행정정리 주소 변수
-                document.getElementById("bname2").innerText = data.bname2; // 법정리의 읍/면 이름
+                  document.getElementById("hname").innerText = data.hname; // 행정정동/행정정리 주소 변수
+                  document.getElementById("bname2").innerText = data.bname2; // 법정리의 읍/면 이름
+                  document.getElementById("buildingName").innerText = data.buildingName; // 건물명
+                  document.getElementById("autoJibunAddress").innerText = data.autoJibunAddress; // '도로명주소'에 매핑된 '지번주소'가 여러개인 경우, 사용자가 '선택안함' 또는 '도로명주소'를 클릭했을 때 연관된 지번 주소 중 임의로 첫번째 매핑 주소를 넣어서 반환합니다.
+
                   setAddressToDart();
               }
           }).open();
@@ -96,6 +101,11 @@
   document.addEventListener('mouseleave', () => time = interval);
   document.addEventListener('mouseout', () => time = interval);
   document.addEventListener('select', () => time = interval);
+</script>
+<script type="text/javascript">
+  function pagePrev(){
+    window.history.back();
+  }
 </script>
 <script>
           function downloadImg(imgSrc) {
@@ -137,12 +147,11 @@
 <!-- This script installs service_worker.js to provide PWA functionality to
        application. For more information, see:
        https://developers.google.com/web/fundamentals/primers/service-workers -->
-<script type ="text/javascript">
+<!--<script type ="text/javascript">-->
 <!--  window.flutterWebRenderer = "html";-->
-      window.flutterWebRenderer = "canvaskit";
-</script>
+<!--</script>-->
 <script>
-    var serviceWorkerVersion = '4082819082';
+    var serviceWorkerVersion = '102069558';
     var scriptLoaded = false;
 
     function appRefresh(){
