@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!--
+    If you are serving your web app in a path other than the root, change the
+    href value below to reflect the base path you are serving from.
+
+    The path provided below has to start and end with a slash "/" in order for
+    it to work correctly.
+
+    For more details:
+    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+
+    This is a placeholder for base href that will be replaced by the value of
+    the `--base-href` argument provided to `flutter build`.
+  -->
+  <!--<base href="$FLUTTER_BASE_HREF">-->
+  <base href="/">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="A new Flutter project.">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="대구로 사장님사이트">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <style>
+    body {
+      background-color: #01CAFF;
+    }
+
+    /*플로팅 버튼*/
+    .floating-button {
+      display: flex;
+      position: fixed;
+      right: 10px;
+      bottom: 15px;
+      z-index: 999;
+    }
+
+    /*플로팅 버튼 아이콘 공용 스타일*/
+    .guest-btn::before {
+       width: 100%;
+       height: 100%;
+       opacity: 1;
+       border-radius: 50%;
+       font-size: 1.15em;
+       font-family: 'Font Awesome 5 Pro';
+    /*플로팅 버튼 아이콘 색상 수정O*/
+        color: #b67700;
+    }
+
+    /*플로팅 버튼 스타일*/
+    .move-guestBook {
+      float: left;
+      display: flex;
+      position: relative;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      justify-content: center;
+      align-items: center;
+      margin-left: 5px;
+      /*사용자 설정 파트*/
+      font-weight: 700;
+      background-color: #00000000;
+      border: 2px solid #b67700;
+    }
+  </style>
+  <!-- Chrome, Firefox OS and Opera -->
+  <meta name="theme-color" content="#01CAFF">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
+  <title>대구로 사장님사이트</title>
+  <link rel="manifest" href="manifest.json">
+
+<!--  <script type ="text/javascript">-->
+<!--    window.flutterWebRenderer = "canvaskit";-->
+<!--  </script>-->
+
+  <script>
+    // The value below is injected by flutter build, do not touch.
+    var serviceWorkerVersion = null;
+  </script>
+  <!-- This script adds the flutter initialization JS code -->
+  <script src="flutter.js?=1" defer=""></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/hung1001/font-awesome-pro@4cac1a6/css/all.css" />
+  <link rel="stylesheet" type="text/css" href="splash/style.css">
+  <!-- <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"> -->
+  <script id="happytalkSDK" src="https://design.happytalkio.com/sdk/happytalk.chat.v2.min.js"></script>
+  <script src="splash/splash.js"></script>
+</head>
+<body>
+<div class="floating-button">
+  <a target="_blank" href="https://api.happytalk.io/api/kakao/chat_open?yid=@%EB%8C%80%EA%B5%AC%EB%A1%9C%EA%B3%A0%EA%B0%9D%EC%84%BC%ED%84%B0&site_id=3000000456&category_id=133357&division_id=133358undefined">
+    <img height="50" width="50" class="img-concert" src="icons/kakao_icon_32.png"/>
+  </a>
+</div>
+<img style="width: 70vw; max-width: 512px; margin: 0; margin-right: -50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);" src="icons/Icon-512.png" />
+  <script>
+    window.addEventListener('load', function (ev) {
+        // Download main.dart.js
+        _flutter.loader.loadEntrypoint({
+          entrypointUrl: "main.dart.js",
+          serviceWorker: {
+            serviceWorkerVersion: serviceWorkerVersion,
+          },
+          onEntrypointLoaded: async function(engineInitializer) {
+            // Initialize the Flutter engine
+            let appRunner = await engineInitializer.initializeEngine({
+              renderer: "html"
+            });
+            // Run the app
+            await appRunner.runApp();
+          }
+        });
+      });
+
+    // web 자동 업데이트 기능을 위한 function
+    function appRefresh() {
+      window.location.reload(true);
+    }
+
+    // 이미지 download
+    function downloadImg(imgSrc) {
+      // console.log('aaaaa');
+      var image = new Image();
+      image.crossOrigin = "anonymous";
+      image.src = imgSrc;
+      var fileName = image.src.split("/").pop();
+      image.onload = function () {
+        var canvas = document.createElement('canvas');
+        canvas.width = this.width;
+        canvas.height = this.height;
+        canvas.getContext('2d').drawImage(this, 0, 0);
+        if (typeof window.navigator.msSaveBlob !== 'undefined') {
+          window.navigator.msSaveBlob(dataURLtoBlob(canvas.toDataURL()), fileName);
+        } else {
+          var link = document.createElement('a');
+          link.href = canvas.toDataURL();
+          link.download = fileName;
+          link.click();
+        }
+      };
+    }
+
+    function pagePrev() {
+      window.history.back();
+    }
+
+<!--    var ht = new Happytalk({-->
+<!--              siteId: '3000000456',-->
+<!--              siteName: '인성데이타(주)',-->
+<!--              categoryId: '133357',-->
+<!--              divisionId: '133358',-->
+<!--          });-->
+
+  </script>
+</body>
+</html>
