@@ -1,0 +1,17 @@
+requestShopRegistInfoEdit 
+1115라인쯤 변경 사업자 정보 children, 1269라인 변경 사업자 정보 children
+
+children: [
+                      const Text('변경 사업자 정보', style: TextStyle(fontSize: 16, fontFamily: FONT_FAMILY_NEXON, fontWeight: FONT_BOLD),),
+                      const SizedBox(height: 10,),
+                      Text('사업자 번호 : ${modRegistInfoData.a_reg_no != '' ? modRegistInfoData.a_reg_no : modRegistInfoData.b_reg_no}', style: TextStyle(fontSize: 15, fontFamily: FONT_FAMILY),),
+                      Text('대표자명 : ${modRegistInfoData.a_owner != '' ? modRegistInfoData.a_owner : modRegistInfoData.b_owner}', style: TextStyle(fontSize: 15, fontFamily: FONT_FAMILY),),
+                      Text('업태 : ${modRegistInfoData.a_buss_con != '' ? modRegistInfoData.a_buss_con : modRegistInfoData.b_buss_con}', style: TextStyle(fontSize: 15, fontFamily: FONT_FAMILY),),
+                      Text('업종 : ${modRegistInfoData.a_buss_type != '' ? modRegistInfoData.a_buss_type : modRegistInfoData.b_buss_type}', style: TextStyle(fontSize: 15, fontFamily: FONT_FAMILY),),
+                      Text('사업자 유형 : ${getBussTypeStr(modRegistInfoData.a_buss_tax_type != '' ? modRegistInfoData.a_buss_tax_type! : modRegistInfoData.b_buss_tax_type!)}', style: TextStyle(fontSize: 15, fontFamily: FONT_FAMILY),),
+                      Text('사업장 주소 : ${modRegistInfoData.a_buss_addr != '' ? modRegistInfoData.a_buss_addr : modRegistInfoData.b_buss_addr }', style: TextStyle(fontSize: 15, fontFamily: FONT_FAMILY),),
+                    ],
+
+요걸로 바꿔주시면 됩니다!
+
+추가로 ReviewSuccessionEdit.dart에도 Expanded 빠져야할 것 같습니다!
